@@ -397,7 +397,7 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    const int bits = (1 << CONFIG_GFX_BPP) - 1;
    const int shift = 8 - (y % (8 / CONFIG_GFX_BPP)) - CONFIG_GFX_BPP;
    const int line = (CONFIG_GFX_HEIGHT * CONFIG_GFX_BPP + 7) / 8;
-   const int addr = line * x + y * CONFIG_GFX_BPP / 8;
+   const int addr = line * (CONFIG_GFX_WIDTH-1-x) + y * CONFIG_GFX_BPP / 8; // Note this is all a bit twisted around on the epaper
    i >>= (8 - CONFIG_GFX_BPP);
    i &= bits;
    i ^= bits;
