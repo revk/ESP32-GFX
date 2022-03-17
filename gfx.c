@@ -710,7 +710,7 @@ void gfx_message(const char *m)
       }
       if (!gfx_y())
          gfx_clear(0);
-      char *e = m;
+      const char *e = m;
       while (*e && *e != '/' && *e != '[')
          e++;
       gfx_text(size, "%.*s", (int) (e - m), m);
