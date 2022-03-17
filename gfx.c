@@ -595,7 +595,7 @@ void gfx_text(int8_t size, const char *fmt, ...)
             c = ' ';
          if (!p[1])
             charw -= (size ? : 1);
-         int dx = ((c == ':' || c == '.') ? 2 : 0);
+         int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
 #if	CONFIG_GFX_BPP == 1
          gfx_block2(x, y, charw, h, dx, fontdata(c), (fontw + 7) / 8);
 #else
