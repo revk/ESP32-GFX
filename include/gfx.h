@@ -60,3 +60,6 @@ void gfx_box(gfx_pos_t w,gfx_pos_t h,gfx_intensity_t); // draw a box, not filled
 void gfx_fill(gfx_pos_t w,gfx_pos_t h,gfx_intensity_t); // draw a filled rectangle
 void gfx_text(int8_t size, const char *fmt,...); // text, use -ve size for descenders versions
 void gfx_icon16(gfx_pos_t w,gfx_pos_t h,const void *data);	// Icon, 16 bit per pixel packed
+
+// General tools
+void gfx_message(const char *);	// General full screen message display (lines separated with / and using [colour/size])

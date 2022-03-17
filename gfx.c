@@ -183,7 +183,8 @@ static esp_err_t gfx_command(uint8_t c, const uint8_t * buf, uint16_t len)
    return e;
 }
 
-static __attribute__((unused)) esp_err_t gfx_command1(uint8_t cmd, uint8_t a)
+static __attribute__((unused))
+esp_err_t gfx_command1(uint8_t cmd, uint8_t a)
 {                               // Send a command with an arg
    esp_err_t e = gfx_send_command(cmd);
    if (e)
@@ -197,7 +198,8 @@ static __attribute__((unused)) esp_err_t gfx_command1(uint8_t cmd, uint8_t a)
    return spi_device_polling_transmit(gfx_spi, &d);
 }
 
-static __attribute__((unused)) esp_err_t gfx_command2(uint8_t cmd, uint8_t a, uint8_t b)
+static __attribute__((unused))
+esp_err_t gfx_command2(uint8_t cmd, uint8_t a, uint8_t b)
 {                               // Send a command with args
    esp_err_t e = gfx_send_command(cmd);
    if (e)
@@ -211,7 +213,8 @@ static __attribute__((unused)) esp_err_t gfx_command2(uint8_t cmd, uint8_t a, ui
    return spi_device_polling_transmit(gfx_spi, &d);
 }
 
-static __attribute__((unused)) esp_err_t gfx_command_list(const uint8_t * init_code)
+static __attribute__((unused))
+esp_err_t gfx_command_list(const uint8_t * init_code)
 {
    uint8_t buf[64];
 
@@ -680,4 +683,41 @@ void gfx_unlock(void)
    gfx_locks--;
    if (gfx_mutex)
       xSemaphoreGive(gfx_mutex);
+}
+
+void gfx_message(const char *m)
+{
+   gfx_lock();
+   char *m = gfx_msg;
+   gfx_pos(CONFIG_GFX_WIDTH / 2, 0, GFX_T | GFX_C | GFX_V);
+   uint8_t size = 2;
+   while (*m)
+   {
+      if (*m == '[')
+      {
+         char isf = 1;
+         for (; *m && *m != ']'; m++)
+            if (isdigit(*m))
+               size = *m - '0'; /* size */
+            else if (isalpha(*m))
+            {                   /* colour */
+               if ((isf++) & 1)
+                  gfx_colour(*m);
+               else
+                  gfx_background(*m);
+            }
+         if (*m)
+            m++;
+      }
+      if (!gfx_y())
+         gfx_clear(0);
+      char *e = m;
+      while (*e && *e != '/' && *e != '[')
+         e++;
+      gfx_text(size, "%.*s", (int) (e - m), m);
+      m = e;
+      if (*m == '/')
+         m++;
+   }
+   gfx_unlock();
 }
