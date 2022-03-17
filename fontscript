@@ -34,7 +34,7 @@ foreach n (1 2 3 4 5)
 	echo "$f"
 	echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
 	foreach u (u00[0-7]*.svg)
-		convert $u:r.png -flatten -negate -scale ${W}x${H}'!' char.mono
+		convert $u:r.png -flatten -monochrome -threshold 50% -scale ${W}x${H}'!' char.mono
 		echo "// $u:r" >> $f
 		od -v -tx1 -w$W -Anone char.mono | sed -e 's/\([0-9a-f][0-9a-f]\)/0x\1,/g' >> $f
 	end

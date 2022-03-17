@@ -125,10 +125,10 @@ static uint8_t const *fonts[] = {
 #define GFX_INTENSITY_BPP  CONFIG_GFX_BPP
 #endif
 
-#if CONFIG_GFX_BPP>16
+#if CONFIG_GFX_BPP > 16
 typedef uint32_t gfx_cell_t;
 #define GFX_SIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
-#elif CONFIG_GFX_BPP>8
+#elif CONFIG_GFX_BPP > 8
 typedef uint16_t gfx_cell_t;
 #define GFX_SIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
 #else
@@ -293,7 +293,7 @@ static uint32_t gfx_colour_lookup(char c)
    case 'k':
    case 'K':
       return BLACK;
-#if CONFIG_GFX_BPP >8
+#if CONFIG_GFX_BPP > 8
    case 'r':
       return (RED >> 1);
    case 'R':
@@ -432,31 +432,31 @@ static void gfx_draw(gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_p
       *yp = t;
 }
 
-static void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const uint8_t * data, int l)
+static void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
-      for (gfx_pos_t col = 0; col < w; col++)
-         gfx_pixel(x + col, y + row, ((data[col / 8] >> (col & 7)) & 1) ? 255 : 0);
+      for (gfx_pos_t col = dx; col < w; col++)
+         gfx_pixel(x + col - dx, y + row, ((data[col / 8] >> (col & 7)) & 1) ? 255 : 0);
       data += l;
    }
 }
 
-static void gfx_block16(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const uint8_t * data, int l)
+static void gfx_block16(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
    if (!l)
       l = (w + 1) / 2;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
-      for (gfx_pos_t col = 0; col < w; col++)
+      for (gfx_pos_t col = dx; col < w; col++)
       {
          uint8_t v = data[col / 2];
-         gfx_pixel(x + col, y + row, (v & 0xF0) | (v >> 4));
+         gfx_pixel(x + col - dx, y + row, (v & 0xF0) | (v >> 4));
          col++;
          if (col < w)
-            gfx_pixel(x + col, y + row, (v & 0xF) | (v << 4));
+            gfx_pixel(x + col - dx, y + row, (v & 0xF) | (v << 4));
       }
       data += l;
    }
@@ -517,7 +517,7 @@ void gfx_icon16(gfx_pos_t w, gfx_pos_t h, const void *data)
       gfx_pos_t x,
        y;
       gfx_draw(w, h, 0, 0, &x, &y);
-      gfx_block16(x, y, w, h, data, 0);
+      gfx_block16(x, y, w, h, 0, data, 0);
    }
 }
 
@@ -560,11 +560,9 @@ void gfx_text(int8_t size, const char *fmt, ...)
    }
    const uint8_t *fontdata(char c) {
 #if	CONFIG_GFX_BPP == 1
-      const uint8_t *d = fonts[size] + (c - ' ') * (fontw + 7) / 8 * fonth;
+      const uint8_t *d = fonts[size] + (c - ' ') * ((fontw + 7) / 8) * fonth;
 #else
       const uint8_t *d = fonts[size] + (c - ' ') * fonth * fontw / 2;
-      if (c == ':' || c == '.')
-         d += size;             // 2 pixels in
 #endif
       return d;
    }
@@ -597,10 +595,11 @@ void gfx_text(int8_t size, const char *fmt, ...)
             c = ' ';
          if (!p[1])
             charw -= (size ? : 1);
+         int dx = ((c == ':' || c == '.') ? 2 : 0);
 #if	CONFIG_GFX_BPP == 1
-         gfx_block2(x, y, charw, h, fontdata(c), (fontw + 7) / 8);
+         gfx_block2(x, y, charw, h, dx, fontdata(c), (fontw + 7) / 8);
 #else
-         gfx_block16(x, y, charw, h, fontdata(c), fontw / 2);
+         gfx_block16(x, y, charw, h, dx, fontdata(c), fontw / 2);
 #endif
          x += charw;
       }
