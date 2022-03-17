@@ -1,0 +1,108 @@
+menu "GFX"
+
+	choice
+		prompt "Driver"
+
+	config GFX_SSD1351
+		bool "SSD1351 - e.g. 1.5in RGB OLED 128x128"
+
+	config GFX_SSD1681
+		bool "SSD1681 - e.g. 1.54in epaper 200x200"
+
+	endchoice
+
+	config GFX_WIDTH
+	int "Width (pixels)"
+	default 128
+	help
+		GFX display width
+
+	config GFX_HEIGHT
+	int "Height (pixels)"
+	default 128
+	help
+		GFX display height
+
+	config GFX_BPP
+	int "Bits per pixel"
+	default 16
+	help
+		GFX display bits per pixel
+
+	config GFX_FONT0
+	bool "Include 3x5 font"
+	default y 
+	help
+		Tiny 3x5 font, limited characters
+
+	config GFX_FONT1
+	bool "Include 5x9 font"
+	default y 
+	help
+		Small 5x9 font
+
+	config GFX_FONT2
+	bool "Include 10x18 font"
+	default y 
+	help
+		Medium 10x18 font
+
+	config GFX_FONT3
+	bool "Include 15x27 font"
+	default y 
+	help
+		Larger 15x27 font
+
+	config GFX_FONT4
+	bool "Include 20x36 font"
+	default y 
+	help
+		Large 20x36 font
+
+	config GFX_FONT5
+	bool "Include 25x45 font"
+	default y 
+	help
+		Extra large 25x45 font
+	
+	config GFX_CS
+	default -1
+	help
+		GPIO pin for CS
+
+	config GFX_DC
+	default -1
+	help
+		GPIO pin for DC
+
+	config GFX_SCK
+	default -1
+	help
+		GPIO pin for SCK
+
+	config GFX_MISO
+	default -1
+	help
+		GPIO pin for MISO
+
+	config GFX_MOSI
+	default -1
+	help
+		GPIO pin for MOSI
+
+	config GFX_RST
+	default -1
+	help
+		GPIO pin for RST
+
+	config GFX_EN
+	default -1
+	help
+		GPIO pin for EN
+
+	config GFX_BUSY
+	default -1
+	help
+		GPIO pin for BUSY
+
+endmenu
