@@ -435,18 +435,11 @@ static void gfx_draw(gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_p
 static void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const uint8_t * data, int l)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
    if (!l)
-#if	CONFIG_GFX_BPP == 1
       l = (w + 7) / 8;          // default is pixels width
-#else
-      l = (w + 1) / 2;          // default is pixels width
-#endif
    for (gfx_pos_t row = 0; row < h; row++)
    {
       for (gfx_pos_t col = 0; col < w; col++)
-      {
-         uint8_t v = data[col / 8];
          gfx_pixel(x + col, y + row, ((data[col / 8] >> (col & 7)) & 1) ? 255 : 0);
-      }
       data += l;
    }
 }
