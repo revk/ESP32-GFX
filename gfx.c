@@ -139,7 +139,7 @@ static uint32_t f_mul = 0,
 
 static void gfx_busy_wait(void)
 {
-   if (gfx_settings.busy < 0)
+   if (!gfx_settings.busy)
    {                            // No busy, so just wait
       sleep(1);
       return;
@@ -650,7 +650,7 @@ const char *gfx_init_opts(gfx_init_t o)
    if (spi_bus_add_device(o.port, &devcfg, &gfx_spi))
       return "Add?";
    gpio_set_direction(o.dc, GPIO_MODE_OUTPUT);
-   if (o.rst >= 0)
+   if (o.rst)
    {
       gpio_set_direction(o.rst, GPIO_MODE_OUTPUT);
       gpio_set_level(o.rst, 1);
@@ -658,7 +658,7 @@ const char *gfx_init_opts(gfx_init_t o)
       gpio_set_level(o.rst, 0);
       usleep(100000);
    }
-   if (o.ena >= 0)
+   if (o.ena)
       gpio_set_level(o.ena, 1); // Enable
    xTaskCreate(gfx_task, "OLED", 8 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
