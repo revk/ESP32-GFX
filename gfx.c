@@ -30,53 +30,74 @@ static const char TAG[] = "OLED";
 #include "freertos/task.h"
 #include "gfx.h"
 
+#if	CONFIG_GFX_BPP == 1
 #ifdef	CONFIG_GFX_FONT0
-#include "font0.h"
+#include "mono0.h"
 #endif
 #ifdef	CONFIG_GFX_FONT1
-#include "font1.h"
+#include "mono1.h"
 #endif
 #ifdef	CONFIG_GFX_FONT2
-#include "font2.h"
+#include "mono2.h"
 #endif
 #ifdef	CONFIG_GFX_FONT3
-#include "font3.h"
+#include "mono3.h"
 #endif
 #ifdef	CONFIG_GFX_FONT4
-#include "font4.h"
+#include "mono4.h"
 #endif
 #ifdef	CONFIG_GFX_FONT5
-#include "font5.h"
+#include "mono5.h"
+#endif
+#else
+#ifdef	CONFIG_GFX_FONT0
+#include "grey0.h"
+#endif
+#ifdef	CONFIG_GFX_FONT1
+#include "grey1.h"
+#endif
+#ifdef	CONFIG_GFX_FONT2
+#include "grey2.h"
+#endif
+#ifdef	CONFIG_GFX_FONT3
+#include "grey3.h"
+#endif
+#ifdef	CONFIG_GFX_FONT4
+#include "grey4.h"
+#endif
+#ifdef	CONFIG_GFX_FONT5
+#include "grey5.h"
+#endif
 #endif
 
 static uint8_t const *fonts[] = {
 #ifdef	CONFIG_GFX_FONT0
-   font0,
+   gfx_font0,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT1
-   font1,
+   gfx_font1,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT2
-   font2,
+   gfx_font2,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT3
-   font3,
+   gfx_font3,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT4
-   font4,
+   gfx_font4,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT5
-   font5,
+   gfx_font5,
 #else
    NULL,
 #endif
@@ -411,6 +432,24 @@ static void gfx_draw(gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_p
       *yp = t;
 }
 
+static void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const uint8_t * data, int l)
+{                               // Draw a block from 16 bit greyscale data, l is data width for each row
+   if (!l)
+#if	CONFIG_GFX_BPP == 1
+      l = (w + 7) / 8;          // default is pixels width
+#else
+      l = (w + 1) / 2;          // default is pixels width
+#endif
+   for (gfx_pos_t row = 0; row < h; row++)
+   {
+      for (gfx_pos_t col = 0; col < w; col++)
+      {
+         uint8_t v = data[col / 8];
+      gfx_pixel(x + col, y + row, ((data[col / 8] >> (col & 7)) & 1) ? 255 : 0)}
+      data += l;
+   }
+}
+
 static void gfx_block16(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const uint8_t * data, int l)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
    if (!l)
@@ -526,10 +565,13 @@ void gfx_text(int8_t size, const char *fmt, ...)
       return fontw;
    }
    const uint8_t *fontdata(char c) {
+#if	CONFIG_GFX_BPP == 1
+      const uint8_t *d = fonts[size] + (c - ' ') * (fontw + 7) / 8 * fonth;
+#else
       const uint8_t *d = fonts[size] + (c - ' ') * fonth * fontw / 2;
       if (c == ':' || c == '.')
-         d += size;
-      //2 pixels in
+         d += size;             // 2 pixels in
+#endif
       return d;
    }
    for (char *p = temp; *p; p++)
@@ -561,7 +603,11 @@ void gfx_text(int8_t size, const char *fmt, ...)
             c = ' ';
          if (!p[1])
             charw -= (size ? : 1);
+#if	CONFIG_GFX_BPP == 1
+         gfx_block2(x, y, charw, h, fontdata(c), (fontw + 7) / 8);
+#else
          gfx_block16(x, y, charw, h, fontdata(c), fontw / 2);
+#endif
          x += charw;
       }
    }

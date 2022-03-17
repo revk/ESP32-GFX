@@ -1,5 +1,10 @@
-#!/bin/csh -fx
+#!/bin/csh -f
 # Bodgy script to make fonts... Use the fonts I commit, probably easier
+setenv d `pwd`
+if(! -e include) then
+	echo run in main dir
+	exit 1
+endif
 if(! -e /tmp/5x9) then
 	/projects/tools/bin/5x9 --style=JTD
 	cd /tmp/5x9
@@ -11,16 +16,28 @@ if(! -e /tmp/5x9) then
 endif
 cd /tmp/5x9
 foreach n (1 2 3 4 5)
-	echo "font$n"
 	@ W = $n * 6
 	@ H = $n * 9
 	@ b = $W * $H / 2
-	set f="font$n.h"
-	echo "const uint8_t font${n}[]={ // $W/$H ($b bytes per character)" > $f
+	set f="grey$n.h"
+	echo "$f"
+	echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
 	foreach u (u00[0-7]*.svg)
 		convert $u:r.png -flatten -negate -scale ${W}x${H}'!' char.gray
 		echo "// $u:r" >> $f
 		od -v -tx1 -w$W -Anone char.gray | sed -e 's/\([0-9a-f]\)[0-9a-f] \([0-9a-f]\)[0-9a-f]/0x\1\2,/g' >> $f
 	end
 	echo "};" >> $f
+	mv -f "$f" "$d/include"
+	@ b = ( $W + 7 ) / 8 * $H
+	set f="mono$n.h"
+	echo "$f"
+	echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
+	foreach u (u00[0-7]*.svg)
+		convert $u:r.png -flatten -negate -scale ${W}x${H}'!' char.mono
+		echo "// $u:r" >> $f
+		od -v -tx1 -w$W -Anone char.mono | sed -e 's/\([0-9a-f][0-9a-f]\)/0x\1,/g' >> $f
+	end
+	echo "};" >> $f
+	mv -f "$f" "$d/include"
 end
