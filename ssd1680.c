@@ -40,7 +40,7 @@ static const char *gfx_driver_init(void)
       SSD1680_SOURCE_VOLTAGE, 3, 0x41, 0x00, 0x32,      // Set source voltage
       SSD1680_SET_RAMXCOUNT, 1, 1,
       SSD1680_SET_RAMYCOUNT, 2, 0, 0,
-      SSD1680_SET_RAMXPOS, 2, 1, CONFIG_GFX_HEIGHT - 1,
+      SSD1680_SET_RAMXPOS, 2, 1, CONFIG_GFX_HEIGHT / 8,
       SSD1680_SET_RAMYPOS, 4, 0, 0, (CONFIG_GFX_WIDTH - 1), (CONFIG_GFX_WIDTH - 1) >> 8,
       SSD1680_DRIVER_CONTROL, 3, (CONFIG_GFX_WIDTH - 1), (CONFIG_GFX_WIDTH - 1) >> 8, 0,
       0xFE
@@ -54,8 +54,10 @@ static const char *gfx_driver_init(void)
 static const char *gfx_driver_send(void)
 {                               // Send buffer and update display
    uint8_t buf[2] = { };
+   buf[0] = 1;
    if (gfx_command(SSD1680_SET_RAMXCOUNT, buf, 1))
       return "Set X failed";
+   buf[0] = 0;
    if (gfx_command(SSD1680_SET_RAMYCOUNT, buf, 2))
       return "Set Y failed";
    if (gfx_command(SSD1680_WRITE_RAM1, NULL, 0))
