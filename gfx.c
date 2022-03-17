@@ -433,7 +433,7 @@ static void gfx_draw(gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_p
 }
 
 static void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
-{                               // Draw a block from 16 bit greyscale data, l is data width for each row
+{                               // Draw a block from 2 bit greyscale data, l is data width for each row
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
