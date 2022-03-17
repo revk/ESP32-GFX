@@ -23,7 +23,7 @@ typedef struct {
  int8_t mosi;	// The GPIO port for MOSI (Master out / slave in), if -1 then default
  int8_t miso;	// The GPIO port for MISO (Master in / slave out), if -1 then default / not used
  int8_t rst;	// The GPIO port for RST (Reset), if -1 then default / not used
- int8_t en;	// The GPIO port for EN (Enable), if -1 then default / not used
+ int8_t ena;	// The GPIO port for ENA (Enable), if -1 then default / not used
  int8_t busy;	// The GPIO port for BUSY (Busy), if -1 then default / not used
  uint8_t contrast;	// Contracts, if display supports it, 0 for default
  uint8_t flipx:1;	// Flip x
@@ -31,7 +31,7 @@ typedef struct {
  uint8_t flipxy:1;	// Swap x and y
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
-unsigned char *gfx_init_opts(gfx_init_t);
+const char *gfx_init_opts(gfx_init_t);
 
 // locking atomic drawing functions
 void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white on black

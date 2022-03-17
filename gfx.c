@@ -106,16 +106,16 @@ static uint8_t const *fonts[] = {
 
 #if CONFIG_GFX_BPP>16
 typedef uint32_t gfx_cell_t;
-#define OLEDSIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
+#define GFX_SIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
 #elif CONFIG_GFX_BPP>8
 typedef uint16_t gfx_cell_t;
-#define OLEDSIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
+#define GFX_SIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
 #else
 typedef uint8_t gfx_cell_t;
-#define OLEDSIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * CONFIG_GFX_BPP / 8)
+#define GFX_SIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * CONFIG_GFX_BPP / 8)
 #endif
 static gfx_cell_t *gfx = NULL;
-static gfx_init_t gfx_setting = { };
+static gfx_init_t gfx_settings = { };
 
 // general global stuff
 static TaskHandle_t gfx_task_id = NULL;
@@ -133,6 +133,126 @@ static char f = 0,              // colour
     b = 0;
 static uint32_t f_mul = 0,
     b_mul = 0;                  // actual f/b colour multiplier
+
+
+// Driver support
+
+static void gfx_busy_wait(void)
+{
+   if (gfx_settings.busy < 0)
+   {                            // No busy, so just wait
+      sleep(1);
+      return;
+   }
+   int try = 1000;
+   while (try--)
+   {
+      if (gpio_get_level(gfx_settings.busy))
+         break;
+      usleep(10000);
+   }
+}
+
+static esp_err_t gfx_send_command(uint8_t cmd)
+{
+   gpio_set_level(gfx_settings.dc, 0);
+   spi_transaction_t t = {
+      .length = 8,
+      .tx_data = { cmd },
+      .flags = SPI_TRANS_USE_TXDATA,
+   };
+   esp_err_t e = spi_device_polling_transmit(gfx_spi, &t);
+   return e;
+}
+
+static esp_err_t gfx_send_data(const void *data, uint16_t len)
+{
+   gpio_set_level(gfx_settings.dc, 1);
+   spi_transaction_t c = {
+      .length = 8 * len,
+      .tx_buffer = data,
+   };
+   return spi_device_transmit(gfx_spi, &c);
+}
+
+static esp_err_t gfx_command(uint8_t c, const uint8_t * buf, uint16_t len)
+{
+   esp_err_t e = gfx_send_command(c);
+   if (!e && len)
+      e = gfx_send_data(buf, len);
+   return e;
+}
+
+static __attribute__((unused)) esp_err_t gfx_command1(uint8_t cmd, uint8_t a)
+{                               // Send a command with an arg
+   esp_err_t e = gfx_send_command(cmd);
+   if (e)
+      return e;
+   gpio_set_level(gfx_settings.dc, 1);
+   spi_transaction_t d = {
+      .length = 8,
+      .tx_data = { a },
+      .flags = SPI_TRANS_USE_TXDATA,
+   };
+   return spi_device_polling_transmit(gfx_spi, &d);
+}
+
+static __attribute__((unused)) esp_err_t gfx_command2(uint8_t cmd, uint8_t a, uint8_t b)
+{                               // Send a command with args
+   esp_err_t e = gfx_send_command(cmd);
+   if (e)
+      return e;
+   gpio_set_level(gfx_settings.dc, 1);
+   spi_transaction_t d = {
+      .length = 16,
+      .tx_data = { a, b },
+      .flags = SPI_TRANS_USE_TXDATA,
+   };
+   return spi_device_polling_transmit(gfx_spi, &d);
+}
+
+static __attribute__((unused)) esp_err_t gfx_command_list(const uint8_t * init_code)
+{
+   uint8_t buf[64];
+
+   while (init_code[0] != 0xFE)
+   {
+      uint8_t cmd = init_code[0];
+      init_code++;
+      uint8_t num_args = init_code[0];
+      init_code++;
+      if (cmd == 0xFF)
+      {
+         gfx_busy_wait();
+         usleep(num_args * 1000);
+         continue;
+      }
+      if (num_args > sizeof(buf))
+      {
+         ESP_LOGE(TAG, "Bad command_list len %d", num_args);
+         break;
+      }
+
+      for (int i = 0; i < num_args; i++)
+      {
+         buf[i] = init_code[0];
+         init_code++;
+      }
+      esp_err_t e = gfx_command(cmd, buf, num_args);
+      if (e)
+         return e;
+   }
+   return 0;
+}
+
+
+// Driver
+#ifdef  CONFIG_GFX_SSD1351
+#include "ssd1351.c"
+#endif
+#ifdef  CONFIG_GFX_SSD1681
+#include "ssd1681.c"
+#endif
 
 // state control
 void gfx_pos(gfx_pos_t newx, gfx_pos_t newy, gfx_align_t newa)
@@ -227,7 +347,8 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    {
       gfx_pos_t t = x;
       x = y;
-   y = t};
+      y = t;
+   };
    if (gfx_settings.flipx)
       x = CONFIG_GFX_WIDTH - 1 - x;
    if (gfx_settings.flipy)
@@ -235,14 +356,23 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    if (!gfx || x < 0 || x >= CONFIG_GFX_WIDTH || y < 0 || y >= CONFIG_GFX_HEIGHT)
       return;                   // out of display
 #if CONFIG_GFX_BPP <= 8
-#error	Not coded greyscale yet
+   const int bits = (1 << CONFIG_GFX_BPP) - 1;
+   const int shift = 8 - (x % (8 / CONFIG_GFX_BPP)) - CONFIG_GFX_BPP;
+   const int line = CONFIG_GFX_WIDTH * CONFIG_GFX_BPP / 8;
+   const int addr = line * y + x * CONFIG_GFX_BPP / 8;
+   i >>= (8 - CONFIG_GFX_BPP);
+   i &= bits;
+   i ^= bits;
+   if (((gfx[addr] >> shift) & bits) == i)
+      return;
+   gfx[addr] = ((gfx[addr] & ~(bits << shift)) | (i << shift));
+   gfx_changed = 1;
 #else
    uint16_t v = ntohs(f_mul * (i >> (8 - GFX_INTENSITY_BPP)) + b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP)));
-   if (v != gfx[(y * CONFIG_GFX_WIDTH) + x])
-   {
-      gfx[(y * CONFIG_GFX_WIDTH) + x] = v;
-      gfx_changed = 1;
-   }
+   if (v == gfx[(y * CONFIG_GFX_WIDTH) + x])
+      return;
+   gfx[(y * CONFIG_GFX_WIDTH) + x] = v;
+   gfx_changed = 1;
 #endif
 }
 
@@ -310,7 +440,7 @@ void gfx_set_contrast(gfx_intensity_t contrast)
 {
    if (!gfx)
       return;
-   gfx_contrast = contrast;
+   gfx_settings.contrast = contrast;
    gfx_update = 1;
    gfx_changed = 1;
 }
@@ -434,111 +564,15 @@ void gfx_text(int8_t size, const char *fmt, ...)
    }
 }
 
-static esp_err_t gfx_cmd(uint8_t cmd)
-{                               // Send command
-   gpio_set_level(gfx_setting.dc, 0);
-   spi_transaction_t t = {
-      .length = 8,
-      .tx_data = { cmd },
-      .flags = SPI_TRANS_USE_TXDATA,
-   };
-   esp_err_t e = spi_device_polling_transmit(gfx_spi, &t);
-   return e;
-}
-
-static esp_err_t gfx_data(int len, void *data)
-{                               // Send data
-   gpio_set_level(gfx_setting.dc, 1);
-   spi_transaction_t c = {
-      .length = 8 * len,
-      .tx_buffer = data,
-   };
-   return spi_device_transmit(gfx_spi, &c);
-}
-
-static esp_err_t gfx_cmd1(uint8_t cmd, uint8_t a)
-{                               // Send a command with an arg
-   esp_err_t e = gfx_cmd(cmd);
-   if (e)
-      return e;
-   gpio_set_level(gfx_setting.dc, 1);
-   spi_transaction_t d = {
-      .length = 8,
-      .tx_data = { a },
-      .flags = SPI_TRANS_USE_TXDATA,
-   };
-   return spi_device_polling_transmit(gfx_spi, &d);
-}
-
-static esp_err_t gfx_cmd2(uint8_t cmd, uint8_t a, uint8_t b)
-{                               // Send a command with args
-   esp_err_t e = gfx_cmd(cmd);
-   if (e)
-      return e;
-   gpio_set_level(gfx_setting.dc, 1);
-   spi_transaction_t d = {
-      .length = 16,
-      .tx_data = { a, b },
-      .flags = SPI_TRANS_USE_TXDATA,
-   };
-   return spi_device_polling_transmit(gfx_spi, &d);
-}
-
 static void gfx_task(void *p)
 {
-   int try = 10;
-   esp_err_t e = 0;
-   usleep(300000);              // 300ms to start up
-   while (try--)
-   {
-      gfx_lock();
-      if (gfx_setting.rst >= 0)
-      {
-         // Reset
-         gpio_set_level(gfx_setting.rst, 0);
-         usleep(1000);
-         gpio_set_level(gfx_setting.rst, 1);
-         usleep(1000);
-      }
-      e = gfx_cmd(0xAF);        // start
-      usleep(10000);
-      // Many of these are setting as defaults, just to be sure
-      e += gfx_cmd(0xA5);       // white
-      e += gfx_cmd1(0xA0, 0x26);        // colour mode
-      e += gfx_cmd1(0xFD, 0x12);        // unlock
-      e += gfx_cmd1(0xFD, 0xB1);        // unlock
-      e += gfx_cmd1(0xA1, 0x00);        // Start 0
-      e += gfx_cmd1(0xA2, 0x00);        // Offset 0
-#if 0
-      e += gfx_cmd1(0xB3, 0xF1);        // Frequency
-      e += gfx_cmd1(0xCA, 0x7F);        // MUX
-      e += gfx_cmd1(0xAB, 0x01);        // Regulator
-      e += gfx_cmd3(0xB4, 0xA0, 0xB5, 0x55);    // VSL
-      e += gfx_cmd3(0xC1, 0xC8, 0x80, 0xC0);    // Contrast
-      e += gfx_cmd1(0xC7, 0x0F);        // current
-      e += gfx_cmd1(0xB1, 0x32);        // clocks
-      e += gfx_cmd3(0xB2, 0xA4, 0x00, 0x00);    // enhance
-      e += gfx_cmd1(0xBB, 0x17);        // pre-charge voltage
-      e += gfx_cmd1(0xB6, 0x01);        // pre-charge period
-      e += gfx_cmd1(0xBE, 0x05);        // COM deselect voltage
-#endif
-      e += gfx_cmd1(0xFD, 0xB0);        // lock
-      gfx_cmd2(0x15, 0, 127);
-      gfx_cmd2(0x75, 0, 127);
-      gfx_cmd(0x5C);
-      gfx_data(OLEDSIZE, (void *) gfx);
-      gfx_cmd(0xA6);
-      gfx_unlock();
-      if (!e)
-         break;
-      sleep(1);
-   }
+   const char *e = gfx_driver_init();
    if (e)
    {
-      ESP_LOGE(TAG, "Configuration failed %s", esp_err_to_name(e));
+      ESP_LOGE(TAG, "Configuration failed %s", e);
       free(gfx);
       gfx = NULL;
-      gfx_setting.port = -1;
+      gfx_settings.port = -1;
       vTaskDelete(NULL);
       return;
    }
@@ -552,20 +586,12 @@ static void gfx_task(void *p)
       }
       gfx_lock();
       gfx_changed = 0;
-      gfx_cmd2(0x15, 0, 127);
-      gfx_cmd2(0x75, 0, 127);
-      gfx_cmd(0x5C);
-      gfx_data(OLEDSIZE, (void *) gfx);
-      if (gfx_update)
-      {
-         gfx_update = 0;
-         gfx_cmd1(0xC7, gfx_contrast >> 4);
-      }
+      gfx_driver_send();
       gfx_unlock();
    }
 }
 
-unsigned char *gfx_init_opts(gfx_init_t o);
+const char *gfx_init_opts(gfx_init_t o)
 {                               // Start OLED task and display
    // Defaults
    if (!o.contrast)
@@ -582,8 +608,8 @@ unsigned char *gfx_init_opts(gfx_init_t o);
       o.miso = CONFIG_GFX_MISO;
    if (o.mosi < 0)
       o.mosi = CONFIG_GFX_MOSI;
-   if (o.en < 0)
-      o.en = CONFIG_GFX_EN;
+   if (o.ena < 0)
+      o.ena = CONFIG_GFX_ENA;
    if (o.busy < 0)
       o.busy = CONFIG_GFX_BUSY;
    // Check
@@ -593,24 +619,24 @@ unsigned char *gfx_init_opts(gfx_init_t o);
       return "SCK not set";
    if (o.dc < 0)
       return "DC not set";
-   gfx_setting = o;
+   gfx_settings = o;
    gfx_mutex = xSemaphoreCreateMutex(); // Shared text access
-   gfx = malloc(OLEDSIZE);
+   gfx = malloc(GFX_SIZE);
    if (!gfx)
       return "Mem?";
-   memset(gfx, 0, OLEDSIZE);
+   memset(gfx, 0, GFX_SIZE);
    spi_bus_config_t config = {
       .mosi_io_num = o.mosi,
       .miso_io_num = -1,
       .sclk_io_num = o.sck,
       .quadwp_io_num = -1,
       .quadhd_io_num = -1,
-      .max_transfer_sz = 8 * (OLEDSIZE + 8),
+      .max_transfer_sz = 8 * (GFX_SIZE + 8),
       .flags = SPICOMMON_BUSFLAG_MASTER,
    };
-   if (port == HSPI_HOST && o.mosi == 22 && o.sck == 18 && o.cs == 5)
+   if (o.port == HSPI_HOST && o.mosi == 22 && o.sck == 18 && o.cs == 5)
       config.flags |= SPICOMMON_BUSFLAG_IOMUX_PINS;
-   if (spi_bus_initialize(port, &config, 2))
+   if (spi_bus_initialize(o.port, &config, 2))
       return "Init?";
    spi_device_interface_config_t devcfg = {
       .clock_speed_hz = SPI_MASTER_FREQ_20M,
@@ -619,11 +645,19 @@ unsigned char *gfx_init_opts(gfx_init_t o);
       .queue_size = 1,
       .flags = SPI_DEVICE_3WIRE,
    };
-   if (spi_bus_add_device(port, &devcfg, &gfx_spi))
+   if (spi_bus_add_device(o.port, &devcfg, &gfx_spi))
       return "Add?";
    gpio_set_direction(o.dc, GPIO_MODE_OUTPUT);
    if (o.rst >= 0)
+   {
       gpio_set_direction(o.rst, GPIO_MODE_OUTPUT);
+      gpio_set_level(o.rst, 1);
+      usleep(100000);
+      gpio_set_level(o.rst, 0);
+      usleep(100000);
+   }
+   if (o.ena >= 0)
+      gpio_set_level(o.ena, 1); // Enable
    xTaskCreate(gfx_task, "OLED", 8 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
 }

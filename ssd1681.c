@@ -27,18 +27,8 @@
 #define SSD1681_SET_RAMXCOUNT 0x4E
 #define SSD1681_SET_RAMYCOUNT 0x4F
 
-static const char *gfx_init(void)
+static const char *gfx_driver_init(void)
 {                               // Initialise
-   if (gfx_rst >= 0)
-   {
-      gpio_set_level(gfx_rst, 1);
-      usleep(100000);
-      gpio_set_level(gfx_rst, 0);
-      usleep(100000);
-   }
-   if (gfx_ena >= 0)
-      gpio_set_level(gfx_ena, 1);
-
    const uint8_t ssd1681_default_init_code[] = {
       SSD1681_SW_RESET, 0,      // soft reset
       0xFF, 20,                 // busy wait
@@ -47,7 +37,7 @@ static const char *gfx_init(void)
       SSD1681_TEMP_CONTROL, 1, 0x80,    // Temp control
       SSD1681_SET_RAMXCOUNT, 1, 0,
       SSD1681_SET_RAMYCOUNT, 2, 0, 0,
-      SSD1681_DRIVER_CONTROL, 3, (CONFIG_EPAPER_WIDTH - 1), (CONFIG_EPAPER_WIDTH - 1) >> 8, 0,
+      SSD1681_DRIVER_CONTROL, 3, (CONFIG_GFX_WIDTH - 1), (CONFIG_GFX_WIDTH - 1) >> 8, 0,
       0xFE
    };
 
@@ -56,7 +46,7 @@ static const char *gfx_init(void)
    return NULL;
 }
 
-static const char *gfx_send(void)
+static const char *gfx_driver_send(void)
 {                               // Send buffer and update display
    uint8_t buf[2] = { };
    if (gfx_command(SSD1681_SET_RAMXCOUNT, buf, 1))
@@ -65,13 +55,13 @@ static const char *gfx_send(void)
       return "Set Y failed";
    if (gfx_command(SSD1681_WRITE_RAM1, NULL, 0))
       return "Write RAM failed";
-   if (gfx_send_data(gfx, EPAPERSIZE))
+   if (gfx_send_data(gfx, GFX_SIZE))
       return "Data send failed";
    buf[0] = 0xF7;
    if (gfx_command(SSD1681_DISP_CTRL2, buf, 1))
       return "Display ctrl failed";
    if (gfx_command(SSD1681_MASTER_ACTIVATE, NULL, 0))
       return "Master activate failed";
-   busy_wait();
+   gfx_busy_wait();
    return NULL;
 }
