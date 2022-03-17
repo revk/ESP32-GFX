@@ -445,7 +445,8 @@ static void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const
       for (gfx_pos_t col = 0; col < w; col++)
       {
          uint8_t v = data[col / 8];
-      gfx_pixel(x + col, y + row, ((data[col / 8] >> (col & 7)) & 1) ? 255 : 0)}
+         gfx_pixel(x + col, y + row, ((data[col / 8] >> (col & 7)) & 1) ? 255 : 0);
+      }
       data += l;
    }
 }
