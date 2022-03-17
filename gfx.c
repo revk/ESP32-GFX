@@ -670,6 +670,8 @@ const char *gfx_init_opts(gfx_init_t o)
       o.ena = CONFIG_GFX_ENA;
    if (!o.busy)
       o.busy = CONFIG_GFX_BUSY;
+   if (!o.flip)
+      o.busy = CONFIG_GFX_FLIP;
    // Check
    if (!o.mosi)
       return "MOSI not set";

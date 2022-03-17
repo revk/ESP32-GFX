@@ -122,4 +122,10 @@ menu "GFX"
 	help
 		GPIO pin for BUSY
 
+	config GFX_FLIP
+	int "Default flip settings"
+	default 0
+	help
+		Display flip logic
+
 endmenu
