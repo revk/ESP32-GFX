@@ -50,5 +50,5 @@ sed "$d/include/grey0.h" \
 	    -e 's/0xF0,0xF0, /0x05, /g' \
 	    -e 's/0xFF,0x00, /0x06, /g' \
 	    -e 's/0xFF,0xF0, /0x07, /g' \
-	    >> mono0.h
+	    > mono0.h
 mv -f mono0.h "$d/include"
