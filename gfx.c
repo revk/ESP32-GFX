@@ -395,9 +395,9 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       return;                   // out of display
 #if CONFIG_GFX_BPP <= 8
    const int bits = (1 << CONFIG_GFX_BPP) - 1;
-   const int shift = 8 - (x % (8 / CONFIG_GFX_BPP)) - CONFIG_GFX_BPP;
-   const int line = (CONFIG_GFX_WIDTH * CONFIG_GFX_BPP + 7) / 8;
-   const int addr = line * y + x * CONFIG_GFX_BPP / 8;
+   const int shift = 8 - (y % (8 / CONFIG_GFX_BPP)) - CONFIG_GFX_BPP;
+   const int line = (CONFIG_GFX_HEIGHT * CONFIG_GFX_BPP + 7) / 8;
+   const int addr = line * x + y * CONFIG_GFX_BPP / 8;
    i >>= (8 - CONFIG_GFX_BPP);
    i &= bits;
    i ^= bits;
