@@ -438,8 +438,8 @@ static void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_p
       l = (w + 7) / 8;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
-      for (gfx_pos_t col = dx; col < w; col++)
-         gfx_pixel(x + col - dx, y + row, ((data[col / 8] >> (col & 7)) & 1) ? 255 : 0);
+      for (gfx_pos_t col = 0; col < w; col++)
+         gfx_pixel(x + col, y + row, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
       data += l;
    }
 }
@@ -450,13 +450,13 @@ static void gfx_block16(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_
       l = (w + 1) / 2;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
-      for (gfx_pos_t col = dx; col < w; col++)
+      for (gfx_pos_t col = 0; col < w; col++)
       {
-         uint8_t v = data[col / 2];
-         gfx_pixel(x + col - dx, y + row, (v & 0xF0) | (v >> 4));
+         uint8_t v = data[(col + dx) / 2];
+         gfx_pixel(x + col, y + row, (v & 0xF0) | (v >> 4));
          col++;
          if (col < w)
-            gfx_pixel(x + col - dx, y + row, (v & 0xF) | (v << 4));
+            gfx_pixel(x + col, y + row, (v & 0xF) | (v << 4));
       }
       data += l;
    }
