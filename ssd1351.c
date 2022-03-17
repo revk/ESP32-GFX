@@ -8,14 +8,6 @@ static const char *gfx_driver_init(void)
    while (try--)
    {
       gfx_lock();
-      if (gfx_settings.rst >= 0)
-      {
-         // Reset
-         gpio_set_level(gfx_settings.rst, 0);
-         usleep(1000);
-         gpio_set_level(gfx_settings.rst, 1);
-         usleep(1000);
-      }
       e = gfx_send_command(0xAF);       // start
       usleep(10000);
       // Many of these are setting as defaults, just to be sure
