@@ -67,49 +67,49 @@ menu "GFX"
 	
 	config GFX_CS
 	int "GPIO pin for CS"
-	default -1
+	default 0
 	help
 		GPIO pin for CS
 
 	config GFX_DC
 	int "GPIO pin for DC"
-	default -1
+	default 0
 	help
 		GPIO pin for DC
 
 	config GFX_SCK
 	int "GPIO pin for SCK"
-	default -1
+	default 0
 	help
 		GPIO pin for SCK
 
 	config GFX_MISO
 	int "GPIO pin for MISO"
-	default -1
+	default 0
 	help
 		GPIO pin for MISO
 
 	config GFX_MOSI
 	int "GPIO pin for MOSI"
-	default -1
+	default 0
 	help
 		GPIO pin for MOSI
 
 	config GFX_RST
 	int "GPIO pin for RST"
-	default -1
+	default 0
 	help
 		GPIO pin for RST
 
 	config GFX_ENA
 	int "GPIO pin for ENA"
-	default -1
+	default 0
 	help
 		GPIO pin for EN
 
 	config GFX_BUSY
 	int "GPIO pin for BUSY"
-	default -1
+	default 0
 	help
 		GPIO pin for BUSY
 

@@ -596,28 +596,30 @@ const char *gfx_init_opts(gfx_init_t o)
    // Defaults
    if (!o.contrast)
       o.contrast = 255;
-   if (o.sck < 0)
+   if (!o.port)
+      o.port = HSPI_HOST;
+   if (!o.sck)
       o.sck = CONFIG_GFX_SCK;
-   if (o.rst < 0)
+   if (!o.rst)
       o.rst = CONFIG_GFX_RST;
-   if (o.dc < 0)
+   if (!o.dc)
       o.dc = CONFIG_GFX_DC;
-   if (o.cs < 0)
+   if (!o.cs)
       o.cs = CONFIG_GFX_CS;
-   if (o.miso < 0)
+   if (!o.miso)
       o.miso = CONFIG_GFX_MISO;
-   if (o.mosi < 0)
+   if (!o.mosi)
       o.mosi = CONFIG_GFX_MOSI;
-   if (o.ena < 0)
+   if (!o.ena)
       o.ena = CONFIG_GFX_ENA;
-   if (o.busy < 0)
+   if (!o.busy)
       o.busy = CONFIG_GFX_BUSY;
    // Check
-   if (o.mosi < 0)
+   if (!o.mosi)
       return "MOSI not set";
-   if (o.sck < 0)
+   if (!o.sck)
       return "SCK not set";
-   if (o.dc < 0)
+   if (!o.dc)
       return "DC not set";
    gfx_settings = o;
    gfx_mutex = xSemaphoreCreateMutex(); // Shared text access

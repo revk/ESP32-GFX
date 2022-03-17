@@ -14,17 +14,17 @@ typedef	uint8_t gfx_align_t;	// Alignment options (GFX_x)
 #define	GFX_R	0x20	// right align
 #define	GFX_H	0x80	// horizontal move
 
-// Set up SPI, and start the update task
+// Set up SPI, and start the update task (note GPIO 0 not used)
 typedef struct {
- int8_t	port;	// The SPI port to use, if -ve then se default
- int8_t cs;	// The GPIO port for CS (Chip select), if -1 then default / not used
- int8_t dc;	// The GPIO port for DS (Data/Commant select), if -1 then default 
- int8_t sck;	// The GPIO port for SKC (Clock), if -1 then default
- int8_t mosi;	// The GPIO port for MOSI (Master out / slave in), if -1 then default
- int8_t miso;	// The GPIO port for MISO (Master in / slave out), if -1 then default / not used
- int8_t rst;	// The GPIO port for RST (Reset), if -1 then default / not used
- int8_t ena;	// The GPIO port for ENA (Enable), if -1 then default / not used
- int8_t busy;	// The GPIO port for BUSY (Busy), if -1 then default / not used
+ uint8_t port;	// The SPI port to use, if -ve then se default
+ uint8_t cs;	// The GPIO port for CS (Chip select), if 0 then default / not used
+ uint8_t dc;	// The GPIO port for DS (Data/Commant select), if 0 then default 
+ uint8_t sck;	// The GPIO port for SKC (Clock), if 0 then default
+ uint8_t mosi;	// The GPIO port for MOSI (Master out / slave in), if 0 then default
+ uint8_t miso;	// The GPIO port for MISO (Master in / slave out), if 0 then default / not used
+ uint8_t rst;	// The GPIO port for RST (Reset), if 0 then default / not used
+ uint8_t ena;	// The GPIO port for ENA (Enable), if 0 then default / not used
+ uint8_t busy;	// The GPIO port for BUSY (Busy), if 0 then default / not used
  uint8_t contrast;	// Contracts, if display supports it, 0 for default
  uint8_t flipx:1;	// Flip x
  uint8_t flipy:1;	// Flip y
