@@ -65,6 +65,12 @@ menu "GFX"
 	help
 		Extra large 25x45 font
 	
+	config GFX_FONT6
+	bool "Include 30x54 font"
+	default y 
+	help
+		Extra large 30x54 font
+	
 	config GFX_CS
 	int "GPIO pin for CS"
 	default 0

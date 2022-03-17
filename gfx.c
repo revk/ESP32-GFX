@@ -49,6 +49,9 @@ static const char TAG[] = "OLED";
 #ifdef	CONFIG_GFX_FONT5
 #include "mono5.h"
 #endif
+#ifdef	CONFIG_GFX_FONT6
+#include "mono6.h"
+#endif
 #else
 #ifdef	CONFIG_GFX_FONT0
 #include "grey0.h"
@@ -67,6 +70,9 @@ static const char TAG[] = "OLED";
 #endif
 #ifdef	CONFIG_GFX_FONT5
 #include "grey5.h"
+#endif
+#ifdef	CONFIG_GFX_FONT6
+#include "grey6.h"
 #endif
 #endif
 
@@ -98,6 +104,11 @@ static uint8_t const *fonts[] = {
 #endif
 #ifdef	CONFIG_GFX_FONT5
    gfx_font5,
+#else
+   NULL,
+#endif
+#ifdef	CONFIG_GFX_FONT6
+   gfx_font6,
 #else
    NULL,
 #endif

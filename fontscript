@@ -23,7 +23,7 @@ if(! -e /tmp/5x9LCD) then
 		inkscape -z --export-area=50:50:662:968 -o $u:r.png $u >& /dev/null
 	end
 endif
-foreach n (1 2 3 4 5)
+foreach n (1 2 3 4 5 6)
 	cd /tmp/5x9JTD
 	if($n == 1) cd /tmp/5x9LCD
 	@ W = $n * 6
