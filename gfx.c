@@ -144,7 +144,7 @@ typedef uint16_t gfx_cell_t;
 #define GFX_SIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
 #else
 typedef uint8_t gfx_cell_t;
-#define GFX_SIZE ((CONFIG_GFX_WIDTH * CONFIG_GFX_BPP + 7) / 8 * CONFIG_GFX_HEIGHT)
+#define GFX_SIZE ((CONFIG_GFX_HEIGHT * CONFIG_GFX_BPP + 7) / 8 * CONFIG_GFX_WIDTH)
 #endif
 static gfx_cell_t *gfx = NULL;
 static gfx_init_t gfx_settings = { };
