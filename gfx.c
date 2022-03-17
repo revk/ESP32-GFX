@@ -688,7 +688,6 @@ void gfx_unlock(void)
 void gfx_message(const char *m)
 {
    gfx_lock();
-   char *m = gfx_msg;
    gfx_pos(CONFIG_GFX_WIDTH / 2, 0, GFX_T | GFX_C | GFX_V);
    uint8_t size = 2;
    while (*m)
