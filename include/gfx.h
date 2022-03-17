@@ -26,9 +26,7 @@ typedef struct {
  uint8_t ena;	// The GPIO port for ENA (Enable), if 0 then default / not used
  uint8_t busy;	// The GPIO port for BUSY (Busy), if 0 then default / not used
  uint8_t contrast;	// Contracts, if display supports it, 0 for default
- uint8_t flipx:1;	// Flip x
- uint8_t flipy:1;	// Flip y
- uint8_t flipxy:1;	// Swap x and y
+ uint8_t flip;	// Display flipping
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);

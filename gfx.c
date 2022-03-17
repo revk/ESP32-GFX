@@ -346,15 +346,15 @@ char gfx_b(void)
 // support
 inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 {                               // set a pixel
-   if (gfx_settings.flipxy)
+   if (gfx_settings.flip & 4)
    {
       gfx_pos_t t = x;
       x = y;
       y = t;
    };
-   if (gfx_settings.flipx)
+   if (gfx_settings.flip & 1)
       x = CONFIG_GFX_WIDTH - 1 - x;
-   if (gfx_settings.flipy)
+   if (gfx_settings.flip & 2)
       y = CONFIG_GFX_HEIGHT - 1 - y;
    if (!gfx || x < 0 || x >= CONFIG_GFX_WIDTH || y < 0 || y >= CONFIG_GFX_HEIGHT)
       return;                   // out of display
