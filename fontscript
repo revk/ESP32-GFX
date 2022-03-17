@@ -5,17 +5,27 @@ if(! -e include) then
 	echo run in main dir
 	exit 1
 endif
-if(! -e /tmp/5x9) then
-	/projects/tools/bin/5x9 --style=JTD
-	cd /tmp/5x9
+if(! -e /tmp/5x9JTD) then
+	/projects/tools/bin/5x9 --style=JTD --dir=/tmp/5x9JTD
+	cd /tmp/5x9JTD
 	foreach u (u00[0-7]*.svg)
 		echo $u
 		inkscape $u --verb EditSelectAll --verb SelectionUnGroup --verb SelectionUnion --verb FileSave --verb FileQuit
-		inkscape -z --export-area=0:0:600:1024 -o $u:r.png $u >& /dev/null
+		inkscape -z --export-area=44:44:600:1024 -o $u:r.png $u >& /dev/null
 	end
 endif
-cd /tmp/5x9
+if(! -e /tmp/5x9LCD) then
+	/projects/tools/bin/5x9 --style=LCD --dir=/tmp/5x9LCD
+	cd /tmp/5x9LCD
+	foreach u (u00[0-7]*.svg)
+		echo $u
+		inkscape $u --verb EditSelectAll --verb SelectionUnGroup --verb SelectionUnion --verb FileSave --verb FileQuit
+		inkscape -z --export-area=44:44:600:1024 -o $u:r.png $u >& /dev/null
+	end
+endif
 foreach n (1 2 3 4 5)
+	cd /tmp/5x9JTD
+	if($n == 1) cd /tmp/5x9LCD
 	@ W = $n * 6
 	@ H = $n * 9
 	@ b = $W * $H / 2
