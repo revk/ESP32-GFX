@@ -11,7 +11,7 @@ if(! -e /tmp/5x9JTD) then
 	foreach u (u00[0-7]*.svg)
 		echo $u
 		inkscape $u --verb EditSelectAll --verb SelectionUnGroup --verb SelectionUnion --verb FileSave --verb FileQuit
-		inkscape -z --export-area=0:0:600:1024 -o $u:r.png $u >& /dev/null
+		inkscape -z --export-area=0:0:612:918 -o $u:r.png $u >& /dev/null
 	end
 endif
 if(! -e /tmp/5x9LCD) then
@@ -20,7 +20,7 @@ if(! -e /tmp/5x9LCD) then
 	foreach u (u00[0-7]*.svg)
 		echo $u
 		inkscape $u --verb EditSelectAll --verb SelectionUnGroup --verb SelectionUnion --verb FileSave --verb FileQuit
-		inkscape -z --export-area=44:44:600:1024 -o $u:r.png $u >& /dev/null
+		inkscape -z --export-area=50:50:662:968 -o $u:r.png $u >& /dev/null
 	end
 endif
 foreach n (1 2 3 4 5)
