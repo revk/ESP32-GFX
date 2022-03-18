@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <export version="E">
   <design>
-    <source>/Users/adrian/git/ESP32-GFX/KiCad/Epaper154.kicad_sch</source>
-    <date>Friday, 18 March 2022 at 09:19:55</date>
+    <source>/Users/adrian/git/ESP32-GFX/KiCad/Epaper213.kicad_sch</source>
+    <date>Friday, 18 March 2022 at 09:48:39</date>
     <tool>Eeschema (6.0.2-0)</tool>
     <textvar name="DATE">2022-03-17</textvar>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
-        <title>1.54" epaper display board</title>
+        <title>2.13" epaper display board</title>
         <company>Adrian Kennard / Andrews &amp; Arnold Ltd</company>
         <rev>1</rev>
         <date>2022-03-17</date>
-        <source>Epaper154.kicad_sch</source>
+        <source>Epaper213.kicad_sch</source>
         <comment number="1" value="@TheRealRevK"/>
         <comment number="2" value="www.me.uk"/>
         <comment number="3" value=""/>
@@ -35,7 +35,7 @@
       <property name="Note" value="X7R or X5R 0603"/>
       <property name="Part No" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000610f9b88</tstamps>
     </comp>
@@ -49,7 +49,7 @@
       <property name="Note" value="0603 or 0805"/>
       <property name="Part No" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000610fd0ef</tstamps>
     </comp>
@@ -63,7 +63,7 @@
       <property name="Note" value="0603 or 0805"/>
       <property name="Part No" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000610fd80e</tstamps>
     </comp>
@@ -72,7 +72,7 @@
       <footprint>RevK:C_0603</footprint>
       <libsource lib="Device" part="C" description="Unpolarized capacitor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>89b4a707-c1ed-4546-9194-77a5268f4f37</tstamps>
     </comp>
@@ -89,7 +89,7 @@
       <property name="Part No" value="CD1206-B2100"/>
       <property name="Note" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000610fe5d2</tstamps>
     </comp>
@@ -98,7 +98,7 @@
       <footprint>RevK:D_1206</footprint>
       <libsource lib="Device" part="D" description="Diode"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>bbc62690-b8fb-438a-8ee0-c77d65956f89</tstamps>
     </comp>
@@ -107,7 +107,7 @@
       <footprint>RevK:LED-RGB-1.6x1.6</footprint>
       <libsource lib="Device" part="LED_ARGB" description="RGB LED, anode/red/green/blue"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-000060cf36bc</tstamps>
     </comp>
@@ -117,7 +117,7 @@
       <datasheet>https://www.usb.org/sites/default/files/documents/usb_type-c.zip</datasheet>
       <libsource lib="RevK" part="USB-C" description="USB 2.0-only Type-C Receptacle connector"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000604764e2</tstamps>
     </comp>
@@ -130,7 +130,7 @@
       <libsource lib="RevK" part="PowerIn" description=""/>
       <property name="Notes" value="Not fitted"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>05c95e20-b8ce-45a0-abe6-40ea1ba1906f</tstamps>
     </comp>
@@ -139,7 +139,7 @@
       <footprint>RevK:Molex_MiniSPOX_H3RA</footprint>
       <libsource lib="Connector_Generic" part="Conn_01x03" description="Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>ca6f103f-48cc-446d-9d86-158c35366e6f</tstamps>
     </comp>
@@ -156,7 +156,7 @@
       <property name="Part No" value="TYA4020"/>
       <property name="Note" value=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000610fe01a</tstamps>
     </comp>
@@ -165,7 +165,7 @@
       <footprint>Connector_PinHeader_2.54mm:PinHeader_1x13_P2.54mm_Vertical</footprint>
       <libsource lib="RevK" part="EPaper" description=""/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>5d13f617-161f-4c68-98ea-696d87f0a0be</tstamps>
     </comp>
@@ -174,7 +174,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>6324f539-5157-429d-ad08-999e5f3ad633</tstamps>
     </comp>
@@ -183,7 +183,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>e632df6d-ccd6-4691-adc1-89013dd5fd28</tstamps>
     </comp>
@@ -192,7 +192,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000604954a7</tstamps>
     </comp>
@@ -201,7 +201,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000604938d6</tstamps>
     </comp>
@@ -210,7 +210,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>d9ede1d9-98fb-4bf6-9188-b8434de8eed0</tstamps>
     </comp>
@@ -219,7 +219,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>64e3fa84-8672-4bfb-a08c-14181f58ca5f</tstamps>
     </comp>
@@ -228,7 +228,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>e7149988-8da9-4254-8dc1-168b761f2899</tstamps>
     </comp>
@@ -237,7 +237,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>ae993647-4c98-4bb9-8c7a-3beaf65656f4</tstamps>
     </comp>
@@ -246,7 +246,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>90b8eaac-a159-4dee-976f-dbdad4d50f22</tstamps>
     </comp>
@@ -255,7 +255,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-000060cf9e4d</tstamps>
     </comp>
@@ -264,7 +264,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-000060cfbfaf</tstamps>
     </comp>
@@ -273,7 +273,7 @@
       <footprint>RevK:R_0603</footprint>
       <libsource lib="Device" part="R" description="Resistor"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-000060a436c8</tstamps>
     </comp>
@@ -288,7 +288,7 @@
       <property name="Manufacturer" value="TI"/>
       <property name="Part No" value="LMR16006YQ3"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>7cbfa237-177e-4c8c-8cb5-2871c201d869</tstamps>
     </comp>
@@ -298,7 +298,7 @@
       <datasheet>https://www.ftdichip.com/Support/Documents/DataSheets/ICs/DS_FT231X.pdf</datasheet>
       <libsource lib="RevK" part="FT231XQ" description="Full Speed USB to Full Handshake UART, QFN-20"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-00006081e5c7</tstamps>
     </comp>
@@ -317,7 +317,7 @@
       <property name="PARTREV" value="v1.0"/>
       <property name="STANDARD" value="Manufacturer Recommendations"/>
       <property name="Sheetname" value=""/>
-      <property name="Sheetfile" value="Epaper154.kicad_sch"/>
+      <property name="Sheetfile" value="Epaper213.kicad_sch"/>
       <sheetpath names="/" tstamps="/"/>
       <tstamps>9297436f-1478-4447-972c-d78e9e10742e</tstamps>
     </comp>

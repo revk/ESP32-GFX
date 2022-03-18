@@ -1,0 +1,13 @@
+### Module positions - created on 2022-03-18 09:48
+### Printed by pcb_positions plugin
+## Unit = mm, Angle = deg.
+## Pcb Height 39.050mm, Pcb Width 58.470mm [based on Edge bounding box]
+## Side : top
+## Board Aux Origin: 0.000mm ,0.000mm
+# Ref         Val                 Package                       PosX       PosY       Pin1_PosX  Pin1_PosY    Rot     Side      Type
+H2            MountingHole        Hole-2.5mm                    124.4600   -67.6800   0.0000     0.0000        0.0    top       VIRTUAL
+H4            MountingHole        Hole-2.5mm                    177.8000   -101.6000  0.0000     0.0000        0.0    top       VIRTUAL
+Logo1         AJK                 AJK                           154.3110   -90.8400   0.0000     0.0000       90.0    top       VIRTUAL
+H3            MountingHole        Hole-2.5mm                    124.4600   -101.6000  0.0000     0.0000        0.0    top       VIRTUAL
+H1            MountingHole        Hole-2.5mm                    177.8000   -67.6800   0.0000     0.0000        0.0    top       VIRTUAL
+## End

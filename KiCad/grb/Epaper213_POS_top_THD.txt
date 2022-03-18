@@ -1,11 +1,11 @@
-### Module positions - created on 2022-03-18 09:19
+### Module positions - created on 2022-03-18 09:48
 ### Printed by pcb_positions plugin
 ## Unit = mm, Angle = deg.
-## Pcb Height 43.230mm, Pcb Width 43.230mm [based on Edge bounding box]
+## Pcb Height 39.050mm, Pcb Width 58.470mm [based on Edge bounding box]
 ## Side : top
 ## Board Aux Origin: 0.000mm ,0.000mm
 # Ref         Val                 Package                       PosX       PosY       Pin1_PosX  Pin1_PosY    Rot     Side      Type
-J3            Conn_01x02          Molex_MiniSPOX_H3RA           159.4020   -71.6280   159.4020   -74.1280     90.0    top       THD
-J2            DC                  Molex_MiniSPOX_H2RA           159.2750   -93.3450   159.2750   -94.5950     90.0    top       THD
+J3            Conn_01x02          Molex_MiniSPOX_H3RA           164.3550   -75.5650   164.3550   -78.0650     90.0    top       THD
+J2            DC                  Molex_MiniSPOX_H2RA           164.3550   -95.2500   164.3550   -96.5000     90.0    top       THD
 M1            EPaper              PinHeader_1x13_P2.54mm_Vert.. 135.8900   -101.6000  135.8900   -101.6000    90.0    top       THD
 ## End

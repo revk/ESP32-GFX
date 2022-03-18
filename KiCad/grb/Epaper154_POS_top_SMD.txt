@@ -1,4 +1,4 @@
-### Module positions - created on 2022-03-18 08:21
+### Module positions - created on 2022-03-18 09:19
 ### Printed by pcb_positions plugin
 ## Unit = mm, Angle = deg.
 ## Pcb Height 43.230mm, Pcb Width 43.230mm [based on Edge bounding box]
@@ -7,11 +7,11 @@
 # Ref         Val                 Package                       PosX       PosY       Pin1_PosX  Pin1_PosY    Rot     Side      Type
 U2            FT231XQ             QFN-20-1EP_4x4mm_P0.5mm_EP2.. 153.6700   -76.8350   151.7700   -75.8350      0.0    top       SMD
 J1            USB-C               USC16-TR-Round                166.3700   -82.5500   0.0000     0.0000       90.0    top       SMD
-C3            10uF                Hidden                        153.9150   -93.8700   0.0000     0.0000        0.0    top       SMD
+C3            10uF                Hidden                        154.8300   -68.5900   0.0000     0.0000       90.0    top       SMD
 C4            10nF                C_0603                        157.2260   -72.0190   157.2260   -71.2440    -90.0    top       SMD
 R7            4k7                 R_0603                        155.1940   -72.5270   156.0190   -72.5270    180.0    top       SMD
-D1            Schottky            Hidden                        156.0350   -93.8700   0.0000     0.0000        0.0    top       SMD
-C1            0.1uF               Hidden                        152.9150   -92.2500   0.0000     0.0000        0.0    top       SMD
+D1            Schottky            Hidden                        151.7100   -68.2100   0.0000     0.0000        0.0    top       SMD
+C1            0.1uF               Hidden                        147.3300   -65.2900   0.0000     0.0000       90.0    top       SMD
 U1            LMR16006+FB         RegulatorBlockFB              149.4300   -65.0400   148.4800   -66.3900      0.0    top       SMD
 R11           2K                  R_0603                        139.7000   -64.0080   139.7000   -63.1830    -90.0    top       SMD
 R9            10k                 R_0603                        138.4300   -90.1700   137.6050   -90.1700      0.0    top       SMD
@@ -26,7 +26,7 @@ R3            5K1                 R_0603                        158.1150   -85.0
 R12           220R                R_0603                        142.2400   -64.0080   142.2400   -63.1830    -90.0    top       SMD
 D3            RGB                 LED-RGB-1.6x1.6               137.7950   -64.0080   137.2950   -64.8830    -90.0    top       SMD
 R2            30k 1% or NF        R_0603                        144.9710   -64.5160   144.1460   -64.5160      0.0    top       SMD
-C2            2.2uF               Hidden                        155.0350   -92.2500   0.0000     0.0000        0.0    top       SMD
+C2            2.2uF               Hidden                        148.5800   -68.5900   0.0000     0.0000       90.0    top       SMD
 R5            27R                 R_0603                        154.9400   -81.2800   154.9400   -82.1050     90.0    top       SMD
-L1            6.8uH               Hidden                        151.7350   -79.3400   0.0000     0.0000        0.0    top       SMD
+L1            6.8uH               Hidden                        153.3300   -65.0400   0.0000     0.0000        0.0    top       SMD
 ## End

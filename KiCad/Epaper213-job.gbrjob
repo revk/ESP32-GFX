@@ -5,17 +5,17 @@
       "Application": "Pcbnew",
       "Version": "(6.0.2-0)"
     },
-    "CreationDate": "2022-03-18T09:49:46+00:00"
+    "CreationDate": "2022-03-18T09:48:20+00:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
-      "Name": "Epaper154",
-      "GUID": "45706170-6572-4313-9534-2e6b69636164",
+      "Name": "Epaper213",
+      "GUID": "45706170-6572-4323-9133-2e6b69636164",
       "Revision": "1"
     },
     "Size": {
-      "X": 43.23,
-      "Y": 43.23
+      "X": 58.47,
+      "Y": 39.05
     },
     "LayerNumber": 2,
     "BoardThickness": 1.6,
@@ -34,47 +34,47 @@
   ],
   "FilesAttributes": [
     {
-      "Path": "Epaper154-F_Cu.gbr",
+      "Path": "Epaper213-F_Cu.gbr",
       "FileFunction": "Copper,L1,Top",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "Epaper154-B_Cu.gbr",
+      "Path": "Epaper213-B_Cu.gbr",
       "FileFunction": "Copper,L2,Bot",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "Epaper154-F_Paste.gbr",
+      "Path": "Epaper213-F_Paste.gbr",
       "FileFunction": "SolderPaste,Top",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "Epaper154-B_Paste.gbr",
+      "Path": "Epaper213-B_Paste.gbr",
       "FileFunction": "SolderPaste,Bot",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "Epaper154-F_Silkscreen.gbr",
+      "Path": "Epaper213-F_Silkscreen.gbr",
       "FileFunction": "Legend,Top",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "Epaper154-B_Silkscreen.gbr",
+      "Path": "Epaper213-B_Silkscreen.gbr",
       "FileFunction": "Legend,Bot",
       "FilePolarity": "Positive"
     },
     {
-      "Path": "Epaper154-F_Mask.gbr",
+      "Path": "Epaper213-F_Mask.gbr",
       "FileFunction": "SolderMask,Top",
       "FilePolarity": "Negative"
     },
     {
-      "Path": "Epaper154-B_Mask.gbr",
+      "Path": "Epaper213-B_Mask.gbr",
       "FileFunction": "SolderMask,Bot",
       "FilePolarity": "Negative"
     },
     {
-      "Path": "Epaper154-Edge_Cuts.gbr",
+      "Path": "Epaper213-Edge_Cuts.gbr",
       "FileFunction": "Profile",
       "FilePolarity": "Positive"
     }
