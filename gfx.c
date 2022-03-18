@@ -701,7 +701,7 @@ const char *gfx_init_opts(gfx_init_t o)
    spi_device_interface_config_t devcfg = {
       .clock_speed_hz = SPI_MASTER_FREQ_20M,
       .mode = 0,
-      .spics_io_num = o.cs,
+      .spics_io_num = o.cs ? : -1,
       .queue_size = 1,
       .flags = SPI_DEVICE_3WIRE,
    };
