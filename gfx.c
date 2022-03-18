@@ -711,9 +711,9 @@ const char *gfx_init_opts(gfx_init_t o)
    if (o.rst)
    {
       gpio_set_direction(o.rst, GPIO_MODE_OUTPUT);
-      gpio_set_level(o.rst, 1);
-      usleep(100000);
       gpio_set_level(o.rst, 0);
+      usleep(100000);
+      gpio_set_level(o.rst, 1);
       usleep(100000);
    }
    if (o.ena)
