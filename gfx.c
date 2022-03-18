@@ -282,13 +282,13 @@ esp_err_t gfx_command_list(const uint8_t * init_code)
 
 
 // Driver
-#ifdef  CONFIG_GFX_SSD1351
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
 #include "ssd1351.c"
 #endif
-#ifdef  CONFIG_GFX_SSD1680
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1680
 #include "ssd1680.c"
 #endif
-#ifdef  CONFIG_GFX_SSD1681
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1681
 #include "ssd1681.c"
 #endif
 

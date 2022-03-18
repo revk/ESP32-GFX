@@ -3,13 +3,13 @@ menu "GFX"
 	choice
 		prompt "Driver"
 
-	config GFX_SSD1351
+	config GFX_BUILD_SUFFIX_SSD1351
 		bool "SSD1351 - e.g. 1.5in RGB OLED 128x128 16bpp"
 
-	config GFX_SSD1680
+	config GFX_BUILD_SUFFIX_SSD1680
 		bool "SSD1680 - e.g. 2.13in epaper 250x122 1bpp"
 
-	config GFX_SSD1681
+	config GFX_BUILD_SUFFIX_SSD1681
 		bool "SSD1681 - e.g. 1.54in epaper 200x200 1bpp"
 
 	endchoice
