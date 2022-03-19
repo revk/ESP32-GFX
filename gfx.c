@@ -446,7 +446,8 @@ static void gfx_draw(gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_p
       *yp = t;
 }
 
-static __attribute__((unused)) void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
+static __attribute__((unused))
+void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 2 bit greyscale data, l is data width for each row
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
@@ -458,7 +459,8 @@ static __attribute__((unused)) void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos
    }
 }
 
-static __attribute__((unused)) void gfx_block16(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
+static __attribute__((unused))
+void gfx_block16(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
    if (!l)
       l = (w + 1) / 2;          // default is pixels width
@@ -707,9 +709,11 @@ const char *gfx_init_opts(gfx_init_t o)
    };
    if (spi_bus_add_device(o.port, &devcfg, &gfx_spi))
       return "Add?";
+   esp_err_tgpio_reset_pin(o.dc);
    gpio_set_direction(o.dc, GPIO_MODE_OUTPUT);
    if (o.rst)
    {
+      esp_err_tgpio_reset_pin(o.rst);
       gpio_set_direction(o.rst, GPIO_MODE_OUTPUT);
       gpio_set_level(o.rst, 0);
       usleep(100000);
