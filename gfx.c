@@ -709,11 +709,11 @@ const char *gfx_init_opts(gfx_init_t o)
    };
    if (spi_bus_add_device(o.port, &devcfg, &gfx_spi))
       return "Add?";
-   esp_err_tgpio_reset_pin(o.dc);
+   gpio_reset_pin(o.dc);
    gpio_set_direction(o.dc, GPIO_MODE_OUTPUT);
    if (o.rst)
    {
-      esp_err_tgpio_reset_pin(o.rst);
+      gpio_reset_pin(o.rst);
       gpio_set_direction(o.rst, GPIO_MODE_OUTPUT);
       gpio_set_level(o.rst, 0);
       usleep(100000);
