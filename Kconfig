@@ -78,49 +78,49 @@ menu "GFX"
 	int "GPIO pin for CS"
 	default 0
 	help
-		GPIO pin for CS
+		GPIO pin for CS (0 means not set)
 
 	config GFX_DC
 	int "GPIO pin for DC"
 	default 0
 	help
-		GPIO pin for DC
+		GPIO pin for DC (0 means not set)
 
 	config GFX_SCK
 	int "GPIO pin for SCK"
 	default 0
 	help
-		GPIO pin for SCK
+		GPIO pin for SCK (0 means not set)
 
 	config GFX_MISO
 	int "GPIO pin for MISO"
 	default 0
 	help
-		GPIO pin for MISO
+		GPIO pin for MISO (0 means not set)
 
 	config GFX_MOSI
 	int "GPIO pin for MOSI"
 	default 0
 	help
-		GPIO pin for MOSI
+		GPIO pin for MOSI (0 means not set)
 
 	config GFX_RST
 	int "GPIO pin for RST"
 	default 0
 	help
-		GPIO pin for RST
+		GPIO pin for RST (0 means not set)
 
 	config GFX_ENA
 	int "GPIO pin for ENA"
 	default 0
 	help
-		GPIO pin for EN
+		GPIO pin for EN (0 means not set)
 
 	config GFX_BUSY
 	int "GPIO pin for BUSY"
 	default 0
 	help
-		GPIO pin for BUSY
+		GPIO pin for BUSY (0 means not set)
 
 	config GFX_FLIP
 	int "Default flip settings"
