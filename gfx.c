@@ -490,7 +490,7 @@ void gfx_clear(gfx_intensity_t i)
 
 void gfx_set_contrast(gfx_intensity_t contrast)
 {
-   if (!gfx)
+   if (!gfx || gfx_settings.contrast == contrast)
       return;
    gfx_settings.contrast = contrast;
    gfx_update = 1;
