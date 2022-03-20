@@ -681,6 +681,16 @@ const char *gfx_init_opts(gfx_init_t o)
       return "SCK not set";
    if (!o.dc)
       return "DC not set";
+   if (!GPIO_IS_VALID_OUTPUT_GPIO(o.mosi))
+      return "MOSI not output";
+   if (!GPIO_IS_VALID_OUTPUT_GPIO(o.sck))
+      return "SCK not output";
+   if (!GPIO_IS_VALID_OUTPUT_GPIO(o.dc))
+      return "DC not output";
+   if (o.ena && !GPIO_IS_VALID_OUTPUT_GPIO(o.ena))
+      return "ENA not output";
+   if (o.rst && !GPIO_IS_VALID_OUTPUT_GPIO(o.rst))
+      return "RST not output";
    gfx_settings = o;
    gfx_mutex = xSemaphoreCreateMutex(); // Shared text access
    gfx = malloc(GFX_SIZE);
