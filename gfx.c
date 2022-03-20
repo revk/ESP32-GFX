@@ -709,6 +709,12 @@ const char *gfx_init_opts(gfx_init_t o)
    };
    if (spi_bus_add_device(o.port, &devcfg, &gfx_spi))
       return "Add?";
+   if (o.ena)
+   {
+      gpio_reset_pin(o.ena);
+      gpio_set_direction(o.ena, GPIO_MODE_OUTPUT);
+      gpio_set_level(o.ena, 1); // Enable
+   }
    gpio_reset_pin(o.dc);
    gpio_set_direction(o.dc, GPIO_MODE_OUTPUT);
    if (o.rst)
@@ -720,8 +726,6 @@ const char *gfx_init_opts(gfx_init_t o)
       gpio_set_level(o.rst, 1);
       usleep(100000);
    }
-   if (o.ena)
-      gpio_set_level(o.ena, 1); // Enable
    xTaskCreate(gfx_task, "OLED", 8 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
 }
