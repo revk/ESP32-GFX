@@ -393,6 +393,8 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       y = CONFIG_GFX_HEIGHT - 1 - y;
    if (!gfx || x < 0 || x >= CONFIG_GFX_WIDTH || y < 0 || y >= CONFIG_GFX_HEIGHT)
       return;                   // out of display
+   if (gfx_settings.contrast < 8)
+      i >>= (8 - gfx_settings.contrast);        // Extra dim
 #if CONFIG_GFX_BPP <= 8
    const int bits = (1 << CONFIG_GFX_BPP) - 1;
    const int shift = 8 - (y % (8 / CONFIG_GFX_BPP)) - CONFIG_GFX_BPP;
