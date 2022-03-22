@@ -32,6 +32,7 @@ static const char TAG[] = "OLED";
 
 // general global stuff
 static gfx_init_t gfx_settings = { };
+
 static TaskHandle_t gfx_task_id = NULL;
 static SemaphoreHandle_t gfx_mutex = NULL;
 static int8_t gfx_locks = 0;
@@ -44,9 +45,12 @@ static void gfx_busy_wait(void);
 static esp_err_t gfx_send_command(uint8_t cmd);
 static esp_err_t gfx_send_gfx(void);
 static esp_err_t gfx_command(uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused)) esp_err_t gfx_command1(uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2(uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command_list(const uint8_t * init_code);
+static __attribute__((unused))
+esp_err_t gfx_command1(uint8_t cmd, uint8_t a);
+static __attribute__((unused))
+esp_err_t gfx_command2(uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused))
+esp_err_t gfx_command_list(const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -230,7 +234,7 @@ static esp_err_t gfx_send_data(const void *data, uint16_t len)
 
 static esp_err_t gfx_send_gfx(void)
 {
-	return gfx_send_data(gfx,GFX_SIZE);
+   return gfx_send_data(gfx, GFX_SIZE);
 }
 
 static esp_err_t gfx_command(uint8_t c, const uint8_t * buf, uint16_t len)
@@ -423,7 +427,9 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       y = gfx_settings.height - 1 - y;
    if (!gfx || x < 0 || x >= gfx_settings.width || y < 0 || y >= gfx_settings.height)
       return;                   // out of display
-   if (gfx_settings.contrast < 8)
+   if (gfx_settings.contrast < 4)
+      i >>= (4 - gfx_settings.contrast + ((x ^ y) & 1));        // Extra dim and dithered
+   else if (gfx_settings.contrast < 4)
       i >>= (8 - gfx_settings.contrast);        // Extra dim
 #if GFX_BPP <= 8
    const int bits = (1 << GFX_BPP) - 1;
