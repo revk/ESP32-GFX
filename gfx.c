@@ -30,7 +30,36 @@ static const char TAG[] = "OLED";
 #include "freertos/task.h"
 #include "gfx.h"
 
-#if	CONFIG_GFX_BPP == 1
+// general global stuff
+static gfx_init_t gfx_settings = { };
+static TaskHandle_t gfx_task_id = NULL;
+static SemaphoreHandle_t gfx_mutex = NULL;
+static int8_t gfx_locks = 0;
+static spi_device_handle_t gfx_spi;
+static volatile uint8_t gfx_changed = 1;        // Pixels changed
+static volatile uint8_t gfx_update = 0; // Other settings changed
+
+// Driver support
+static void gfx_busy_wait(void);
+static esp_err_t gfx_send_command(uint8_t cmd);
+static esp_err_t gfx_send_gfx(void);
+static esp_err_t gfx_command(uint8_t c, const uint8_t * buf, uint16_t len);
+static __attribute__((unused)) esp_err_t gfx_command1(uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2(uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command_list(const uint8_t * init_code);
+
+// Driver (and defaults for driver)
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
+#include "ssd1351.c"
+#endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1680
+#include "ssd1680.c"
+#endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1681
+#include "ssd1681.c"
+#endif
+
+#if	GFX_BPP == 1
 #ifdef	CONFIG_GFX_FONT0
 #include "mono0.h"
 #endif
@@ -115,7 +144,7 @@ static uint8_t const *fonts[] = {
 };
 
 #define	BLACK	0
-#if CONFIG_GFX_BPP == 16        // 16 bit RGB
+#if GFX_BPP == 16               // 16 bit RGB
 #define GFX_INTENSITY_BPP  4    // We work on each colour being 4 bits intensity based on one of a set of colours
 #define R       (1<<11)
 #define G       (1<<5)
@@ -131,31 +160,23 @@ static uint8_t const *fonts[] = {
 
 #define WHITE   (RED+GREEN+BLUE)
 
-#elif CONFIG_GFX_BPP <= 8       // Greyscale or mono
+#elif GFX_BPP <= 8              // Greyscale or mono
 #define WHITE   1
-#define GFX_INTENSITY_BPP  CONFIG_GFX_BPP
+#define GFX_INTENSITY_BPP  GFX_BPP
 #endif
 
-#if CONFIG_GFX_BPP > 16
+#if GFX_BPP > 16
 typedef uint32_t gfx_cell_t;
-#define GFX_SIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
-#elif CONFIG_GFX_BPP > 8
+#define GFX_SIZE (gfx_settings.width * gfx_settings.height * sizeof(gfx_cell_t))
+#elif GFX_BPP > 8
 typedef uint16_t gfx_cell_t;
-#define GFX_SIZE (CONFIG_GFX_WIDTH * CONFIG_GFX_HEIGHT * sizeof(gfx_cell_t))
+#define GFX_SIZE (gfx_settings.width * gfx_settings.height * sizeof(gfx_cell_t))
 #else
 typedef uint8_t gfx_cell_t;
-#define GFX_SIZE ((CONFIG_GFX_HEIGHT * CONFIG_GFX_BPP + 7) / 8 * CONFIG_GFX_WIDTH)
+#define GFX_SIZE ((gfx_settings.height * GFX_BPP + 7) / 8 * gfx_settings.width)
 #endif
 static gfx_cell_t *gfx = NULL;
-static gfx_init_t gfx_settings = { };
 
-// general global stuff
-static TaskHandle_t gfx_task_id = NULL;
-static SemaphoreHandle_t gfx_mutex = NULL;
-static int8_t gfx_locks = 0;
-static spi_device_handle_t gfx_spi;
-static volatile uint8_t gfx_changed = 1;        // Pixels changed
-static volatile uint8_t gfx_update = 0; // Other settings changed
 
 // drawing state
 static gfx_pos_t x = 0,
@@ -205,6 +226,11 @@ static esp_err_t gfx_send_data(const void *data, uint16_t len)
       .tx_buffer = data,
    };
    return spi_device_transmit(gfx_spi, &c);
+}
+
+static esp_err_t gfx_send_gfx(void)
+{
+	return gfx_send_data(gfx,GFX_SIZE);
 }
 
 static esp_err_t gfx_command(uint8_t c, const uint8_t * buf, uint16_t len)
@@ -280,18 +306,6 @@ esp_err_t gfx_command_list(const uint8_t * init_code)
    return 0;
 }
 
-
-// Driver
-#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
-#include "ssd1351.c"
-#endif
-#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1680
-#include "ssd1680.c"
-#endif
-#ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1681
-#include "ssd1681.c"
-#endif
-
 // state control
 void gfx_pos(gfx_pos_t newx, gfx_pos_t newy, gfx_align_t newa)
 {                               // Set position
@@ -307,7 +321,7 @@ static uint32_t gfx_colour_lookup(char c)
    case 'k':
    case 'K':
       return BLACK;
-#if CONFIG_GFX_BPP > 8
+#if GFX_BPP > 8
    case 'r':
       return (RED >> 1);
    case 'R':
@@ -352,6 +366,22 @@ void gfx_background(char newb)
    b_mul = gfx_colour_lookup(b = newb);
 }
 
+// Basic settings
+uint8_t gfx_width(void)
+{                               // Display width
+   return gfx_settings.width;
+}
+
+uint8_t gfx_height(void)
+{                               // Display height
+   return gfx_settings.height;
+}
+
+uint8_t gfx_bpp(void)
+{
+   return GFX_BPP;
+}
+
 // State get
 gfx_pos_t gfx_x(void)
 {
@@ -388,19 +418,19 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       y = t;
    };
    if (gfx_settings.flip & 1)
-      x = CONFIG_GFX_WIDTH - 1 - x;
+      x = gfx_settings.width - 1 - x;
    if (gfx_settings.flip & 2)
-      y = CONFIG_GFX_HEIGHT - 1 - y;
-   if (!gfx || x < 0 || x >= CONFIG_GFX_WIDTH || y < 0 || y >= CONFIG_GFX_HEIGHT)
+      y = gfx_settings.height - 1 - y;
+   if (!gfx || x < 0 || x >= gfx_settings.width || y < 0 || y >= gfx_settings.height)
       return;                   // out of display
    if (gfx_settings.contrast < 8)
       i >>= (8 - gfx_settings.contrast);        // Extra dim
-#if CONFIG_GFX_BPP <= 8
-   const int bits = (1 << CONFIG_GFX_BPP) - 1;
-   const int shift = 8 - (y % (8 / CONFIG_GFX_BPP)) - CONFIG_GFX_BPP;
-   const int line = (CONFIG_GFX_HEIGHT * CONFIG_GFX_BPP + 7) / 8;
-   const int addr = line * (CONFIG_GFX_WIDTH - 1 - x) + y * CONFIG_GFX_BPP / 8; // Note this is all a bit twisted around on the epaper
-   i >>= (8 - CONFIG_GFX_BPP);
+#if GFX_BPP <= 8
+   const int bits = (1 << GFX_BPP) - 1;
+   const int shift = 8 - (y % (8 / GFX_BPP)) - GFX_BPP;
+   const int line = (gfx_settings.height * GFX_BPP + 7) / 8;
+   const int addr = line * (gfx_settings.width - 1 - x) + y * GFX_BPP / 8;      // Note this is all a bit twisted around on the epaper
+   i >>= (8 - GFX_BPP);
    i &= bits;
    i ^= bits;
    if (((gfx[addr] >> shift) & bits) == i)
@@ -409,9 +439,9 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    gfx_changed = 1;
 #else
    uint16_t v = ntohs(f_mul * (i >> (8 - GFX_INTENSITY_BPP)) + b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP)));
-   if (v == gfx[(y * CONFIG_GFX_WIDTH) + x])
+   if (v == gfx[(y * gfx_settings.width) + x])
       return;
-   gfx[(y * CONFIG_GFX_WIDTH) + x] = v;
+   gfx[(y * gfx_settings.width) + x] = v;
    gfx_changed = 1;
 #endif
 }
@@ -485,8 +515,8 @@ void gfx_clear(gfx_intensity_t i)
 {
    if (!gfx)
       return;
-   for (gfx_pos_t y = 0; y < CONFIG_GFX_HEIGHT; y++)
-      for (gfx_pos_t x = 0; x < CONFIG_GFX_WIDTH; x++)
+   for (gfx_pos_t y = 0; y < gfx_settings.height; y++)
+      for (gfx_pos_t x = 0; x < gfx_settings.width; x++)
          gfx_pixel(x, y, i);
 }
 
@@ -546,7 +576,7 @@ void gfx_text(int8_t size, const char *fmt, ...)
    if (!gfx)
       return;
    va_list ap;
-   char temp[CONFIG_GFX_WIDTH / 4 + 2];
+   char temp[gfx_settings.width / 4 + 2];
    va_start(ap, fmt);
    vsnprintf(temp, sizeof(temp), fmt, ap);
    va_end(ap);
@@ -579,7 +609,7 @@ void gfx_text(int8_t size, const char *fmt, ...)
       return fontw;
    }
    const uint8_t *fontdata(char c) {
-#if	CONFIG_GFX_BPP == 1
+#if	GFX_BPP == 1
       const uint8_t *d = fonts[size] + (c - ' ') * ((fontw + 7) / 8) * fonth;
 #else
       const uint8_t *d = fonts[size] + (c - ' ') * fonth * fontw / 2;
@@ -616,7 +646,7 @@ void gfx_text(int8_t size, const char *fmt, ...)
          if (!p[1])
             charw -= (size ? : 1);
          int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
-#if	CONFIG_GFX_BPP == 1
+#if	GFX_BPP == 1
          gfx_block2(x, y, charw, h, dx, fontdata(c), (fontw + 7) / 8);
 #else
          gfx_block16(x, y, charw, h, dx, fontdata(c), fontw / 2);
@@ -678,6 +708,10 @@ const char *gfx_init_opts(gfx_init_t o)
       o.busy = CONFIG_GFX_BUSY;
    if (!o.flip)
       o.busy = CONFIG_GFX_FLIP;
+   if (!o.width)
+      o.width = GFX_DEFAULT_WIDTH;
+   if (!o.height)
+      o.height = GFX_DEFAULT_HEIGHT;
    // Check
    if (!o.mosi)
       return "MOSI not set";
@@ -765,7 +799,7 @@ void gfx_unlock(void)
 void gfx_message(const char *m)
 {
    gfx_lock();
-   gfx_pos(CONFIG_GFX_WIDTH / 2, 0, GFX_T | GFX_C | GFX_V);
+   gfx_pos(gfx_settings.width / 2, 0, GFX_T | GFX_C | GFX_V);
    uint8_t size = 2;
    while (*m)
    {

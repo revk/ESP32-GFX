@@ -1,5 +1,9 @@
 // SSD1680 driver code
 
+#define GFX_DEFAULT_WIDTH	250
+#define GFX_DEFAULT_HEIGHT	122
+#define GFX_BPP			1
+
 #define SSD1680_DRIVER_CONTROL 0x01
 #define SSD1680_GATE_VOLTAGE 0x03
 #define SSD1680_SOURCE_VOLTAGE 0x04
@@ -62,7 +66,7 @@ static const char *gfx_driver_send(void)
       return "Set Y failed";
    if (gfx_command(SSD1680_WRITE_RAM1, NULL, 0))
       return "Write RAM failed";
-   if (gfx_send_data(gfx, GFX_SIZE))
+   if (gfx_send_gfx())
       return "Data send failed";
    buf[0] = 0xF7;
    if (gfx_command(SSD1680_DISP_CTRL2, buf, 1))

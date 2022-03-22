@@ -1,5 +1,9 @@
 // SSD1351 driver code
 
+#define	GFX_DEFAULT_WIDTH	128
+#define	GFX_DEFAULT_HEIGHT	128
+#define	GFX_BPP			16
+
 static const char *gfx_driver_init(void)
 {                               // Initialise
    int try = 10;
@@ -31,10 +35,10 @@ static const char *gfx_driver_init(void)
       e += gfx_command1(0xBE, 0x05);    // COM deselect voltage
 #endif
       e += gfx_command1(0xFD, 0xB0);    // lock
-      gfx_command2(0x15, 0, 127);
-      gfx_command2(0x75, 0, 127);
-      gfx_send_command(0x5C);
-      gfx_send_data(gfx, GFX_SIZE);
+      gfx_command2(0x15, 0, gfx_width()-1);
+      gfx_command2(0x75, 0, gfx_height()-1);
+      //gfx_send_command(0x5C);
+      //gfx_send_data(gfx, GFX_SIZE);
       gfx_send_command(0xA6);
       gfx_unlock();
       if (!e)
@@ -51,12 +55,11 @@ static const char *gfx_driver_send(void)
    gfx_command2(0x15, 0, 127);
    gfx_command2(0x75, 0, 127);
    gfx_send_command(0x5C);
-   gfx_send_data(gfx, GFX_SIZE);
+   gfx_send_gfx();
    if (gfx_update)
    {
       gfx_update = 0;
       gfx_command1(0xC7, gfx_settings.contrast >> 4);
    }
-
    return NULL;
 }

@@ -3,6 +3,9 @@ menu "GFX"
 	choice
 		prompt "Driver"
 
+	config GFX_NONE
+		bool "No GFX driver"
+
 	config GFX_BUILD_SUFFIX_SSD1351
 		bool "SSD1351 - e.g. 1.5in RGB OLED 128x128 16bpp"
 
@@ -16,21 +19,15 @@ menu "GFX"
 
 	config GFX_WIDTH
 	int "Width (pixels)"
-	default 128
+	default 0
 	help
-		GFX display width
+		GFX display width (0 for default for driver)
 
 	config GFX_HEIGHT
 	int "Height (pixels)"
-	default 128
+	default 0
 	help
-		GFX display height
-
-	config GFX_BPP
-	int "Bits per pixel"
-	default 16
-	help
-		GFX display bits per pixel
+		GFX display height (0 for default for driver)
 
 	config GFX_FONT0
 	bool "Include 3x5 font"
