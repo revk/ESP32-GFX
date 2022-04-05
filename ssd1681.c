@@ -59,7 +59,7 @@ static const char *gfx_driver_send(void)
       return "Set Y failed";
    if (gfx_command(SSD1681_WRITE_RAM1, NULL, 0))
       return "Write RAM failed";
-   if (gfx_send_data(gfx, GFX_SIZE))
+   if (gfx_send_gfx())
       return "Data send failed";
    buf[0] = 0xF7;
    if (gfx_command(SSD1681_DISP_CTRL2, buf, 1))
