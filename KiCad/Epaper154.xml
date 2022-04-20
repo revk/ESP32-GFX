@@ -2,15 +2,15 @@
 <export version="E">
   <design>
     <source>/Users/adrian/git/ESP32-GFX/KiCad/Epaper154.kicad_sch</source>
-    <date>Friday, 18 March 2022 at 09:19:55</date>
+    <date>Wednesday, 20 April 2022 at 12:26:42</date>
     <tool>Eeschema (6.0.2-0)</tool>
-    <textvar name="DATE">2022-03-17</textvar>
+    <textvar name="DATE">2022-04-20</textvar>
     <sheet number="1" name="/" tstamps="/">
       <title_block>
         <title>1.54" epaper display board</title>
         <company>Adrian Kennard / Andrews &amp; Arnold Ltd</company>
         <rev>1</rev>
-        <date>2022-03-17</date>
+        <date>2022-04-20</date>
         <source>Epaper154.kicad_sch</source>
         <comment number="1" value="@TheRealRevK"/>
         <comment number="2" value="www.me.uk"/>
@@ -121,7 +121,7 @@
       <sheetpath names="/" tstamps="/"/>
       <tstamps>00000000-0000-0000-0000-0000604764e2</tstamps>
     </comp>
-    <comp ref="J2">
+    <comp ref="J3">
       <value>DC</value>
       <footprint>RevK:Molex_MiniSPOX_H2RA</footprint>
       <fields>
@@ -134,7 +134,7 @@
       <sheetpath names="/" tstamps="/"/>
       <tstamps>05c95e20-b8ce-45a0-abe6-40ea1ba1906f</tstamps>
     </comp>
-    <comp ref="J3">
+    <comp ref="J4">
       <value>Conn_01x02</value>
       <footprint>RevK:Molex_MiniSPOX_H3RA</footprint>
       <libsource lib="Connector_Generic" part="Conn_01x03" description="Generic connector, single row, 01x03, script generated (kicad-library-utils/schlib/autogen/connector/)"/>
@@ -601,6 +601,20 @@
         <field name="Note">Non part, PCB printed</field>
       </fields>
     </libpart>
+    <libpart lib="RevK" part="Shelly">
+      <fields>
+        <field name="Reference">J</field>
+        <field name="Value">Shelly</field>
+        <field name="Footprint">RevK:Shelly</field>
+      </fields>
+      <pins>
+        <pin num="1" name="GND" type="power_in"/>
+        <pin num="2" name="0" type="output"/>
+        <pin num="3" name="3V3" type="power_in"/>
+        <pin num="4" name="Rx" type="output"/>
+        <pin num="5" name="Tx" type="input"/>
+      </pins>
+    </libpart>
     <libpart lib="RevK" part="USB-C">
       <description>USB 2.0-only Type-C Receptacle connector</description>
       <docs>https://www.usb.org/sites/default/files/documents/usb_type-c.zip</docs>
@@ -674,11 +688,11 @@
       <node ref="U3" pin="17" pinfunction="IO27" pintype="bidirectional"/>
     </net>
     <net code="5" name="BUTTON1">
-      <node ref="J3" pin="2" pinfunction="Pin_2" pintype="passive"/>
+      <node ref="J4" pin="2" pinfunction="Pin_2" pintype="passive"/>
       <node ref="U3" pin="24" pinfunction="IO4" pintype="bidirectional"/>
     </net>
     <net code="6" name="BUTTON2">
-      <node ref="J3" pin="3" pinfunction="Pin_3" pintype="passive"/>
+      <node ref="J4" pin="3" pinfunction="Pin_3" pintype="passive"/>
       <node ref="U3" pin="26" pinfunction="IO20" pintype="bidirectional"/>
     </net>
     <net code="7" name="CS">
@@ -695,7 +709,7 @@
     </net>
     <net code="10" name="DC">
       <node ref="D2" pin="1" pinfunction="K" pintype="passive"/>
-      <node ref="J2" pin="2" pinfunction="DC" pintype="power_out"/>
+      <node ref="J3" pin="2" pinfunction="DC" pintype="power_out"/>
       <node ref="U1" pin="1" pinfunction="SHDN" pintype="input"/>
       <node ref="U1" pin="2" pinfunction="VIN" pintype="power_in"/>
     </net>
@@ -723,8 +737,8 @@
       <node ref="J1" pin="B1" pinfunction="GND" pintype="passive"/>
       <node ref="J1" pin="B12" pinfunction="GND" pintype="passive"/>
       <node ref="J1" pin="S1" pinfunction="SHIELD" pintype="passive"/>
-      <node ref="J2" pin="1" pinfunction="GND" pintype="power_in"/>
-      <node ref="J3" pin="1" pinfunction="Pin_1" pintype="passive"/>
+      <node ref="J3" pin="1" pinfunction="GND" pintype="power_in"/>
+      <node ref="J4" pin="1" pinfunction="Pin_1" pintype="passive"/>
       <node ref="M1" pin="3" pinfunction="GND" pintype="power_in"/>
       <node ref="R2" pin="1" pintype="passive"/>
       <node ref="R3" pin="2" pintype="passive"/>
