@@ -31,100 +31,99 @@ static const char TAG[] = "OLED";
 #include "gfx.h"
 
 #ifdef	CONFIG_GFX_NONE
-// Dummy - no driver
-const char *gfx_init_opts(gfx_init_t)
-{
+const char *gfx_init_opts(gfx_init_t o)
+{                               // Dummy - no driver
    return "Not configured";
 }
 
 void gfx_lock(void)
-{
+{                               // Dummy - no driver
 }
 
 void gfx_unlock(void)
-{
+{                               // Dummy - no driver
 }
 
-void gfx_set_contrast(gfx_intensity_t)
-{
+void gfx_set_contrast(gfx_intensity_t i)
+{                               // Dummy - no driver
 }
 
-void gfx_pos(gfx_pos_t x, gfx_pos_t y, gfx_align_t)
-{
+void gfx_pos(gfx_pos_t x, gfx_pos_t y, gfx_align_t a)
+{                               // Dummy - no driver
 }
 
 void gfx_colour(char)
-{
+{                               // Dummy - no driver
 }
 
 void gfx_background(char)
-{
+{                               // Dummy - no driver
 }
 
 uint8_t gfx_width(void)
-{
+{                               // Dummy - no driver
    return 0;
 }
 
 uint8_t gfx_height(void)
-{
+{                               // Dummy - no driver
    return 0;
 }
 
 uint8_t gfx_bpp(void)
-{
+{                               // Dummy - no driver
    return 0;
 }
 
 gfx_pos_t gfx_x(void)
-{
+{                               // Dummy - no driver
    return 0;
 }
 
 gfx_pos_t gfx_y(void)
-{
+{                               // Dummy - no driver
    return 0;
 }
 
 gfx_align_t gfx_a(void)
-{
+{                               // Dummy - no driver
    return 0;
 }
 
 char gfx_f(void)
-{
+{                               // Dummy - no driver
 }
 
 char gfx_b(void)
-{
+{                               // Dummy - no driver
 }
 
 void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
-{
+{                               // Dummy - no driver
 }
 
-void gfx_clear(gfx_intensity_t)
-{
+void gfx_clear(gfx_intensity_t i)
+{                               // Dummy - no driver
 }
 
-void gfx_box(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t)
-{
+void gfx_box(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
+{                               // Dummy - no driver
 }
 
-void gfx_fill(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t)
-{
+void gfx_fill(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
+{                               // Dummy - no driver
 }
 
 void gfx_text(int8_t size, const char *fmt, ...)
-{
+{                               // Dummy - no driver
 }
 
 void gfx_icon16(gfx_pos_t w, gfx_pos_t h, const void *data)
-{
+{                               // Dummy - no driver
 }
 
-void gfx_message(const char *)
-{
+void gfx_message(const char *m)
+{                               // Dummy - no driver
 }
 #else
 
