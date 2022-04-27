@@ -30,6 +30,104 @@ static const char TAG[] = "OLED";
 #include "freertos/task.h"
 #include "gfx.h"
 
+#ifdef	CONFIG_GFX_NONE
+// Dummy - no driver
+const char *gfx_init_opts(gfx_init_t)
+{
+   return "Not configured";
+}
+
+void gfx_lock(void)
+{
+}
+
+void gfx_unlock(void)
+{
+}
+
+void gfx_set_contrast(gfx_intensity_t)
+{
+}
+
+void gfx_pos(gfx_pos_t x, gfx_pos_t y, gfx_align_t)
+{
+}
+
+void gfx_colour(char)
+{
+}
+
+void gfx_background(char)
+{
+}
+
+uint8_t gfx_width(void)
+{
+   return 0;
+}
+
+uint8_t gfx_height(void)
+{
+   return 0;
+}
+
+uint8_t gfx_bpp(void)
+{
+   return 0;
+}
+
+gfx_pos_t gfx_x(void)
+{
+   return 0;
+}
+
+gfx_pos_t gfx_y(void)
+{
+   return 0;
+}
+
+gfx_align_t gfx_a(void)
+{
+   return 0;
+}
+
+char gfx_f(void)
+{
+}
+
+char gfx_b(void)
+{
+}
+
+void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
+{
+}
+
+void gfx_clear(gfx_intensity_t)
+{
+}
+
+void gfx_box(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t)
+{
+}
+
+void gfx_fill(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t)
+{
+}
+
+void gfx_text(int8_t size, const char *fmt, ...)
+{
+}
+
+void gfx_icon16(gfx_pos_t w, gfx_pos_t h, const void *data)
+{
+}
+
+void gfx_message(const char *)
+{
+}
+#else
+
 // general global stuff
 static gfx_init_t gfx_settings = { };
 
@@ -837,3 +935,4 @@ void gfx_message(const char *m)
    }
    gfx_unlock();
 }
+#endif
