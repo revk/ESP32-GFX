@@ -15,7 +15,8 @@
  * 
  */
 
-static const char TAG[] = "OLED";
+static __attribute__((unused))
+const char TAG[] = "GFX";
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -92,10 +93,12 @@ gfx_align_t gfx_a(void)
 
 char gfx_f(void)
 {                               // Dummy - no driver
+   return 0;
 }
 
 char gfx_b(void)
 {                               // Dummy - no driver
+   return 0;
 }
 
 void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
