@@ -52,11 +52,11 @@ void gfx_pos(gfx_pos_t x, gfx_pos_t y, gfx_align_t a)
 {                               // Dummy - no driver
 }
 
-void gfx_colour(char)
+void gfx_colour(char c)
 {                               // Dummy - no driver
 }
 
-void gfx_background(char)
+void gfx_background(char c)
 {                               // Dummy - no driver
 }
 
