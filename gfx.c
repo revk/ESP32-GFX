@@ -913,9 +913,9 @@ void gfx_message(const char *m)
       {
          char isf = 1;
          for (; *m && *m != ']'; m++)
-            if (isdigit(*m))
+            if (isdigit((unsigned char)*m))
                size = *m - '0'; /* size */
-            else if (isalpha(*m))
+            else if (isalpha((unsigned char)*m))
             {                   /* colour */
                if ((isf++) & 1)
                   gfx_colour(*m);
