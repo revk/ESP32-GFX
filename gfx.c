@@ -624,6 +624,7 @@ void gfx_clear(gfx_intensity_t i)
    for (gfx_pos_t y = 0; y < gfx_settings.height; y++)
       for (gfx_pos_t x = 0; x < gfx_settings.width; x++)
          gfx_pixel(x, y, i);
+   gfx_colour('W');
 }
 
 void gfx_set_contrast(gfx_intensity_t contrast)
