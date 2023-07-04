@@ -527,10 +527,12 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       y = gfx_settings.height - 1 - y;
    if (!gfx || x < 0 || x >= gfx_settings.width || y < 0 || y >= gfx_settings.height)
       return;                   // out of display
+#if GFX_BPP > 1
    if (gfx_settings.contrast < 4)
       i >>= (4 - gfx_settings.contrast + ((x ^ y) & 1));        // Extra dim and dithered
    else if (gfx_settings.contrast < 4)
       i >>= (8 - gfx_settings.contrast);        // Extra dim
+#endif
 #if GFX_BPP <= 8
    const int bits = (1 << GFX_BPP) - 1;
    const int shift = 8 - (y % (8 / GFX_BPP)) - GFX_BPP;
