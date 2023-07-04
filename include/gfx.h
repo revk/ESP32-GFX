@@ -35,7 +35,7 @@ const char *gfx_init_opts(gfx_init_t);
 
 // locking atomic drawing functions
 void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white on black
-void gfx_unlock(uint8_t);	// unlocks display allowing it to be sent if there has been any change
+void gfx_unlock(uint8_t);	// unlocks display allowing it to be sent if there has been any change - sets display mode for next update
 
 // Overall display contrast setting if supported by display
 void gfx_set_contrast(gfx_intensity_t);
