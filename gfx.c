@@ -881,7 +881,7 @@ const char *gfx_init_opts(gfx_init_t o)
       gpio_set_level(o.rst, 1);
       usleep(100000);
    }
-   xTaskCreate(gfx_task, "OLED", 8 * 1024, NULL, 2, &gfx_task_id);
+   xTaskCreate(gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
 }
 
