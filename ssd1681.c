@@ -73,8 +73,12 @@ gfx_driver_send (uint8_t mode)
       return "Data send failed";
    if (gfx_command1 (SSD1681_DISP_CTRL2, mode ? 0xFF : 0xF7))
       return "Display ctrl failed";
-   if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
-      return "Master activate failed";
-   gfx_busy_wait ();
+   int try = mode ? 10 : 1;
+   while (try--)
+   {
+      if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
+         return "Master activate failed";
+      gfx_busy_wait ();
+   }
    return NULL;
 }
