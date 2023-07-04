@@ -67,18 +67,11 @@ gfx_driver_send (uint8_t mode)
       return "Data start failed";
    if (gfx_send_gfx ())
       return "Data send failed";
-   if (gfx_send_command (SSD1681_WRITE_RAM2))
-      return "Data start failed";
-   if (gfx_send_gfx ())
-      return "Data send failed";
    if (gfx_command1 (SSD1681_DISP_CTRL2, mode ? 0xFF : 0xF7))
       return "Display ctrl failed";
-   int try = mode ? 10 : 1;
-   while (try--)
-   {
+   // TODO need to handle RAM1/RAM2 in mode 2 updates
       if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
          return "Master activate failed";
       gfx_busy_wait ();
-   }
    return NULL;
 }
