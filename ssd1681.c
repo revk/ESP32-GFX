@@ -37,12 +37,12 @@ static const char *gfx_driver_init(void)
    const uint8_t ssd1681_default_init_code[] = {
       SSD1681_SW_RESET, 0,      // soft reset
       0xFF, 20,                 // busy wait
+      SSD1681_DRIVER_CONTROL, 3, (gfx_width() - 1), (gfx_width() - 1) >> 8, 0,
       SSD1681_DATA_MODE, 1, 0x03,       // Ram data entry mode
       SSD1681_WRITE_BORDER, 1, 0x05,    // border color
       SSD1681_TEMP_CONTROL, 1, 0x80,    // Temp control
       SSD1681_SET_RAMXCOUNT, 1, 0,
       SSD1681_SET_RAMYCOUNT, 2, 0, 0,
-      SSD1681_DRIVER_CONTROL, 3, (CONFIG_GFX_WIDTH - 1), (CONFIG_GFX_WIDTH - 1) >> 8, 0,
       0xFE
    };
 
