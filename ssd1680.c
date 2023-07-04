@@ -31,7 +31,8 @@
 #define SSD1680_SET_RAMXCOUNT 0x4E
 #define SSD1680_SET_RAMYCOUNT 0x4F
 
-static const char *gfx_driver_init(void)
+static const char *
+gfx_driver_init (void)
 {                               // Initialise
    const uint8_t ssd1680_default_init_code[] = {
       SSD1680_SW_RESET, 0,      // soft reset
@@ -50,29 +51,30 @@ static const char *gfx_driver_init(void)
       0xFE
    };
 
-   if (gfx_command_list(ssd1680_default_init_code))
+   if (gfx_command_list (ssd1680_default_init_code))
       return "Init failed";
    return NULL;
 }
 
-static const char *gfx_driver_send(void)
+static const char *
+gfx_driver_send (uint8_t mode)
 {                               // Send buffer and update display
    uint8_t buf[2] = { };
    buf[0] = 1;
-   if (gfx_command(SSD1680_SET_RAMXCOUNT, buf, 1))
+   if (gfx_command (SSD1680_SET_RAMXCOUNT, buf, 1))
       return "Set X failed";
    buf[0] = 0;
-   if (gfx_command(SSD1680_SET_RAMYCOUNT, buf, 2))
+   if (gfx_command (SSD1680_SET_RAMYCOUNT, buf, 2))
       return "Set Y failed";
-   if (gfx_command(SSD1680_WRITE_RAM1, NULL, 0))
+   if (gfx_command (SSD1680_WRITE_RAM1, NULL, 0))
       return "Write RAM failed";
-   if (gfx_send_gfx())
+   if (gfx_send_gfx ())
       return "Data send failed";
    buf[0] = 0xF7;
-   if (gfx_command(SSD1680_DISP_CTRL2, buf, 1))
+   if (gfx_command (SSD1680_DISP_CTRL2, buf, 1))
       return "Display ctrl failed";
-   if (gfx_command(SSD1680_MASTER_ACTIVATE, NULL, 0))
+   if (gfx_command (SSD1680_MASTER_ACTIVATE, NULL, 0))
       return "Master activate failed";
-   gfx_busy_wait();
+   gfx_busy_wait ();
    return NULL;
 }

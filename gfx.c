@@ -43,7 +43,7 @@ gfx_lock (void)
 }
 
 void
-gfx_unlock (void)
+gfx_unlock (uint8_t mode)
 {                               // Dummy - no driver
 }
 
@@ -160,24 +160,17 @@ static int8_t gfx_locks = 0;
 static spi_device_handle_t gfx_spi;
 static volatile uint8_t gfx_changed = 1;        // Pixels changed
 static volatile uint8_t gfx_update = 0; // Other settings changed
+static volatile uint8_t gfx_mode = 0;   // Display mode (depends on driver)
 
 // Driver support
 static void gfx_busy_wait (void);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -236,44 +229,43 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const *
-        fonts[] = {
+static uint8_t const *fonts[] = {
 #ifdef	CONFIG_GFX_FONT0
-        gfx_font0,
+   gfx_font0,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT1
-        gfx_font1,
+   gfx_font1,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT2
-        gfx_font2,
+   gfx_font2,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT3
-        gfx_font3,
+   gfx_font3,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT4
-        gfx_font4,
+   gfx_font4,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT5
-        gfx_font5,
+   gfx_font5,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT6
-        gfx_font6,
+   gfx_font6,
 #else
-        NULL,
+   NULL,
 #endif
-     };
+};
 
 #define	BLACK	0
 #if GFX_BPP == 16               // 16 bit RGB
@@ -858,8 +850,8 @@ gfx_task (void *p)
       }
       gfx_lock ();
       gfx_changed = 0;
-      gfx_driver_send ();
-      gfx_unlock ();
+      gfx_driver_send (gfx_mode);
+      gfx_unlock (0);
    }
 }
 
@@ -972,8 +964,9 @@ gfx_lock (void)
 }
 
 void
-gfx_unlock (void)
+gfx_unlock (uint8_t mode)
 {                               // Unlock display task
+   gfx_mode = mode;
    gfx_locks--;
    if (gfx_mutex)
       xSemaphoreGive (gfx_mutex);
@@ -1013,6 +1006,6 @@ gfx_message (const char *m)
       if (*m == '/')
          m++;
    }
-   gfx_unlock ();
+   gfx_unlock (0);
 }
 #endif

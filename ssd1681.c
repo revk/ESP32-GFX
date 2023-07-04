@@ -57,7 +57,7 @@ gfx_driver_init (void)
 }
 
 static const char *
-gfx_driver_send (void)
+gfx_driver_send (uint8_t mode)
 {                               // Send buffer and update display
    if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
       return "Set X failed";
@@ -71,7 +71,7 @@ gfx_driver_send (void)
       return "Data start failed";
    if (gfx_send_gfx ())
       return "Data send failed";
-   if (gfx_command1 (SSD1681_DISP_CTRL2, 0xF7))
+   if (gfx_command1 (SSD1681_DISP_CTRL2, mode ? 0xFF : 0xF7))
       return "Display ctrl failed";
    if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
       return "Master activate failed";
