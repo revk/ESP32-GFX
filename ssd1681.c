@@ -53,7 +53,7 @@ static const char *gfx_driver_init(void)
 
 static const char *gfx_driver_send(void)
 {                               // Send buffer and update display
-   uint8_t buf[2] = { };
+   uint8_t buf[2] = {0};
    if (gfx_command(SSD1681_SET_RAMXCOUNT, buf, 1))
       return "Set X failed";
    if (gfx_command(SSD1681_SET_RAMYCOUNT, buf, 2))
@@ -62,7 +62,7 @@ static const char *gfx_driver_send(void)
       return "Write RAM failed";
    if (gfx_send_gfx())
       return "Data send failed";
-   buf[0] = 0xF7;
+   buf[0] = 0xF7; // DISPLAY with DISPLAY Mode 1
    if (gfx_command(SSD1681_DISP_CTRL2, buf, 1))
       return "Display ctrl failed";
    if (gfx_command(SSD1681_MASTER_ACTIVATE, NULL, 0))
