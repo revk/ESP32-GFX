@@ -16,7 +16,7 @@
  */
 
 static __attribute__((unused))
-const char TAG[] = "GFX";
+     const char TAG[] = "GFX";
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -32,106 +32,127 @@ const char TAG[] = "GFX";
 #include "gfx.h"
 
 #ifdef	CONFIG_GFX_NONE
-const char *gfx_init_opts(gfx_init_t o)
+     const char *gfx_init_opts (gfx_init_t o)
 {                               // Dummy - no driver
    return "Not configured";
 }
 
-void gfx_lock(void)
+void
+gfx_lock (void)
 {                               // Dummy - no driver
 }
 
-void gfx_unlock(void)
+void
+gfx_unlock (void)
 {                               // Dummy - no driver
 }
 
-void gfx_set_contrast(gfx_intensity_t i)
+void
+gfx_set_contrast (gfx_intensity_t i)
 {                               // Dummy - no driver
 }
 
-void gfx_pos(gfx_pos_t x, gfx_pos_t y, gfx_align_t a)
+void
+gfx_pos (gfx_pos_t x, gfx_pos_t y, gfx_align_t a)
 {                               // Dummy - no driver
 }
 
-void gfx_colour(char c)
+void
+gfx_colour (char c)
 {                               // Dummy - no driver
 }
 
-void gfx_background(char c)
+void
+gfx_background (char c)
 {                               // Dummy - no driver
 }
 
-uint8_t gfx_width(void)
-{                               // Dummy - no driver
-   return 0;
-}
-
-uint8_t gfx_height(void)
-{                               // Dummy - no driver
-   return 0;
-}
-
-uint8_t gfx_bpp(void)
+uint8_t
+gfx_width (void)
 {                               // Dummy - no driver
    return 0;
 }
 
-gfx_pos_t gfx_x(void)
+uint8_t
+gfx_height (void)
 {                               // Dummy - no driver
    return 0;
 }
 
-gfx_pos_t gfx_y(void)
+uint8_t
+gfx_bpp (void)
 {                               // Dummy - no driver
    return 0;
 }
 
-gfx_align_t gfx_a(void)
+gfx_pos_t
+gfx_x (void)
 {                               // Dummy - no driver
    return 0;
 }
 
-char gfx_f(void)
+gfx_pos_t
+gfx_y (void)
 {                               // Dummy - no driver
    return 0;
 }
 
-char gfx_b(void)
+gfx_align_t
+gfx_a (void)
 {                               // Dummy - no driver
    return 0;
 }
 
-void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
+char
+gfx_f (void)
+{                               // Dummy - no driver
+   return 0;
+}
+
+char
+gfx_b (void)
+{                               // Dummy - no driver
+   return 0;
+}
+
+void
+gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 {                               // Dummy - no driver
 }
 
-void gfx_clear(gfx_intensity_t i)
+void
+gfx_clear (gfx_intensity_t i)
 {                               // Dummy - no driver
 }
 
-void gfx_box(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
+void
+gfx_box (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 {                               // Dummy - no driver
 }
 
-void gfx_fill(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
+void
+gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 {                               // Dummy - no driver
 }
 
-void gfx_text(int8_t size, const char *fmt, ...)
+void
+gfx_text (int8_t size, const char *fmt, ...)
 {                               // Dummy - no driver
 }
 
-void gfx_icon16(gfx_pos_t w, gfx_pos_t h, const void *data)
+void
+gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
 {                               // Dummy - no driver
 }
 
-void gfx_message(const char *m)
+void
+gfx_message (const char *m)
 {                               // Dummy - no driver
 }
 #else
 
 // general global stuff
-static gfx_init_t gfx_settings = { };
+     static gfx_init_t gfx_settings = { };
 
 static TaskHandle_t gfx_task_id = NULL;
 static SemaphoreHandle_t gfx_mutex = NULL;
@@ -141,16 +162,22 @@ static volatile uint8_t gfx_changed = 1;        // Pixels changed
 static volatile uint8_t gfx_update = 0; // Other settings changed
 
 // Driver support
-static void gfx_busy_wait(void);
-static esp_err_t gfx_send_command(uint8_t cmd);
-static esp_err_t gfx_send_gfx(void);
-static esp_err_t gfx_command(uint8_t c, const uint8_t * buf, uint16_t len);
+static void gfx_busy_wait (void);
+static esp_err_t gfx_send_command (uint8_t cmd);
+static esp_err_t gfx_send_gfx (void);
+static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
 static __attribute__((unused))
-esp_err_t gfx_command1(uint8_t cmd, uint8_t a);
-static __attribute__((unused))
-esp_err_t gfx_command2(uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused))
-esp_err_t gfx_command_list(const uint8_t * init_code);
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -209,43 +236,44 @@ esp_err_t gfx_command_list(const uint8_t * init_code);
 #endif
 #endif
 
-static uint8_t const *fonts[] = {
+     static uint8_t const *
+        fonts[] = {
 #ifdef	CONFIG_GFX_FONT0
-   gfx_font0,
+        gfx_font0,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT1
-   gfx_font1,
+        gfx_font1,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT2
-   gfx_font2,
+        gfx_font2,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT3
-   gfx_font3,
+        gfx_font3,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT4
-   gfx_font4,
+        gfx_font4,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT5
-   gfx_font5,
+        gfx_font5,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT6
-   gfx_font6,
+        gfx_font6,
 #else
-   NULL,
+        NULL,
 #endif
-};
+     };
 
 #define	BLACK	0
 #if GFX_BPP == 16               // 16 bit RGB
@@ -284,99 +312,119 @@ static gfx_cell_t *gfx = NULL;
 
 // drawing state
 static gfx_pos_t x = 0,
-    y = 0;                      // position
+   y = 0;                       // position
 static gfx_align_t a = 0;       // alignment and movement
 static char f = 0,              // colour
-    b = 0;
+   b = 0;
 static uint32_t f_mul = 0,
-    b_mul = 0;                  // actual f/b colour multiplier
+   b_mul = 0;                   // actual f/b colour multiplier
 
 
 // Driver support
 
-static void gfx_busy_wait(void)
+static void
+gfx_busy_wait (void)
 {
    if (!gfx_settings.busy)
    {                            // No busy, so just wait
-      sleep(1);
+      sleep (1);
       return;
    }
    int try = 1000;
    while (try--)
    {
-      if (gpio_get_level(gfx_settings.busy))
+      if (gpio_get_level (gfx_settings.busy))
          break;
-      usleep(10000);
+      usleep (10000);
    }
 }
 
-static esp_err_t gfx_send_command(uint8_t cmd)
+static esp_err_t
+gfx_send_command (uint8_t cmd)
 {
-   gpio_set_level(gfx_settings.dc, 0);
+   gpio_set_level (gfx_settings.dc, 0);
    spi_transaction_t t = {
       .length = 8,
-      .tx_data = { cmd },
+      .tx_data = {cmd},
       .flags = SPI_TRANS_USE_TXDATA,
    };
-   esp_err_t e = spi_device_polling_transmit(gfx_spi, &t);
+   esp_err_t e = spi_device_polling_transmit (gfx_spi, &t);
    return e;
 }
 
-static esp_err_t gfx_send_data(const void *data, uint16_t len)
+static esp_err_t
+gfx_send_data (const void *data, uint16_t len)
 {
-   gpio_set_level(gfx_settings.dc, 1);
+   gpio_set_level (gfx_settings.dc, 1);
    spi_transaction_t c = {
       .length = 8 * len,
       .tx_buffer = data,
    };
-   return spi_device_transmit(gfx_spi, &c);
+   return spi_device_transmit (gfx_spi, &c);
 }
 
-static esp_err_t gfx_send_gfx(void)
+static esp_err_t
+gfx_send_gfx (void)
 {
-   return gfx_send_data(gfx, GFX_SIZE);
+   return gfx_send_data (gfx, GFX_SIZE);
 }
 
-static esp_err_t gfx_command(uint8_t c, const uint8_t * buf, uint16_t len)
+static esp_err_t
+gfx_command (uint8_t c, const uint8_t * buf, uint16_t len)
 {
-   esp_err_t e = gfx_send_command(c);
+   esp_err_t e = gfx_send_command (c);
    if (!e && len)
-      e = gfx_send_data(buf, len);
+      e = gfx_send_data (buf, len);
    return e;
 }
 
 static __attribute__((unused))
-esp_err_t gfx_command1(uint8_t cmd, uint8_t a)
+     esp_err_t gfx_command1 (uint8_t cmd, uint8_t a)
 {                               // Send a command with an arg
-   esp_err_t e = gfx_send_command(cmd);
+   esp_err_t e = gfx_send_command (cmd);
    if (e)
       return e;
-   gpio_set_level(gfx_settings.dc, 1);
-   spi_transaction_t d = {
+   gpio_set_level (gfx_settings.dc, 1);
+   spi_transaction_t t = {
       .length = 8,
-      .tx_data = { a },
+      .tx_data = {a},
       .flags = SPI_TRANS_USE_TXDATA,
    };
-   return spi_device_polling_transmit(gfx_spi, &d);
+   return spi_device_polling_transmit (gfx_spi, &t);
 }
 
 static __attribute__((unused))
-esp_err_t gfx_command2(uint8_t cmd, uint8_t a, uint8_t b)
+     esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b)
 {                               // Send a command with args
-   esp_err_t e = gfx_send_command(cmd);
+   esp_err_t e = gfx_send_command (cmd);
    if (e)
       return e;
-   gpio_set_level(gfx_settings.dc, 1);
-   spi_transaction_t d = {
+   gpio_set_level (gfx_settings.dc, 1);
+   spi_transaction_t t = {
       .length = 16,
-      .tx_data = { a, b },
+      .tx_data = {a, b},
       .flags = SPI_TRANS_USE_TXDATA,
    };
-   return spi_device_polling_transmit(gfx_spi, &d);
+   return spi_device_polling_transmit (gfx_spi, &t);
 }
 
 static __attribute__((unused))
-esp_err_t gfx_command_list(const uint8_t * init_code)
+     esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+{                               // Send a command with args
+   esp_err_t e = gfx_send_command (cmd);
+   if (e)
+      return e;
+   gpio_set_level (gfx_settings.dc, 1);
+   spi_transaction_t t = {
+      .length = 32,
+      .tx_data = {a, b, c, d},
+      .flags = SPI_TRANS_USE_TXDATA,
+   };
+   return spi_device_polling_transmit (gfx_spi, &t);
+}
+
+static __attribute__((unused))
+     esp_err_t gfx_command_list (const uint8_t * init_code)
 {
    uint8_t buf[64];
 
@@ -388,13 +436,13 @@ esp_err_t gfx_command_list(const uint8_t * init_code)
       init_code++;
       if (cmd == 0xFF)
       {
-         gfx_busy_wait();
-         usleep(num_args * 1000);
+         gfx_busy_wait ();
+         usleep (num_args * 1000);
          continue;
       }
-      if (num_args > sizeof(buf))
+      if (num_args > sizeof (buf))
       {
-         ESP_LOGE(TAG, "Bad command_list len %d", num_args);
+         ESP_LOGE (TAG, "Bad command_list len %d", num_args);
          break;
       }
 
@@ -403,7 +451,7 @@ esp_err_t gfx_command_list(const uint8_t * init_code)
          buf[i] = init_code[0];
          init_code++;
       }
-      esp_err_t e = gfx_command(cmd, buf, num_args);
+      esp_err_t e = gfx_command (cmd, buf, num_args);
       if (e)
          return e;
    }
@@ -411,14 +459,16 @@ esp_err_t gfx_command_list(const uint8_t * init_code)
 }
 
 // state control
-void gfx_pos(gfx_pos_t newx, gfx_pos_t newy, gfx_align_t newa)
+void
+gfx_pos (gfx_pos_t newx, gfx_pos_t newy, gfx_align_t newa)
 {                               // Set position
    x = newx;
    y = newy;
    a = (newa ? : (GFX_L | GFX_T | GFX_H));
 }
 
-static uint32_t gfx_colour_lookup(char c)
+static uint32_t
+gfx_colour_lookup (char c)
 {                               // character to colour mapping, default is white
    switch (c)
    {
@@ -460,60 +510,71 @@ static uint32_t gfx_colour_lookup(char c)
    return WHITE;
 }
 
-void gfx_colour(char newf)
+void
+gfx_colour (char newf)
 {                               // Set foreground
-   f_mul = gfx_colour_lookup(f = newf);
+   f_mul = gfx_colour_lookup (f = newf);
 }
 
-void gfx_background(char newb)
+void
+gfx_background (char newb)
 {                               // Set background
-   b_mul = gfx_colour_lookup(b = newb);
+   b_mul = gfx_colour_lookup (b = newb);
 }
 
 // Basic settings
-uint8_t gfx_width(void)
+uint8_t
+gfx_width (void)
 {                               // Display width
    return gfx_settings.width;
 }
 
-uint8_t gfx_height(void)
+uint8_t
+gfx_height (void)
 {                               // Display height
    return gfx_settings.height;
 }
 
-uint8_t gfx_bpp(void)
+uint8_t
+gfx_bpp (void)
 {
    return GFX_BPP;
 }
 
 // State get
-gfx_pos_t gfx_x(void)
+gfx_pos_t
+gfx_x (void)
 {
    return x;
 }
 
-gfx_pos_t gfx_y(void)
+gfx_pos_t
+gfx_y (void)
 {
    return y;
 }
 
-gfx_align_t gfx_a(void)
+gfx_align_t
+gfx_a (void)
 {
    return a;
 }
 
-char gfx_f(void)
+char
+gfx_f (void)
 {
    return f;
 }
 
-char gfx_b(void)
+char
+gfx_b (void)
 {
    return b;
 }
 
 // support
-inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
+inline void
+gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 {                               // set a pixel
    if (gfx_settings.flip & 4)
    {
@@ -546,7 +607,7 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    gfx[addr] = ((gfx[addr] & ~(bits << shift)) | (i << shift));
    gfx_changed = 1;
 #else
-   uint16_t v = ntohs(f_mul * (i >> (8 - GFX_INTENSITY_BPP)) + b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP)));
+   uint16_t v = ntohs (f_mul * (i >> (8 - GFX_INTENSITY_BPP)) + b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP)));
    if (v == gfx[(y * gfx_settings.width) + x])
       return;
    gfx[(y * gfx_settings.width) + x] = v;
@@ -554,10 +615,11 @@ inline void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 #endif
 }
 
-static void gfx_draw(gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp)
+static void
+gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp)
 {                               // move x/y based on drawing a box w/h, set x/y as top left of said box
    gfx_pos_t l = x,
-       t = y;
+      t = y;
    if ((a & GFX_C) == GFX_C)
       l -= (w - 1) / 2;
    else if (a & GFX_R)
@@ -587,20 +649,20 @@ static void gfx_draw(gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_p
 }
 
 static __attribute__((unused))
-void gfx_block2(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
+     void gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 2 bit greyscale data, l is data width for each row
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
       for (gfx_pos_t col = 0; col < w; col++)
-         gfx_pixel(x + col, y + row, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
+         gfx_pixel (x + col, y + row, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
       data += l;
    }
 }
 
 static __attribute__((unused))
-void gfx_block16(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
+     void gfx_block16 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
    if (!l)
       l = (w + 1) / 2;          // default is pixels width
@@ -609,27 +671,29 @@ void gfx_block16(gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t d
       for (gfx_pos_t col = 0; col < w; col++)
       {
          uint8_t v = data[(col + dx) / 2];
-         gfx_pixel(x + col, y + row, (v & 0xF0) | (v >> 4));
+         gfx_pixel (x + col, y + row, (v & 0xF0) | (v >> 4));
          col++;
          if (col < w)
-            gfx_pixel(x + col, y + row, (v & 0xF) | (v << 4));
+            gfx_pixel (x + col, y + row, (v & 0xF) | (v << 4));
       }
       data += l;
    }
 }
 
 // drawing
-void gfx_clear(gfx_intensity_t i)
+void
+gfx_clear (gfx_intensity_t i)
 {
    if (!gfx)
       return;
    for (gfx_pos_t y = 0; y < gfx_settings.height; y++)
       for (gfx_pos_t x = 0; x < gfx_settings.width; x++)
-         gfx_pixel(x, y, i);
-   gfx_colour('w');
+         gfx_pixel (x, y, i);
+   gfx_colour ('w');
 }
 
-void gfx_set_contrast(gfx_intensity_t contrast)
+void
+gfx_set_contrast (gfx_intensity_t contrast)
 {
    if (!contrast)
       contrast = 255;
@@ -640,55 +704,59 @@ void gfx_set_contrast(gfx_intensity_t contrast)
    gfx_changed = 1;
 }
 
-void gfx_box(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
+void
+gfx_box (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 {                               // draw a box, not filled
    gfx_pos_t x,
-    y;
-   gfx_draw(w, h, 0, 0, &x, &y);
+     y;
+   gfx_draw (w, h, 0, 0, &x, &y);
    for (gfx_pos_t n = 0; n < w; n++)
    {
-      gfx_pixel(x + n, y, i);
-      gfx_pixel(x + n, y + h - 1, i);
+      gfx_pixel (x + n, y, i);
+      gfx_pixel (x + n, y + h - 1, i);
    }
    for (gfx_pos_t n = 1; n < h - 1; n++)
    {
-      gfx_pixel(x, y + n, i);
-      gfx_pixel(x + w - 1, y + n, i);
+      gfx_pixel (x, y + n, i);
+      gfx_pixel (x + w - 1, y + n, i);
    }
 }
 
-void gfx_fill(gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
+void
+gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 {                               // draw a filled rectangle
    gfx_pos_t x,
-    y;
-   gfx_draw(w, h, 0, 0, &x, &y);
+     y;
+   gfx_draw (w, h, 0, 0, &x, &y);
    for (gfx_pos_t row = 0; row < h; row++)
       for (gfx_pos_t col = 0; col < w; col++)
-         gfx_pixel(x + col, y + row, i);
+         gfx_pixel (x + col, y + row, i);
 }
 
-void gfx_icon16(gfx_pos_t w, gfx_pos_t h, const void *data)
+void
+gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
 {                               // Icon, 16 bit packed
    if (!data)
-      gfx_fill(w, h, 0);        // No icon
+      gfx_fill (w, h, 0);       // No icon
    else
    {
       gfx_pos_t x,
-       y;
-      gfx_draw(w, h, 0, 0, &x, &y);
-      gfx_block16(x, y, w, h, 0, data, 0);
+        y;
+      gfx_draw (w, h, 0, 0, &x, &y);
+      gfx_block16 (x, y, w, h, 0, data, 0);
    }
 }
 
-void gfx_text(int8_t size, const char *fmt, ...)
+void
+gfx_text (int8_t size, const char *fmt, ...)
 {                               // Size negative for descenders
    if (!gfx)
       return;
    va_list ap;
    char temp[gfx_settings.width / 4 + 2];
-   va_start(ap, fmt);
-   vsnprintf(temp, sizeof(temp), fmt, ap);
-   va_end(ap);
+   va_start (ap, fmt);
+   vsnprintf (temp, sizeof (temp), fmt, ap);
+   va_end (ap);
    int z = 7;                   // effective height
    if (size < 0)
    {                            // indicates descenders allowed
@@ -696,8 +764,8 @@ void gfx_text(int8_t size, const char *fmt, ...)
       z = 9;
    } else if (!size)
       z = 5;
-   if (size > sizeof(fonts) / sizeof(*fonts))
-      size = sizeof(fonts) / sizeof(*fonts);
+   if (size > sizeof (fonts) / sizeof (*fonts))
+      size = sizeof (fonts) / sizeof (*fonts);
    if (!fonts[size])
       return;
    int fontw = (size ? 6 * size : 4);   // pixel width of characters in font file
@@ -705,7 +773,8 @@ void gfx_text(int8_t size, const char *fmt, ...)
 
    int w = 0;                   // width of overall text
    int h = z * (size ? : 1);    // height of overall text
-   int cwidth(char c) {         // character width as printed - some characters are done narrow, and <' ' is fixed size move
+   int cwidth (char c)
+   {                            // character width as printed - some characters are done narrow, and <' ' is fixed size move
       if (c & 0x80)
          return 0;
       if (size)
@@ -717,7 +786,8 @@ void gfx_text(int8_t size, const char *fmt, ...)
       }
       return fontw;
    }
-   const uint8_t *fontdata(char c) {
+   const uint8_t *fontdata (char c)
+   {
 #if	GFX_BPP == 1
       const uint8_t *d = fonts[size] + (c - ' ') * ((fontw + 7) / 8) * fonth;
 #else
@@ -726,28 +796,28 @@ void gfx_text(int8_t size, const char *fmt, ...)
       return d;
    }
    for (char *p = temp; *p; p++)
-      w += cwidth(*p);
+      w += cwidth (*p);
    gfx_pos_t x,
-    y;
+     y;
    if (w)
       w -= (size ? : 1);        // Margin right hand pixel needs removing from width
-   gfx_draw(w, h, size ? : 1, size ? : 1, &x, &y);      // starting point
+   gfx_draw (w, h, size ? : 1, size ? : 1, &x, &y);     // starting point
    if (!w)
       return;                   // nothing to print
    for (gfx_pos_t n = -1; n <= w; n++)
    {
-      gfx_pixel(x + n, y - 1, 0);
-      gfx_pixel(x + n, y + h, 0);
+      gfx_pixel (x + n, y - 1, 0);
+      gfx_pixel (x + n, y + h, 0);
    }
    for (gfx_pos_t n = 0; n < h; n++)
    {
-      gfx_pixel(x - 1, y + n, 0);
-      gfx_pixel(x + w, y + n, 0);
+      gfx_pixel (x - 1, y + n, 0);
+      gfx_pixel (x + w, y + n, 0);
    }
    for (char *p = temp; *p; p++)
    {
       int c = *p;
-      int charw = cwidth(c);
+      int charw = cwidth (c);
       if (charw)
       {
          if (c < ' ')
@@ -756,25 +826,26 @@ void gfx_text(int8_t size, const char *fmt, ...)
             charw -= (size ? : 1);
          int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
 #if	GFX_BPP == 1
-         gfx_block2(x, y, charw, h, dx, fontdata(c), (fontw + 7) / 8);
+         gfx_block2 (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8);
 #else
-         gfx_block16(x, y, charw, h, dx, fontdata(c), fontw / 2);
+         gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
 #endif
          x += charw;
       }
    }
 }
 
-static void gfx_task(void *p)
+static void
+gfx_task (void *p)
 {
-   const char *e = gfx_driver_init();
+   const char *e = gfx_driver_init ();
    if (e)
    {
-      ESP_LOGE(TAG, "Configuration failed %s", e);
-      free(gfx);
+      ESP_LOGE (TAG, "Configuration failed %s", e);
+      free (gfx);
       gfx = NULL;
       gfx_settings.port = -1;
-      vTaskDelete(NULL);
+      vTaskDelete (NULL);
       return;
    }
    gfx_update = 1;
@@ -782,17 +853,18 @@ static void gfx_task(void *p)
    {                            // Update
       if (!gfx_changed)
       {
-         usleep(100000);
+         usleep (100000);
          continue;
       }
-      gfx_lock();
+      gfx_lock ();
       gfx_changed = 0;
-      gfx_driver_send();
-      gfx_unlock();
+      gfx_driver_send ();
+      gfx_unlock ();
    }
 }
 
-const char *gfx_init_opts(gfx_init_t o)
+const char *
+gfx_init_opts (gfx_init_t o)
 {                               // Start OLED task and display
    // Defaults
    if (!o.contrast)
@@ -828,22 +900,22 @@ const char *gfx_init_opts(gfx_init_t o)
       return "SCK not set";
    if (!o.dc)
       return "DC not set";
-   if (!GPIO_IS_VALID_OUTPUT_GPIO(o.mosi))
+   if (!GPIO_IS_VALID_OUTPUT_GPIO (o.mosi))
       return "MOSI not output";
-   if (!GPIO_IS_VALID_OUTPUT_GPIO(o.sck))
+   if (!GPIO_IS_VALID_OUTPUT_GPIO (o.sck))
       return "SCK not output";
-   if (!GPIO_IS_VALID_OUTPUT_GPIO(o.dc))
+   if (!GPIO_IS_VALID_OUTPUT_GPIO (o.dc))
       return "DC not output";
-   if (o.ena && !GPIO_IS_VALID_OUTPUT_GPIO(o.ena))
+   if (o.ena && !GPIO_IS_VALID_OUTPUT_GPIO (o.ena))
       return "ENA not output";
-   if (o.rst && !GPIO_IS_VALID_OUTPUT_GPIO(o.rst))
+   if (o.rst && !GPIO_IS_VALID_OUTPUT_GPIO (o.rst))
       return "RST not output";
    gfx_settings = o;
-   gfx_mutex = xSemaphoreCreateMutex(); // Shared text access
-   gfx = malloc(GFX_SIZE);
+   gfx_mutex = xSemaphoreCreateMutex ();        // Shared text access
+   gfx = malloc (GFX_SIZE);
    if (!gfx)
       return "Mem?";
-   memset(gfx, 0, GFX_SIZE);
+   memset (gfx, 0, GFX_SIZE);
    spi_bus_config_t config = {
       .mosi_io_num = o.mosi,
       .miso_io_num = -1,
@@ -855,7 +927,7 @@ const char *gfx_init_opts(gfx_init_t o)
    };
    if (o.port == HSPI_HOST && o.mosi == 22 && o.sck == 18 && o.cs == 5)
       config.flags |= SPICOMMON_BUSFLAG_IOMUX_PINS;
-   if (spi_bus_initialize(o.port, &config, 2))
+   if (spi_bus_initialize (o.port, &config, 2))
       return "Init?";
    spi_device_interface_config_t devcfg = {
       .clock_speed_hz = SPI_MASTER_FREQ_20M,
@@ -864,51 +936,54 @@ const char *gfx_init_opts(gfx_init_t o)
       .queue_size = 1,
       .flags = SPI_DEVICE_3WIRE,
    };
-   if (spi_bus_add_device(o.port, &devcfg, &gfx_spi))
+   if (spi_bus_add_device (o.port, &devcfg, &gfx_spi))
       return "Add?";
    if (o.ena)
    {
-      gpio_reset_pin(o.ena);
-      gpio_set_direction(o.ena, GPIO_MODE_OUTPUT);
-      gpio_set_level(o.ena, 1); // Enable
+      gpio_reset_pin (o.ena);
+      gpio_set_direction (o.ena, GPIO_MODE_OUTPUT);
+      gpio_set_level (o.ena, 1);        // Enable
    }
-   gpio_reset_pin(o.dc);
-   gpio_set_direction(o.dc, GPIO_MODE_OUTPUT);
+   gpio_reset_pin (o.dc);
+   gpio_set_direction (o.dc, GPIO_MODE_OUTPUT);
    if (o.rst)
    {
-      gpio_reset_pin(o.rst);
-      gpio_set_direction(o.rst, GPIO_MODE_OUTPUT);
-      gpio_set_level(o.rst, 0);
-      usleep(100000);
-      gpio_set_level(o.rst, 1);
-      usleep(100000);
+      gpio_reset_pin (o.rst);
+      gpio_set_direction (o.rst, GPIO_MODE_OUTPUT);
+      gpio_set_level (o.rst, 0);
+      usleep (100000);
+      gpio_set_level (o.rst, 1);
+      usleep (100000);
    }
-   xTaskCreate(gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);
+   xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
 }
 
-void gfx_lock(void)
+void
+gfx_lock (void)
 {                               // Lock display task
    if (gfx_mutex)
-      xSemaphoreTake(gfx_mutex, portMAX_DELAY);
+      xSemaphoreTake (gfx_mutex, portMAX_DELAY);
    gfx_locks++;
    // preset state
-   gfx_background('k');
-   gfx_colour('w');
-   gfx_pos(0, 0, GFX_L | GFX_T | GFX_H);
+   gfx_background ('k');
+   gfx_colour ('w');
+   gfx_pos (0, 0, GFX_L | GFX_T | GFX_H);
 }
 
-void gfx_unlock(void)
+void
+gfx_unlock (void)
 {                               // Unlock display task
    gfx_locks--;
    if (gfx_mutex)
-      xSemaphoreGive(gfx_mutex);
+      xSemaphoreGive (gfx_mutex);
 }
 
-void gfx_message(const char *m)
+void
+gfx_message (const char *m)
 {
-   gfx_lock();
-   gfx_pos(gfx_settings.width / 2, 0, GFX_T | GFX_C | GFX_V);
+   gfx_lock ();
+   gfx_pos (gfx_settings.width / 2, 0, GFX_T | GFX_C | GFX_V);
    uint8_t size = 2;
    while (*m)
    {
@@ -916,28 +991,28 @@ void gfx_message(const char *m)
       {
          char isf = 1;
          for (; *m && *m != ']'; m++)
-            if (isdigit((unsigned char)*m))
+            if (isdigit ((unsigned char) *m))
                size = *m - '0'; /* size */
-            else if (isalpha((unsigned char)*m))
+            else if (isalpha ((unsigned char) *m))
             {                   /* colour */
                if ((isf++) & 1)
-                  gfx_colour(*m);
+                  gfx_colour (*m);
                else
-                  gfx_background(*m);
+                  gfx_background (*m);
             }
          if (*m)
             m++;
       }
-      if (!gfx_y())
-         gfx_clear(0);
+      if (!gfx_y ())
+         gfx_clear (0);
       const char *e = m;
       while (*e && *e != '/' && *e != '[')
          e++;
-      gfx_text(size, "%.*s", (int) (e - m), m);
+      gfx_text (size, "%.*s", (int) (e - m), m);
       m = e;
       if (*m == '/')
          m++;
    }
-   gfx_unlock();
+   gfx_unlock ();
 }
 #endif

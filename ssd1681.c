@@ -32,41 +32,49 @@
 #define SSD1681_SET_RAMXCOUNT 0x4E
 #define SSD1681_SET_RAMYCOUNT 0x4F
 
-static const char *gfx_driver_init(void)
+static const char *
+gfx_driver_init (void)
 {                               // Initialise
+   int W = gfx_width ();
+   int H = gfx_height ();
    const uint8_t ssd1681_default_init_code[] = {
       SSD1681_SW_RESET, 0,      // soft reset
       0xFF, 20,                 // busy wait
-      SSD1681_DRIVER_CONTROL, 3, (gfx_width() - 1), (gfx_width() - 1) >> 8, 0,
+      SSD1681_DRIVER_CONTROL, 3, (W - 1), (W - 1) >> 8, 0,      //
       SSD1681_DATA_MODE, 1, 0x03,       // Ram data entry mode
       SSD1681_WRITE_BORDER, 1, 0x05,    // border color
       SSD1681_TEMP_CONTROL, 1, 0x80,    // Temp control
       SSD1681_SET_RAMXCOUNT, 1, 0,
       SSD1681_SET_RAMYCOUNT, 2, 0, 0,
+      SSD1681_SET_RAMXPOS, 2, 0, (W + 7) / 8 - 1,       //
+      SSD1681_SET_RAMYPOS, 4, 0, 0, (H - 1) & 0xFF, (H - 1) / 256,      //
       0xFE
    };
 
-   if (gfx_command_list(ssd1681_default_init_code))
+   if (gfx_command_list (ssd1681_default_init_code))
       return "Init failed";
    return NULL;
 }
 
-static const char *gfx_driver_send(void)
+static const char *
+gfx_driver_send (void)
 {                               // Send buffer and update display
-   uint8_t buf[2] = {0};
-   if (gfx_command(SSD1681_SET_RAMXCOUNT, buf, 1))
+   if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
       return "Set X failed";
-   if (gfx_command(SSD1681_SET_RAMYCOUNT, buf, 2))
+   if (gfx_command2 (SSD1681_SET_RAMYCOUNT, 0, 0))
       return "Set Y failed";
-   if (gfx_command(SSD1681_WRITE_RAM1, NULL, 0))
-      return "Write RAM failed";
-   if (gfx_send_gfx())
+   if (gfx_send_command (SSD1681_WRITE_RAM1))
+      return "Data start failed";
+   if (gfx_send_gfx ())
       return "Data send failed";
-   buf[0] = 0xF7; // DISPLAY with DISPLAY Mode 1
-   if (gfx_command(SSD1681_DISP_CTRL2, buf, 1))
+   if (gfx_send_command (SSD1681_WRITE_RAM2))
+      return "Data start failed";
+   if (gfx_send_gfx ())
+      return "Data send failed";
+   if (gfx_command1 (SSD1681_DISP_CTRL2, 0xF7))
       return "Display ctrl failed";
-   if (gfx_command(SSD1681_MASTER_ACTIVATE, NULL, 0))
+   if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
       return "Master activate failed";
-   gfx_busy_wait();
+   gfx_busy_wait ();
    return NULL;
 }
