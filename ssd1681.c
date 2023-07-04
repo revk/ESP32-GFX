@@ -1,4 +1,5 @@
 // SSD1681 driver code
+// http://www.e-paper-display.com/download_detail/downloadsId=825.html
 
 #define GFX_DEFAULT_WIDTH	200
 #define GFX_DEFAULT_HEIGHT	200
