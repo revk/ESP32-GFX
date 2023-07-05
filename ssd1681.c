@@ -35,8 +35,8 @@
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
-   int W = gfx_width ();
-   int H = gfx_height ();
+   int W = gfx_settings.width;
+   int H = gfx_settings.height;
    const uint8_t ssd1681_default_init_code[] = {
       SSD1681_SW_RESET, 0,      // soft reset
       0xFF, 20,                 // busy wait
@@ -57,7 +57,7 @@ gfx_driver_init (void)
 }
 
 static const char *
-gfx_driver_send (uint8_t mode)
+gfx_driver_send (void)
 {                               // Send buffer and update display
    if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
       return "Set X failed";
@@ -67,7 +67,7 @@ gfx_driver_send (uint8_t mode)
       return "Data start failed";
    if (gfx_send_gfx ())
       return "Data send failed";
-   if (gfx_command1 (SSD1681_DISP_CTRL2, mode ? 0xFF : 0xF7))
+   if (gfx_command1 (SSD1681_DISP_CTRL2, gfx_settings.mode2 ? 0xFF : 0xF7))
       return "Display ctrl failed";
    // TODO need to handle RAM1/RAM2 in mode 2 updates
       if (gfx_send_command (SSD1681_MASTER_ACTIVATE))

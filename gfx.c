@@ -43,7 +43,7 @@ gfx_lock (void)
 }
 
 void
-gfx_unlock (uint8_t mode)
+gfx_unlock (void)
 {                               // Dummy - no driver
 }
 
@@ -160,7 +160,6 @@ static int8_t gfx_locks = 0;
 static spi_device_handle_t gfx_spi;
 static volatile uint8_t gfx_changed = 1;        // Pixels changed
 static volatile uint8_t gfx_update = 0; // Other settings changed
-static volatile uint8_t gfx_mode = 0;   // Display mode (depends on driver)
 
 // Driver support
 static void gfx_busy_wait (void);
@@ -850,8 +849,8 @@ gfx_task (void *p)
       }
       gfx_lock ();
       gfx_changed = 0;
-      gfx_driver_send (gfx_mode);
-      gfx_unlock (0);
+      gfx_driver_send ();
+      gfx_unlock ();
    }
 }
 
@@ -964,12 +963,16 @@ gfx_lock (void)
 }
 
 void
-gfx_unlock (uint8_t mode)
+gfx_unlock (void)
 {                               // Unlock display task
-   gfx_mode = mode;
    gfx_locks--;
    if (gfx_mutex)
       xSemaphoreGive (gfx_mutex);
+}
+
+void gfx_refresh(void)
+{
+	// TODO
 }
 
 void
@@ -1006,6 +1009,7 @@ gfx_message (const char *m)
       if (*m == '/')
          m++;
    }
-   gfx_unlock (0);
+   gfx_unlock ();
 }
 #endif
+

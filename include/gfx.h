@@ -28,14 +28,17 @@ typedef struct {
  uint8_t contrast;	// Contracts, if display supports it, 0 for default
  uint8_t width;	// Display width
  uint8_t height;	// Display width
- uint8_t flip;	// Display flipping
+ uint8_t flip:3;	// Display flipping
+ uint8_t partial:1;	// E-Paper partial updates
+ uint8_t mode2:1;	// E-Paper mode 2 updates
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);
 
 // locking atomic drawing functions
 void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white on black
-void gfx_unlock(uint8_t);	// unlocks display allowing it to be sent if there has been any change - sets display mode for next update
+void gfx_unlock(void);	// unlocks display allowing it to be sent if there has been any change
+void gfx_refresh(void);	// E-paper mainly, do full mode update
 
 // Overall display contrast setting if supported by display
 void gfx_set_contrast(gfx_intensity_t);

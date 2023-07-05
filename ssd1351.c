@@ -52,7 +52,7 @@ gfx_driver_init (void)
 }
 
 static const char *
-gfx_driver_send (uint8_t mode)
+gfx_driver_send (void)
 {                               // Send buffer and update display
    gfx_command2 (0x15, 0, 127);
    gfx_command2 (0x75, 0, 127);
