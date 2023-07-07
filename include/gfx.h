@@ -31,6 +31,11 @@ typedef struct {
  uint8_t flip:3;	// Display flipping
  uint8_t partial:1;	// E-Paper partial updates
  uint8_t mode2:1;	// E-Paper mode 2 updates
+ uint8_t sleep:1;	// E-Paper sleep mode
+ // Some dynamic values - don't set in init
+ uint8_t changed:1;	// There has been a change, cleared when sent
+ uint8_t refresh:1;	// Next update is full refresh (E-paper mainly), self clearing
+ uint8_t update:1;	// Controls update, cleared when updated
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);
@@ -39,6 +44,7 @@ const char *gfx_init_opts(gfx_init_t);
 void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white on black
 void gfx_unlock(void);	// unlocks display allowing it to be sent if there has been any change
 void gfx_refresh(void);	// E-paper mainly, do full mode update
+void gfx_wait(void);	// Wait for updates to be done
 
 // Overall display contrast setting if supported by display
 void gfx_set_contrast(gfx_intensity_t);

@@ -158,8 +158,6 @@ static TaskHandle_t gfx_task_id = NULL;
 static SemaphoreHandle_t gfx_mutex = NULL;
 static int8_t gfx_locks = 0;
 static spi_device_handle_t gfx_spi;
-static volatile uint8_t gfx_changed = 1;        // Pixels changed
-static volatile uint8_t gfx_update = 0; // Other settings changed
 
 // Driver support
 static void gfx_busy_wait (void);
@@ -324,9 +322,9 @@ gfx_busy_wait (void)
    int try = 1000;
    while (try--)
    {
-      if (gpio_get_level (gfx_settings.busy))
-         break;
       usleep (10000);
+      if (!gpio_get_level (gfx_settings.busy))
+         break;                 // Not busy
    }
 }
 
@@ -596,13 +594,13 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    if (((gfx[addr] >> shift) & bits) == i)
       return;
    gfx[addr] = ((gfx[addr] & ~(bits << shift)) | (i << shift));
-   gfx_changed = 1;
+   gfx_settings.changed = 1;
 #else
    uint16_t v = ntohs (f_mul * (i >> (8 - GFX_INTENSITY_BPP)) + b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP)));
    if (v == gfx[(y * gfx_settings.width) + x])
       return;
    gfx[(y * gfx_settings.width) + x] = v;
-   gfx_changed = 1;
+   gfx_settings.changed = 1;
 #endif
 }
 
@@ -691,8 +689,8 @@ gfx_set_contrast (gfx_intensity_t contrast)
    if (!gfx || gfx_settings.contrast == contrast)
       return;
    gfx_settings.contrast = contrast;
-   gfx_update = 1;
-   gfx_changed = 1;
+   gfx_settings.update = 1;
+   gfx_settings.changed = 1;
 }
 
 void
@@ -839,17 +837,18 @@ gfx_task (void *p)
       vTaskDelete (NULL);
       return;
    }
-   gfx_update = 1;
+   gfx_settings.update = 1;
    while (1)
    {                            // Update
-      if (!gfx_changed)
+      if (!gfx_settings.changed)
       {
          usleep (100000);
          continue;
       }
       gfx_lock ();
-      gfx_changed = 0;
+      gfx_settings.changed = 0;
       gfx_driver_send ();
+      gfx_settings.refresh = 0;
       gfx_unlock ();
    }
 }
@@ -879,11 +878,12 @@ gfx_init_opts (gfx_init_t o)
    if (!o.busy)
       o.busy = CONFIG_GFX_BUSY;
    if (!o.flip)
-      o.busy = CONFIG_GFX_FLIP;
+      o.flip = CONFIG_GFX_FLIP;
    if (!o.width)
       o.width = GFX_DEFAULT_WIDTH;
    if (!o.height)
       o.height = GFX_DEFAULT_HEIGHT;
+   o.refresh = 1;
    // Check
    if (!o.mosi)
       return "MOSI not set";
@@ -937,14 +937,20 @@ gfx_init_opts (gfx_init_t o)
    }
    gpio_reset_pin (o.dc);
    gpio_set_direction (o.dc, GPIO_MODE_OUTPUT);
+   if (o.busy)
+   {
+      gpio_reset_pin (o.busy);
+      gpio_set_direction (o.busy, GPIO_MODE_INPUT);
+   }
    if (o.rst)
    {
       gpio_reset_pin (o.rst);
       gpio_set_direction (o.rst, GPIO_MODE_OUTPUT);
       gpio_set_level (o.rst, 0);
-      usleep (100000);
+      usleep (10000);
       gpio_set_level (o.rst, 1);
-      usleep (100000);
+      usleep (10000);
+      gfx_busy_wait ();
    }
    xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
@@ -970,9 +976,18 @@ gfx_unlock (void)
       xSemaphoreGive (gfx_mutex);
 }
 
-void gfx_refresh(void)
-{
-	// TODO
+void
+gfx_refresh (void)
+{                               // For e-paper force full refresh
+   gfx_settings.refresh = 1;
+   gfx_settings.changed = 1;
+}
+
+void
+gfx_wait (void)
+{                               // Wait for changes to be applied
+   while (gfx_settings.changed)
+      usleep (100000);
 }
 
 void
@@ -1012,4 +1027,3 @@ gfx_message (const char *m)
    gfx_unlock ();
 }
 #endif
-

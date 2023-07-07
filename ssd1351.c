@@ -58,9 +58,9 @@ gfx_driver_send (void)
    gfx_command2 (0x75, 0, 127);
    gfx_send_command (0x5C);
    gfx_send_gfx ();
-   if (gfx_update)
+   if (gfx_settings.update)
    {
-      gfx_update = 0;
+      gfx_settings.update = 0;
       gfx_command1 (0xC7, gfx_settings.contrast >> 4);
    }
    return NULL;
