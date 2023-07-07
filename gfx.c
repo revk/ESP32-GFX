@@ -164,10 +164,18 @@ static void gfx_busy_wait (void);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -226,43 +234,44 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const *fonts[] = {
+     static uint8_t const *
+        fonts[] = {
 #ifdef	CONFIG_GFX_FONT0
-   gfx_font0,
+        gfx_font0,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT1
-   gfx_font1,
+        gfx_font1,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT2
-   gfx_font2,
+        gfx_font2,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT3
-   gfx_font3,
+        gfx_font3,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT4
-   gfx_font4,
+        gfx_font4,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT5
-   gfx_font5,
+        gfx_font5,
 #else
-   NULL,
+        NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT6
-   gfx_font6,
+        gfx_font6,
 #else
-   NULL,
+        NULL,
 #endif
-};
+     };
 
 #define	BLACK	0
 #if GFX_BPP == 16               // 16 bit RGB
@@ -638,6 +647,20 @@ gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, 
 }
 
 static __attribute__((unused))
+     void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l, int c)
+{                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
+   if (!l)
+      l = (w + 7) / 8;          // default is pixels width
+   for (gfx_pos_t row = 0; row < h; row++)
+   {
+      for (gfx_pos_t col = 0; col < w; col++)
+         if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
+            gfx_pixel (x + col, y + row, c);
+      data += l;
+   }
+}
+
+static __attribute__((unused))
      void gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 2 bit greyscale data, l is data width for each row
    if (!l)
@@ -720,6 +743,20 @@ gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
    for (gfx_pos_t row = 0; row < h; row++)
       for (gfx_pos_t col = 0; col < w; col++)
          gfx_pixel (x + col, y + row, i);
+}
+
+void
+gfx_icon2 (gfx_pos_t w, gfx_pos_t h, const void *data)
+{                               // Icon, 2 bit packed
+   if (!data)
+      gfx_fill (w, h, 0);       // No icon
+   else
+   {
+      gfx_pos_t x,
+        y;
+      gfx_draw (w, h, 0, 0, &x, &y);
+      gfx_block2 (x, y, w, h, 0, data, 0);
+   }
 }
 
 void
