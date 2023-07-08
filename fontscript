@@ -10,8 +10,7 @@ if(! -e /tmp/5x9JTDBold) then
 	cd /tmp/5x9JTDBold
 	foreach u (u00[0-7]*.svg)
 		echo $u
-		inkscape $u --verb EditSelectAll --verb SelectionUnGroup --verb SelectionUnion --verb FileSave --verb FileQuit
-		inkscape -z --export-area=0:0:612:918 -o $u:r.png $u >& /dev/null
+		inkscape --export-area=0:0:612:918 -o $u:r.png $u >& /dev/null
 	end
 endif
 if(! -e /tmp/5x9JTD) then
@@ -19,8 +18,7 @@ if(! -e /tmp/5x9JTD) then
 	cd /tmp/5x9JTD
 	foreach u (u00[0-7]*.svg)
 		echo $u
-		inkscape $u --verb EditSelectAll --verb SelectionUnGroup --verb SelectionUnion --verb FileSave --verb FileQuit
-		inkscape -z --export-area=0:0:612:918 -o $u:r.png $u >& /dev/null
+		inkscape --export-area=0:0:612:918 -o $u:r.png $u >& /dev/null
 	end
 endif
 if(! -e /tmp/5x9LCD) then
@@ -28,8 +26,15 @@ if(! -e /tmp/5x9LCD) then
 	cd /tmp/5x9LCD
 	foreach u (u00[0-7]*.svg)
 		echo $u
-		inkscape $u --verb EditSelectAll --verb SelectionUnGroup --verb SelectionUnion --verb FileSave --verb FileQuit
-		inkscape -z --export-area=50:50:662:968 -o $u:r.png $u >& /dev/null
+		inkscape --export-area=50:50:662:968 -o $u:r.png $u >& /dev/null
+	end
+endif
+if(! -e /tmp/7seg) then
+	mkdir /tmp/7seg
+	cd /tmp/7seg
+	foreach s (a b c d e f g h i)
+		echo $s
+		inkscape --actions="export-id:$s;export-id-only;export-area-page;export-background:white;export-filename:$s.png;export-do" $d/SevenSeg.svg >& /dev/null
 	end
 endif
 foreach n (1 2 3 4 5 6)
@@ -56,6 +61,17 @@ foreach n (1 2 3 4 5 6)
 	foreach u (u00[0-7]*.svg)
 		convert $u:r.png -flatten -monochrome -dither None -scale ${W}x${H}'!' char.mono
 		echo "// $u:r" >> $f
+		od -v -tx1 -w$W -Anone char.mono | sed -e 's/\([0-9a-f][0-9a-f]\)/0x\1,/g' >> $f
+	end
+	echo "};" >> $f
+	mv -f "$f" "$d/include"
+	cd /tmp/7seg
+	set f="7seg$n.h"
+	echo "$f"
+	echo "static const uint8_t gfx_7seg${n}[]={ // $W/$H ($b bytes per character)" > $f
+	foreach s (a b c d e f g h i)
+		convert $s:r.png -flatten -monochrome -dither None -scale ${W}x${H}'!' char.mono
+		echo "// $s:r" >> $f
 		od -v -tx1 -w$W -Anone char.mono | sed -e 's/\([0-9a-f][0-9a-f]\)/0x\1,/g' >> $f
 	end
 	echo "};" >> $f
