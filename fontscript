@@ -37,34 +37,38 @@ if(! -e /tmp/7seg) then
 		inkscape --actions="export-id:$s;export-id-only;export-area-page;export-background:white;export-filename:$s.png;export-do" $d/SevenSeg.svg >& /dev/null
 	end
 endif
-foreach n (1 2 3 4 5 6)
-	cd /tmp/5x9JTD
-	if($n == 1) cd /tmp/5x9JTDBold
-	@ W = $n * 6
-	@ H = $n * 9
-	@ b = $W * $H / 2
-	set f="grey$n.h"
-	echo "$f"
-	echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
-	foreach u (u00[0-7]*.svg)
-		convert $u:r.png -flatten -negate -scale ${W}x${H}'!' char.gray
-		echo "// $u:r" >> $f
-		od -v -tx1 -w$W -Anone char.gray | sed -e 's/\([0-9a-f]\)[0-9a-f] \([0-9a-f]\)[0-9a-f]/0x\1\2,/g' >> $f
-	end
-	echo "};" >> $f
-	mv -f "$f" "$d/include"
-	if($n == 1) cd /tmp/5x9LCD
-	@ b = ( $W + 7 ) / 8 * $H
-	set f="mono$n.h"
-	echo "$f"
-	echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
-	foreach u (u00[0-7]*.svg)
-		convert $u:r.png -flatten -monochrome -dither None -scale ${W}x${H}'!' char.mono
-		echo "// $u:r" >> $f
-		od -v -tx1 -w$W -Anone char.mono | sed -e 's/\([0-9a-f][0-9a-f]\)/0x\1,/g' >> $f
-	end
-	echo "};" >> $f
-	mv -f "$f" "$d/include"
+foreach n (1 2 3 4 5 6 7 8)
+	if($n <= 6) then
+		cd /tmp/5x9JTD
+		if($n == 1) cd /tmp/5x9JTDBold
+		@ W = $n * 6
+		@ H = $n * 9
+		@ b = $W * $H / 2
+		set f="grey$n.h"
+		echo "$f"
+		echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
+		foreach u (u00[0-7]*.svg)
+			convert $u:r.png -flatten -negate -scale ${W}x${H}'!' char.gray
+			echo "// $u:r" >> $f
+			od -v -tx1 -w$W -Anone char.gray | sed -e 's/\([0-9a-f]\)[0-9a-f] \([0-9a-f]\)[0-9a-f]/0x\1\2,/g' >> $f
+		end
+		echo "};" >> $f
+		mv -f "$f" "$d/include"
+		if($n == 1) cd /tmp/5x9LCD
+		@ b = ( $W + 7 ) / 8 * $H
+		set f="mono$n.h"
+		echo "$f"
+		echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
+		foreach u (u00[0-7]*.svg)
+			convert $u:r.png -flatten -monochrome -dither None -scale ${W}x${H}'!' char.mono
+			echo "// $u:r" >> $f
+			od -v -tx1 -w$W -Anone char.mono | sed -e 's/\([0-9a-f][0-9a-f]\)/0x\1,/g' >> $f
+		end
+		echo "};" >> $f
+		mv -f "$f" "$d/include"
+	endif
+	@ W = $n * 8
+	@ H = $n * 10
 	cd /tmp/7seg
 	set f="7seg$n.h"
 	echo "$f"

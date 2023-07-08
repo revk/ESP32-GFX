@@ -164,18 +164,10 @@ static void gfx_busy_wait (void);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -195,6 +187,8 @@ static __attribute__((unused))
 #include "7seg4.h"
 #include "7seg5.h"
 #include "7seg6.h"
+#include "7seg7.h"
+#include "7seg8.h"
 #endif
 
 #if	GFX_BPP == 1
@@ -243,8 +237,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x1B, 0x4F, 0x66, 0x2D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -254,6 +247,8 @@ static uint8_t const *sevenseg[] = {
    gfx_7seg4,
    gfx_7seg5,
    gfx_7seg6,
+   gfx_7seg7,
+   gfx_7seg8,
 #endif
 };
 
@@ -810,34 +805,48 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    vsnprintf (temp, sizeof (temp), fmt, ap);
    va_end (ap);
 
-   int fontw = 6 * size;        // pixel width of characters in font file
-   int fonth = 9 * size;        // pixel height of characters in font file
-
-   char *p = temp;
-   while (*p)
+   int fontw = 8 * size;        // pixel width of characters in font file
+   int fonth = 10 * size;       // pixel height of characters in font file
+   inline const uint8_t *fontdata (uint8_t s)
    {
-      if (isdigit ((int) *p))
+      return sevenseg[size - 1] + s * ((fontw + 7) / 8) * fonth;
+   }
+
+   int w = 0;
+   for (char *p = temp; *p; p++)
+      if (*p == ' ' || *p == '-' || isdigit ((int) *p))
       {
-         uint8_t segs = 7;
-         if (p[1] == ':' || p[1] == '.' || p[1] == ' ')
-            segs = 9;
-         uint16_t map = sevensegmap[*p - '0'];
-         if (p[1] == '.' || p[1] == ':')
-            map |= 0x80;
+         w += 6 * size;
+         if (p[1] == ':' || p[1] == '.')
+            w += 2 * size;
+      }
+
+   gfx_pos_t x,
+     y;
+   gfx_draw (w, 10 * size, size, size, &x, &y); // starting point
+
+   for (char *p = temp; *p; p++)
+   {
+      if (*p != ' ' && *p != '-' && !isdigit ((int) *p))
+         continue;
+      uint8_t segs = 7;
+      uint16_t map = 0;
+      if (*p == '-')
+         map = 0x40;
+      else if (isdigit ((int) *p))
+         map = sevensegmap[*p - '0'];
+      if (p[1] == ':' || p[1] == '.')
+      {
+         segs = 9;
+         map |= 0x80;
          if (p[1] == ':')
             map |= 0x100;
-         gfx_pos_t x,
-           y;
-         int w = fontw;
-	 if(segs>7)w+=size;
-#if 0
-         gfx_draw (w, fonth, 0, 0, &x, &y);
-         for (int s = 0; s < segs; s++)
-		 if(map & (1 << s))
-            gfx_mask (x, y, w, fonth, s == segs - 1 ? w : 0, sevenseg[s], (fontw + 7) / 8, 255);
-#endif
       }
-      p++;
+      if (map)
+         for (int s = 0; s < segs; s++)
+            if (map & (1 << s))
+               gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, 255);
+      x += (segs == 9 ? fontw : 6 * size);
    }
 }
 
