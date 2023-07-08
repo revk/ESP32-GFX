@@ -949,17 +949,20 @@ gfx_text (int8_t size, const char *fmt, ...)
 static void
 gfx_task (void *p)
 {
-   const char *e = gfx_driver_init ();
-   if (e)
+   if (!gfx_settings.norefresh)
    {
-      ESP_LOGE (TAG, "Configuration failed %s", e);
-      free (gfx);
-      gfx = NULL;
-      gfx_settings.port = -1;
-      vTaskDelete (NULL);
-      return;
+      const char *e = gfx_driver_init ();
+      if (e)
+      {
+         ESP_LOGE (TAG, "Configuration failed %s", e);
+         free (gfx);
+         gfx = NULL;
+         gfx_settings.port = -1;
+         vTaskDelete (NULL);
+         return;
+      }
+      gfx_settings.update = 1;
    }
-   gfx_settings.update = 1;
    while (1)
    {                            // Update
       if (!gfx_settings.changed)
@@ -1068,11 +1071,14 @@ gfx_init_opts (gfx_init_t o)
       gpio_reset_pin (o.rst);
       gpio_set_level (o.rst, 1);
       gpio_set_direction (o.rst, GPIO_MODE_OUTPUT);
+      if (!o.norefresh)
+      {
          gpio_set_level (o.rst, 0);
          usleep (10000);
          gpio_set_level (o.rst, 1);
          usleep (10000);
          gfx_busy_wait ();
+      }
    }
    xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
