@@ -1068,14 +1068,11 @@ gfx_init_opts (gfx_init_t o)
       gpio_reset_pin (o.rst);
       gpio_set_level (o.rst, 1);
       gpio_set_direction (o.rst, GPIO_MODE_OUTPUT);
-      if (!o.norefresh)
-      {
          gpio_set_level (o.rst, 0);
          usleep (10000);
          gpio_set_level (o.rst, 1);
          usleep (10000);
          gfx_busy_wait ();
-      }
    }
    xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
