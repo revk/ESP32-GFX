@@ -34,7 +34,7 @@ typedef struct {
  uint8_t sleep:1;	// E-Paper sleep mode
  // Some dynamic values - don't set in init
  uint8_t changed:1;	// There has been a change, cleared when sent
- uint8_t refresh:1;	// Next update is full refresh (E-paper mainly), self clearing
+ uint8_t norefresh:1;	// Next update does not need full refresh, can be set in init to avoid normal startup process (e.g. from deep sleep)
  uint8_t update:1;	// Controls update, cleared when updated
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})

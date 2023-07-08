@@ -164,10 +164,18 @@ static void gfx_busy_wait (void);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -237,7 +245,8 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -806,7 +815,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    va_end (ap);
 
    int fontw = 7 * size;        // pixel width of characters in font file
-   int fonth = 9 * size;       // pixel height of characters in font file
+   int fonth = 9 * size;        // pixel height of characters in font file
    inline const uint8_t *fontdata (uint8_t s)
    {
       return sevenseg[size - 1] + s * ((fontw + 7) / 8) * fonth;
@@ -823,7 +832,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
 
    gfx_pos_t x,
      y;
-   gfx_draw (w, 9 * size, size, size, &x, &y); // starting point
+   gfx_draw (w, 9 * size, size, size, &x, &y);  // starting point
 
    for (char *p = temp; *p; p++)
    {
@@ -961,7 +970,7 @@ gfx_task (void *p)
       gfx_lock ();
       gfx_settings.changed = 0;
       gfx_driver_send ();
-      gfx_settings.refresh = 0;
+      gfx_settings.norefresh = 1;
       gfx_unlock ();
    }
 }
@@ -996,7 +1005,6 @@ gfx_init_opts (gfx_init_t o)
       o.width = GFX_DEFAULT_WIDTH;
    if (!o.height)
       o.height = GFX_DEFAULT_HEIGHT;
-   o.refresh = 1;
    // Check
    if (!o.mosi)
       return "MOSI not set";
@@ -1058,12 +1066,16 @@ gfx_init_opts (gfx_init_t o)
    if (o.rst)
    {
       gpio_reset_pin (o.rst);
-      gpio_set_direction (o.rst, GPIO_MODE_OUTPUT);
-      gpio_set_level (o.rst, 0);
-      usleep (10000);
       gpio_set_level (o.rst, 1);
-      usleep (10000);
-      gfx_busy_wait ();
+      gpio_set_direction (o.rst, GPIO_MODE_OUTPUT);
+      if (!o.norefresh)
+      {
+         gpio_set_level (o.rst, 0);
+         usleep (10000);
+         gpio_set_level (o.rst, 1);
+         usleep (10000);
+         gfx_busy_wait ();
+      }
    }
    xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);
    return NULL;
@@ -1092,7 +1104,7 @@ gfx_unlock (void)
 void
 gfx_refresh (void)
 {                               // For e-paper force full refresh
-   gfx_settings.refresh = 1;
+   gfx_settings.norefresh = 0;
    gfx_settings.changed = 1;
 }
 
