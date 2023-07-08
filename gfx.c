@@ -188,27 +188,15 @@ static __attribute__((unused))
 #include "ssd1681.c"
 #endif
 
-#ifdef	CONFIG_GFX_FONT0
-#include "7seg0.h"
-#endif
-#ifdef	CONFIG_GFX_FONT1
+#ifdef	CONFIG_GFX_7SEG
 #include "7seg1.h"
-#endif
-#ifdef	CONFIG_GFX_FONT2
 #include "7seg2.h"
-#endif
-#ifdef	CONFIG_GFX_FONT3
 #include "7seg3.h"
-#endif
-#ifdef	CONFIG_GFX_FONT4
 #include "7seg4.h"
-#endif
-#ifdef	CONFIG_GFX_FONT5
 #include "7seg5.h"
-#endif
-#ifdef	CONFIG_GFX_FONT6
 #include "7seg6.h"
 #endif
+
 #if	GFX_BPP == 1
 #ifdef	CONFIG_GFX_FONT0
 #include "mono0.h"
@@ -255,44 +243,57 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const *
-        fonts[] = {
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x1B, 0x4F, 0x66, 0x2D, 0x7D, 0x07, 0x7F, 0x6F };
+
+static uint8_t const *sevenseg[] = {
+#ifdef	CONFIG_GFX_7SEG
+   gfx_7seg1,
+   gfx_7seg2,
+   gfx_7seg3,
+   gfx_7seg4,
+   gfx_7seg5,
+   gfx_7seg6,
+#endif
+};
+
+static uint8_t const *fonts[] = {
 #ifdef	CONFIG_GFX_FONT0
-        gfx_font0,
+   gfx_font0,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT1
-        gfx_font1,
+   gfx_font1,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT2
-        gfx_font2,
+   gfx_font2,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT3
-        gfx_font3,
+   gfx_font3,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT4
-        gfx_font4,
+   gfx_font4,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT5
-        gfx_font5,
+   gfx_font5,
 #else
-        NULL,
+   NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT6
-        gfx_font6,
+   gfx_font6,
 #else
-        NULL,
+   NULL,
 #endif
-     };
+};
 
 #define	BLACK	0
 #if GFX_BPP == 16               // 16 bit RGB
@@ -795,15 +796,54 @@ gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
 }
 
 void
-gfx_text (int8_t size, const char *fmt, ...)
-{                               // Size negative for descenders
-   if (!gfx)
+gfx_7seg (int8_t size, const char *fmt, ...)
+{                               // Plot 7 segment digits
+   if (size < 1)
+      size = 1;
+   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
+      size = sizeof (sevenseg) / sizeof (*sevenseg);
+   if (!gfx || size < 1 || !sevenseg[size - 1])
       return;
    va_list ap;
    char temp[gfx_settings.width / 4 + 2];
    va_start (ap, fmt);
    vsnprintf (temp, sizeof (temp), fmt, ap);
    va_end (ap);
+
+   int fontw = 6 * size;        // pixel width of characters in font file
+   int fonth = 9 * size;        // pixel height of characters in font file
+
+   char *p = temp;
+   while (*p)
+   {
+      if (isdigit ((int) *p))
+      {
+         uint8_t segs = 7;
+         if (p[1] == ':' || p[1] == '.' || p[1] == ' ')
+            segs = 9;
+         uint16_t map = sevensegmap[*p - '0'];
+         if (p[1] == '.' || p[1] == ':')
+            map |= 0x80;
+         if (p[1] == ':')
+            map |= 0x100;
+         gfx_pos_t x,
+           y;
+         int w = fontw;
+	 if(segs>7)w+=size;
+#if 0
+         gfx_draw (w, fonth, 0, 0, &x, &y);
+         for (int s = 0; s < segs; s++)
+		 if(map & (1 << s))
+            gfx_mask (x, y, w, fonth, s == segs - 1 ? w : 0, sevenseg[s], (fontw + 7) / 8, 255);
+#endif
+      }
+      p++;
+   }
+}
+
+void
+gfx_text (int8_t size, const char *fmt, ...)
+{                               // Size negative for descenders
    int z = 7;                   // effective height
    if (size < 0)
    {                            // indicates descenders allowed
@@ -813,8 +853,14 @@ gfx_text (int8_t size, const char *fmt, ...)
       z = 5;
    if (size > sizeof (fonts) / sizeof (*fonts))
       size = sizeof (fonts) / sizeof (*fonts);
-   if (!fonts[size])
+   if (!gfx || !fonts[size])
       return;
+   va_list ap;
+   char temp[gfx_settings.width / 4 + 2];
+   va_start (ap, fmt);
+   vsnprintf (temp, sizeof (temp), fmt, ap);
+   va_end (ap);
+
    int fontw = (size ? 6 * size : 4);   // pixel width of characters in font file
    int fonth = (size ? 9 * size : 5);   // pixel height of characters in font file
 

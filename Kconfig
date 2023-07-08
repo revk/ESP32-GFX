@@ -29,6 +29,12 @@ menu "GFX"
 	help
 		GFX display height (0 for default for driver)
 
+	config GFX_7SEG
+	bool "Include 7 seg font"
+	default y 
+	help
+		7 segment digit fonts (all sizes)
+
 	config GFX_FONT0
 	bool "Include 3x5 font"
 	default y 
