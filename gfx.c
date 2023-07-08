@@ -188,6 +188,27 @@ static __attribute__((unused))
 #include "ssd1681.c"
 #endif
 
+#ifdef	CONFIG_GFX_FONT0
+#include "7seg0.h"
+#endif
+#ifdef	CONFIG_GFX_FONT1
+#include "7seg1.h"
+#endif
+#ifdef	CONFIG_GFX_FONT2
+#include "7seg2.h"
+#endif
+#ifdef	CONFIG_GFX_FONT3
+#include "7seg3.h"
+#endif
+#ifdef	CONFIG_GFX_FONT4
+#include "7seg4.h"
+#endif
+#ifdef	CONFIG_GFX_FONT5
+#include "7seg5.h"
+#endif
+#ifdef	CONFIG_GFX_FONT6
+#include "7seg6.h"
+#endif
 #if	GFX_BPP == 1
 #ifdef	CONFIG_GFX_FONT0
 #include "mono0.h"
