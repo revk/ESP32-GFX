@@ -67,8 +67,8 @@ foreach n (1 2 3 4 5 6 7 8)
 		echo "};" >> $f
 		mv -f "$f" "$d/include"
 	endif
-	@ W = $n * 8
-	@ H = $n * 10
+	@ W = $n * 7
+	@ H = $n * 9
 	cd /tmp/7seg
 	set f="7seg$n.h"
 	echo "$f"

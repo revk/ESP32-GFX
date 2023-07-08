@@ -805,8 +805,8 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    vsnprintf (temp, sizeof (temp), fmt, ap);
    va_end (ap);
 
-   int fontw = 8 * size;        // pixel width of characters in font file
-   int fonth = 10 * size;       // pixel height of characters in font file
+   int fontw = 7 * size;        // pixel width of characters in font file
+   int fonth = 9 * size;       // pixel height of characters in font file
    inline const uint8_t *fontdata (uint8_t s)
    {
       return sevenseg[size - 1] + s * ((fontw + 7) / 8) * fonth;
@@ -818,12 +818,12 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       {
          w += 6 * size;
          if (p[1] == ':' || p[1] == '.')
-            w += 2 * size;
+            w += size;
       }
 
    gfx_pos_t x,
      y;
-   gfx_draw (w, 10 * size, size, size, &x, &y); // starting point
+   gfx_draw (w, 9 * size, size, size, &x, &y); // starting point
 
    for (char *p = temp; *p; p++)
    {
