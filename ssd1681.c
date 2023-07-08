@@ -75,12 +75,12 @@ gfx_driver_send (void)
       return "Data start failed";
    if (gfx_send_gfx ())
       return "Data send failed";
-   if (gfx_command1 (SSD1681_DISP_CTRL2, !gfx_settings.refresh && gfx_settings.mode2 ? 0xFF : 0xF7))
+   if (gfx_command1 (SSD1681_DISP_CTRL2, gfx_settings.norefresh && gfx_settings.mode2 ? 0xFF : 0xF7))
       return "Display ctrl failed";
    if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
       return "Master activate failed";
    gfx_busy_wait ();
-   if (gfx_settings.refresh && gfx_settings.mode2)
+   if (!gfx_settings.norefresh && gfx_settings.mode2)
    {
       if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
          return "Display ctrl failed";
