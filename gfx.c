@@ -352,12 +352,12 @@ gfx_busy_wait (const char *why)
       sleep (5);
       return;
    }
-   uint64_t a = esp_timer_get_time ();
+   //uint64_t a = esp_timer_get_time ();
    int try = 5000;
    while (try-- && gpio_get_level (gfx_settings.busy))
       usleep (1000);
-   uint64_t b = esp_timer_get_time ();
-   ESP_LOGE (TAG, "Busy waited %s %lldms", why, (b - a + 500) / 1000);
+   //uint64_t b = esp_timer_get_time ();
+   //ESP_LOGE (TAG, "Busy waited %s %lldms", why, (b - a + 500) / 1000);
 }
 
 static esp_err_t
