@@ -62,10 +62,9 @@ gfx_driver_send (void)
    if (gfx_settings.sleep && gfx_settings.rst)
    {                            // Needs a reset
       gpio_set_level (gfx_settings.rst, 0);
-      usleep (10000);
+      usleep (1000);
       gpio_set_level (gfx_settings.rst, 1);
-      usleep (10000);
-      gfx_busy_wait ();
+      usleep (1000);
    }
    if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
       return "Set X failed";
@@ -75,23 +74,35 @@ gfx_driver_send (void)
       return "Data start failed";
    if (gfx_send_gfx ())
       return "Data send failed";
-   if (gfx_command1 (SSD1681_DISP_CTRL2, gfx_settings.norefresh && gfx_settings.mode2 ? 0xFF : 0xF7))
-      return "Display ctrl failed";
-   if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
-      return "Master activate failed";
-   gfx_busy_wait ();
-   if (!gfx_settings.norefresh && gfx_settings.mode2)
-   {
+
+   if (gfx_settings.norefresh && gfx_settings.mode2)
+   {                            // mode 2
       if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
          return "Display ctrl failed";
       if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
          return "Master activate failed";
-      gfx_busy_wait ();
+      // Seems a busy wait is not needed?
+   } else
+   {                            // mode 1
+      if (gfx_command1 (SSD1681_DISP_CTRL2, 0xF7))
+         return "Display ctrl failed";
+      if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
+         return "Master activate failed";
+      gfx_busy_wait ("Draw");
+      if (gfx_settings.mode2)
+      {                         // Will revert
+         if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
+            return "Display ctrl failed";
+         if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
+            return "Master activate failed";
+      gfx_busy_wait ("Draw2");
+      }
    }
    if (gfx_settings.sleep)
    {                            // Mode 1 is 1, Mode 2 is 3. In mode 2 RAM is not retained. Current mode 1/2 is almost the same
       if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
          return "Sleep";
+      // Don't busy wait as will be permanently busy
    }
    return NULL;
 }
