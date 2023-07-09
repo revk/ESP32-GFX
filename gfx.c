@@ -967,7 +967,7 @@ gfx_task (void *p)
    {                            // Update
       if (!gfx_settings.changed)
       {
-         usleep (100000);
+         usleep (10000);
          continue;
       }
       gfx_lock ();
@@ -1115,7 +1115,7 @@ void
 gfx_wait (void)
 {                               // Wait for changes to be applied
    while (gfx_settings.changed)
-      usleep (100000);
+      usleep (10000);
 }
 
 void
