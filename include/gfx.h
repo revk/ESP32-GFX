@@ -46,6 +46,7 @@ void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white
 void gfx_unlock(void);	// unlocks display allowing it to be sent if there has been any change
 void gfx_refresh(void);	// E-paper mainly, do full mode update
 void gfx_wait(void);	// Wait for updates to be done
+int gfx_ok(void);	// GFX is enabled
 
 // Overall display contrast setting if supported by display
 void gfx_set_contrast(gfx_intensity_t);

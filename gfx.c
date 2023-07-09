@@ -149,6 +149,12 @@ void
 gfx_message (const char *m)
 {                               // Dummy - no driver
 }
+
+int
+gfx_ok (void)
+{
+   return 0;
+}
 #else
 
 // general global stuff
@@ -1081,12 +1087,10 @@ gfx_init_opts (gfx_init_t o)
          free (gfx);
          gfx = NULL;
          gfx_settings.port = -1;
-         vTaskDelete (NULL);
-         return;
       }
       gfx_settings.update = 1;
    }
-   if (!gfx_settings.direct)
+   if (!gfx_settings.direct && gfx)
       xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);   // Start update task
    return NULL;
 }
@@ -1162,5 +1166,14 @@ gfx_message (const char *m)
          m++;
    }
    gfx_unlock ();
+}
+
+int
+gfx_ok (void)
+{
+   if (gfx)
+      return 1;
+   else
+      return 0;
 }
 #endif
