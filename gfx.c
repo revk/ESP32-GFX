@@ -354,7 +354,7 @@ gfx_busy_wait (void)
    int try = 1000;
    while (try--)
    {
-      usleep (1000);
+      usleep (10000);
       if (!gpio_get_level (gfx_settings.busy))
          break;                 // Not busy
    }
