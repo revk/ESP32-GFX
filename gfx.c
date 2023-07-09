@@ -361,12 +361,11 @@ gfx_busy_wait (void)
       return;
    }
    int try = 1000;
-   usleep (5000);
    while (try--)
    {
+      usleep (10000);
       if (!gpio_get_level (gfx_settings.busy))
          break;                 // Not busy
-      usleep (1000);
    }
 }
 
