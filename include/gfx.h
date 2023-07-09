@@ -32,6 +32,7 @@ typedef struct {
  uint8_t partial:1;	// E-Paper partial updates
  uint8_t mode2:1;	// E-Paper mode 2 updates
  uint8_t sleep:1;	// E-Paper sleep mode
+ uint8_t direct:1;	// Update on unlock, not on a task
  // Some dynamic values - don't set in init
  uint8_t changed:1;	// There has been a change, cleared when sent
  uint8_t norefresh:1;	// Next update does not need full refresh, can be set in init to avoid normal startup process (e.g. from deep sleep)

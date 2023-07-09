@@ -164,18 +164,10 @@ static void gfx_busy_wait (void);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -245,8 +237,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -357,7 +348,7 @@ gfx_busy_wait (void)
    int try = 1000;
    while (try--)
    {
-      usleep (10000);
+      usleep (1000);
       if (!gpio_get_level (gfx_settings.busy))
          break;                 // Not busy
    }
@@ -947,33 +938,25 @@ gfx_text (int8_t size, const char *fmt, ...)
 }
 
 static void
+gfx_update (void)
+{                               // Update
+   gfx_settings.changed = 0;
+   gfx_driver_send ();
+   gfx_settings.norefresh = 1;
+}
+
+static void
 gfx_task (void *p)
 {
-   if (!gfx_settings.norefresh)
-   {
-      const char *e = gfx_driver_init ();
-      if (e)
-      {
-         ESP_LOGE (TAG, "Configuration failed %s", e);
-         free (gfx);
-         gfx = NULL;
-         gfx_settings.port = -1;
-         vTaskDelete (NULL);
-         return;
-      }
-      gfx_settings.update = 1;
-   }
    while (1)
-   {                            // Update
+   {
       if (!gfx_settings.changed)
       {
          usleep (10000);
          continue;
       }
       gfx_lock ();
-      gfx_settings.changed = 0;
-      gfx_driver_send ();
-      gfx_settings.norefresh = 1;
+      gfx_update ();
       gfx_unlock ();
    }
 }
@@ -1080,7 +1063,22 @@ gfx_init_opts (gfx_init_t o)
          gfx_busy_wait ();
       }
    }
-   xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);
+   if (!gfx_settings.norefresh)
+   {
+      const char *e = gfx_driver_init ();
+      if (e)
+      {
+         ESP_LOGE (TAG, "Configuration failed %s", e);
+         free (gfx);
+         gfx = NULL;
+         gfx_settings.port = -1;
+         vTaskDelete (NULL);
+         return;
+      }
+      gfx_settings.update = 1;
+   }
+   if (!gfx_settings.direct)
+      xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);   // Start update task
    return NULL;
 }
 
@@ -1102,6 +1100,8 @@ gfx_unlock (void)
    gfx_locks--;
    if (gfx_mutex)
       xSemaphoreGive (gfx_mutex);
+   if (!gfx_locks && gfx_settings.direct)
+      gfx_update ();
 }
 
 void
