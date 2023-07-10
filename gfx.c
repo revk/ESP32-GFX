@@ -1029,59 +1029,60 @@ gfx_init_opts (gfx_init_t o)
    gfx_mutex = xSemaphoreCreateMutex ();        // Shared text access
    gfx = malloc (GFX_SIZE);
    if (!gfx)
-      return "Mem?";
+      return "Malloc fail!";
    memset (gfx, 0, GFX_SIZE);
    spi_bus_config_t config = {
-      .mosi_io_num = o.mosi,
+      .mosi_io_num = gfx_settings.mosi,
       .miso_io_num = -1,
-      .sclk_io_num = o.sck,
+      .sclk_io_num = gfx_settings.sck,
       .quadwp_io_num = -1,
       .quadhd_io_num = -1,
       .max_transfer_sz = 8 * (GFX_SIZE + 8),
       .flags = SPICOMMON_BUSFLAG_MASTER,
    };
-   if (o.port == HSPI_HOST && o.mosi == 22 && o.sck == 18 && o.cs == 5)
+   if (gfx_settings.port == HSPI_HOST && gfx_settings.mosi == 22 && gfx_settings.sck == 18 && gfx_settings.cs == 5)
       config.flags |= SPICOMMON_BUSFLAG_IOMUX_PINS;
-   if (spi_bus_initialize (o.port, &config, 2))
+   if (spi_bus_initialize (gfx_settings.port, &config, 2))
       return "Init?";
    spi_device_interface_config_t devcfg = {
       .clock_speed_hz = SPI_MASTER_FREQ_20M,
       .mode = 0,
-      .spics_io_num = o.cs ? : -1,
+      .spics_io_num = gfx_settings.cs ? : -1,
       .queue_size = 1,
       .flags = SPI_DEVICE_3WIRE,
    };
-   if (spi_bus_add_device (o.port, &devcfg, &gfx_spi))
+   if (spi_bus_add_device (gfx_settings.port, &devcfg, &gfx_spi))
       return "Add?";
-   if (o.ena)
+   if (gfx_settings.ena)
    {
-      gpio_reset_pin (o.ena);
-      gpio_set_direction (o.ena, GPIO_MODE_OUTPUT);
-      gpio_set_level (o.ena, 1);        // Enable
+      gpio_reset_pin (gfx_settings.ena);
+      gpio_set_direction (gfx_settings.ena, GPIO_MODE_OUTPUT);
+      gpio_set_level (gfx_settings.ena, 1);     // Enable
    }
-   gpio_reset_pin (o.dc);
-   gpio_set_direction (o.dc, GPIO_MODE_OUTPUT);
-   if (o.busy)
+   gpio_reset_pin (gfx_settings.dc);
+   gpio_set_direction (gfx_settings.dc, GPIO_MODE_OUTPUT);
+   if (gfx_settings.busy)
    {
-      gpio_reset_pin (o.busy);
-      gpio_set_direction (o.busy, GPIO_MODE_INPUT);
+      gpio_reset_pin (gfx_settings.busy);
+      gpio_pullup_dis (gfx_settings.busy);
+      gpio_set_direction (gfx_settings.busy, GPIO_MODE_INPUT);
    }
-   if (o.rst)
+   if (gfx_settings.rst)
    {
-      gpio_reset_pin (o.rst);
-      gpio_set_level (o.rst, 1);
-      gpio_set_direction (o.rst, GPIO_MODE_OUTPUT);
-      if (!o.sleep)
+      gpio_reset_pin (gfx_settings.rst);
+      gpio_set_level (gfx_settings.rst, 1);
+      gpio_set_direction (gfx_settings.rst, GPIO_MODE_OUTPUT);
+      if (!gfx_settings.sleep)
       {
-         gpio_set_level (o.rst, 0);
+         gpio_set_level (gfx_settings.rst, 0);
          usleep (1000);
-         gpio_set_level (o.rst, 1);
+         gpio_set_level (gfx_settings.rst, 1);
          usleep (1000);
       }
    }
-   if (o.sleep)
-      o.asleep = 1;
-   if (!gfx_settings.norefresh)
+   if (gfx_settings.sleep)
+      gfx_settings.asleep = 1;
+   if (!gfx_settings.sleep)
    {
       const char *e = gfx_driver_init ();
       if (e)
@@ -1187,6 +1188,7 @@ gfx_ok (void)
 void
 gfx_sleep (void)
 {
-   gfx_driver_sleep ();
+   if (gfx)
+      gfx_driver_sleep ();
 }
 #endif

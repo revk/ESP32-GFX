@@ -35,6 +35,7 @@
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
+   ESP_LOGD (TAG, "Init");
    int W = gfx_settings.width;
    int H = gfx_settings.height;
    const uint8_t ssd1681_default_init_code[] = {
@@ -61,13 +62,12 @@ gfx_driver_send (void)
 {                               // Send buffer and update display
    if (gfx_settings.asleep && gfx_settings.rst)
    {                            // Needs a reset
-      gfx_settings.asleep = 1;
+      ESP_LOGD (TAG, "Reset");
+      gfx_settings.asleep = 0;
       gpio_set_level (gfx_settings.rst, 0);
       usleep (1000);
       gpio_set_level (gfx_settings.rst, 1);
       usleep (1000);
-      if (!esp_sleep_get_wakeup_cause ())
-         gfx_driver_init ();
    } else
       gfx_busy_wait ("Pre draw");
    if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
@@ -81,13 +81,18 @@ gfx_driver_send (void)
 
    if (gfx_settings.norefresh && gfx_settings.mode2)
    {                            // mode 2
+      ESP_LOGD (TAG, "Mode2");
       if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
          return "Display ctrl failed";
       if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
          return "Master activate failed";
-      // Seems a busy wait is not needed?
+      gfx_settings.asleep = 1;
+      // If we wait here, even wait busy as you would expect, we actually get a flicker display. Sending sleep right away works way better, silly
+      if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
+         return "Sleep fail";
    } else
    {                            // mode 1
+      ESP_LOGD (TAG, "Mode1");
       if (gfx_command1 (SSD1681_DISP_CTRL2, 0xF7))
          return "Display ctrl failed";
       if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
@@ -102,20 +107,16 @@ gfx_driver_send (void)
          gfx_busy_wait ("Draw2");
       }
    }
-   if (gfx_settings.sleep)
-   {                            // Mode 1 is 1, Mode 2 is 3. In mode 2 RAM is not retained. Current mode 1/2 is almost the same
-      if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
-         return "Sleep";
-      // Don't busy wait as will be permanently busy
-   }
    return NULL;
 }
 
 static const char *
 gfx_driver_sleep (void)
 {
-   if (!gfx_settings.sleep || gfx_settings.asleep)
+   if (gfx_settings.asleep)
       return NULL;
+   gfx_settings.sleep = 1;
+   ESP_LOGD (TAG, "Sleep");
    gfx_settings.asleep = 1;
    if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
       return "Sleep fail";
