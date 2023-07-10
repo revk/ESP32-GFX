@@ -69,7 +69,7 @@ gfx_driver_send (void)
       if (!esp_sleep_get_wakeup_cause ())
          gfx_driver_init ();
    } else
-      gfx_busy_wait ();
+      gfx_busy_wait ("Pre draw");
    if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
       return "Set X failed";
    if (gfx_command2 (SSD1681_SET_RAMYCOUNT, 0, 0))
