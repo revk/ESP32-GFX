@@ -338,8 +338,12 @@ static gfx_pos_t x = 0,
 static gfx_align_t a = 0;       // alignment and movement
 static char f = 0,              // colour
    b = 0;
-static uint32_t f_mul = 0,
-   b_mul = 0;                   // actual f/b colour multiplier
+#if GFX_BPP > 1
+static uint32_t f_mul = 0;
+b_mul = 0;                      // actual f/b colour multiplier
+#else
+static uint8_t bw = 0;          // 1bpp foregrund colour
+#endif
 
 
 // Driver support
@@ -488,6 +492,7 @@ gfx_pos (gfx_pos_t newx, gfx_pos_t newy, gfx_align_t newa)
    a = (newa ? : (GFX_L | GFX_T | GFX_H));
 }
 
+#if	GFX_BPP > 1
 static uint32_t
 gfx_colour_lookup (char c)
 {                               // character to colour mapping, default is white
@@ -530,17 +535,24 @@ gfx_colour_lookup (char c)
    }
    return WHITE;
 }
+#endif
 
 void
 gfx_colour (char newf)
 {                               // Set foreground
+#if GFX_BPP > 1
    f_mul = gfx_colour_lookup (f = newf);
+#else
+   bw = (newf == 'K' || newf == 'k' ? 255 : 0);
+#endif
 }
 
 void
 gfx_background (char newb)
 {                               // Set background
+#if GFX_BPP >1
    b_mul = gfx_colour_lookup (b = newb);
+#endif
 }
 
 // Basic settings
@@ -684,19 +696,6 @@ static __attribute__((unused))
 }
 
 static __attribute__((unused))
-     void gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
-{                               // Draw a block from 2 bit greyscale data, l is data width for each row
-   if (!l)
-      l = (w + 7) / 8;          // default is pixels width
-   for (gfx_pos_t row = 0; row < h; row++)
-   {
-      for (gfx_pos_t col = 0; col < w; col++)
-         gfx_pixel (x + col, y + row, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
-      data += l;
-   }
-}
-
-static __attribute__((unused))
      void gfx_block16 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
    if (!l)
@@ -724,7 +723,11 @@ gfx_clear (gfx_intensity_t i)
    for (gfx_pos_t y = 0; y < gfx_settings.height; y++)
       for (gfx_pos_t x = 0; x < gfx_settings.width; x++)
          gfx_pixel (x, y, i);
+#if GFX_BPP > 1
    gfx_colour ('w');
+#else
+   gfx_colour ('K');
+#endif
 }
 
 void
@@ -778,7 +781,7 @@ gfx_icon2 (gfx_pos_t w, gfx_pos_t h, const void *data)
       gfx_pos_t x,
         y;
       gfx_draw (w, h, 0, 0, &x, &y);
-      gfx_block2 (x, y, w, h, 0, data, 0);
+      gfx_mask (x, y, w, h, 0, data, 0, bw);
    }
 }
 
@@ -851,7 +854,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       if (map)
          for (int s = 0; s < segs; s++)
             if (map & (1 << s))
-               gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, 255);
+               gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, bw);
       x += (segs == 9 ? fontw : 6 * size);
    }
 }
@@ -934,7 +937,7 @@ gfx_text (int8_t size, const char *fmt, ...)
             charw -= (size ? : 1);
          int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
 #if	GFX_BPP == 1
-         gfx_block2 (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8);
+         gfx_mask (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8, bw);
 #else
          gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
 #endif
@@ -1094,8 +1097,12 @@ gfx_lock (void)
       xSemaphoreTake (gfx_mutex, portMAX_DELAY);
    gfx_locks++;
    // preset state
+#if GFX_BPP > 1
    gfx_background ('k');
    gfx_colour ('w');
+#else
+   gfx_colour ('K');
+#endif
    gfx_pos (0, 0, GFX_L | GFX_T | GFX_H);
 }
 
