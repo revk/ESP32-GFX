@@ -156,6 +156,11 @@ gfx_ok (void)
 {
    return 0;
 }
+
+void
+gfx_sleep (void)
+{
+}
 #else
 
 // general global stuff
@@ -171,10 +176,18 @@ static void gfx_busy_wait (const char *);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -244,7 +257,8 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1065,7 +1079,7 @@ gfx_init_opts (gfx_init_t o)
       gpio_reset_pin (o.rst);
       gpio_set_level (o.rst, 1);
       gpio_set_direction (o.rst, GPIO_MODE_OUTPUT);
-      if (!o.norefresh)
+      if (!o.sleep)
       {
          gpio_set_level (o.rst, 0);
          usleep (1000);
@@ -1073,6 +1087,8 @@ gfx_init_opts (gfx_init_t o)
          usleep (1000);
       }
    }
+   if (o.sleep)
+      o.asleep = 1;
    if (!gfx_settings.norefresh)
    {
       const char *e = gfx_driver_init ();
@@ -1174,5 +1190,11 @@ gfx_ok (void)
       return 1;
    else
       return 0;
+}
+
+void
+gfx_sleep (void)
+{
+   gfx_driver_sleep ();
 }
 #endif

@@ -65,3 +65,9 @@ gfx_driver_send (void)
    }
    return NULL;
 }
+
+static const char *
+gfx_driver_sleep (void)
+{
+   return NULL;
+}

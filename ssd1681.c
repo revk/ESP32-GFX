@@ -59,13 +59,17 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   if (gfx_settings.sleep && gfx_settings.rst)
+   if (gfx_settings.asleep && gfx_settings.rst)
    {                            // Needs a reset
+      gfx_settings.asleep = 1;
       gpio_set_level (gfx_settings.rst, 0);
       usleep (1000);
       gpio_set_level (gfx_settings.rst, 1);
       usleep (1000);
-   }
+      if (!esp_sleep_get_wakeup_cause ())
+         gfx_driver_init ();
+   } else
+      gfx_busy_wait ();
    if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
       return "Set X failed";
    if (gfx_command2 (SSD1681_SET_RAMYCOUNT, 0, 0))
@@ -95,7 +99,7 @@ gfx_driver_send (void)
             return "Display ctrl failed";
          if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
             return "Master activate failed";
-      gfx_busy_wait ("Draw2");
+         gfx_busy_wait ("Draw2");
       }
    }
    if (gfx_settings.sleep)
@@ -105,4 +109,16 @@ gfx_driver_send (void)
       // Don't busy wait as will be permanently busy
    }
    return NULL;
+}
+
+static const char *
+gfx_driver_sleep (void)
+{
+   if (!gfx_settings.sleep || gfx_settings.asleep)
+      return NULL;
+   gfx_settings.asleep = 1;
+   if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
+      return "Sleep fail";
+   return NULL;
+
 }

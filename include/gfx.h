@@ -47,6 +47,7 @@ void gfx_unlock(void);	// unlocks display allowing it to be sent if there has be
 void gfx_refresh(void);	// E-paper mainly, do full mode update
 void gfx_wait(void);	// Wait for updates to be done
 int gfx_ok(void);	// GFX is enabled
+void gfx_sleep(void);	// Put device to sleep
 
 // Overall display contrast setting if supported by display
 void gfx_set_contrast(gfx_intensity_t);
