@@ -37,6 +37,7 @@ typedef struct {
  uint8_t changed:1;	// There has been a change, cleared when sent
  uint8_t norefresh:1;	// Next update does not need full refresh, can be set in init to avoid normal startup process (e.g. from deep sleep)
  uint8_t update:1;	// Controls update, cleared when updated
+ uint8_t asleep:1;	// Device is asleep
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);
