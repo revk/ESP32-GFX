@@ -60,6 +60,11 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
+   if (gfx_settings.pause)
+   {
+      gfx_settings.pause = 0;
+      usleep (500000);
+   }
    if (gfx_settings.asleep && gfx_settings.rst)
    {                            // Needs a reset
       ESP_LOGD (TAG, "Reset");
@@ -87,6 +92,8 @@ gfx_driver_send (void)
       if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
          return "Master activate failed";
       gfx_settings.asleep = 1;
+      gfx_settings.pause = 1;
+      usleep (1000);
       // If we wait here, even wait busy as you would expect, we actually get a flicker display. Sending sleep right away works way better, silly
       if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
          return "Sleep fail";
