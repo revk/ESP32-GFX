@@ -68,6 +68,7 @@ char gfx_f(void);	// Current foreground colour
 char gfx_b(void);	// Current background colour
 
 // Drawing
+void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp); // Work out drawing position for object
 void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i); // set pixel directly (uses current foreogrund/background colour)
 void gfx_clear(gfx_intensity_t);	// clear whole display - same as gfx_pixel for all points
 void gfx_box(gfx_pos_t w,gfx_pos_t h,gfx_intensity_t); // draw a box, not filled

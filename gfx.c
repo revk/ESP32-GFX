@@ -636,7 +636,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 #endif
 }
 
-static void
+void
 gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp)
 {                               // move x/y based on drawing a box w/h, set x/y as top left of said box
    gfx_pos_t l = x,
