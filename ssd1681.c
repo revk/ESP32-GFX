@@ -93,7 +93,7 @@ gfx_driver_send (void)
          return "Master activate failed";
       gfx_settings.asleep = 1;
       gfx_settings.pause = 1;
-      usleep (1000);
+      usleep (2000);
       // If we wait here, even wait busy as you would expect, we actually get a flicker display. Sending sleep right away works way better, silly
       if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
          return "Sleep fail";
