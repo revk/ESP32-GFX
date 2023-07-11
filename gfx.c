@@ -169,8 +169,50 @@ gfx_flip (uint8_t flip)
 }
 
 void
-gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_t)
+gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_t l)
 {                               // Draw a line
+   gfx_pos_t dx = x2 - x1,
+      adx = dx,
+      sdx = 1;
+   gfx_pos_t dy = y2 - y1,
+      ady = dy,
+      sdy = 1;
+   if (!dx && !dy)
+   {                            // dot!
+      gfx_pixel (x1, y1, l);
+      return;
+   }
+   if (adx > ady)
+   {
+      gfx_pos_t d = ady / 2;
+      while (x1 != x2)
+      {
+         gfx_pixel (x1, y1, l);
+         d += ady;
+         if (d >= adx)
+         {
+            d -= adx;
+            y1 += sdy;
+         }
+         x1 += sdx;
+      }
+      gfx_pixel (x1, y1, l);
+   } else
+   {
+      gfx_pos_t d = adx / 2;
+      while (y1 != y2)
+      {
+         gfx_pixel (x1, y1, l);
+         d += adx;
+         if (d >= ady)
+         {
+            d -= ady;
+            x1 += sdx;
+         }
+         y1 += sdy;
+      }
+      gfx_pixel (x1, y1, l);
+   }
 }
 #else
 
@@ -187,18 +229,10 @@ static void gfx_busy_wait (const char *);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -268,8 +302,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
