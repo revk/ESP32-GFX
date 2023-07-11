@@ -162,6 +162,10 @@ void
 gfx_sleep (void)
 {
 }
+
+void gfx_flip(uint8_t flip)
+{
+}
 #else
 
 // general global stuff
@@ -1193,5 +1197,11 @@ gfx_sleep (void)
 {
    if (gfx)
       gfx_driver_sleep ();
+}
+
+void gfx_flip(uint8_t flip)
+{
+	gfx_settings.flip=flip;
+	gfx_settings.changed=1;
 }
 #endif

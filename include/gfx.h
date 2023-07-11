@@ -38,17 +38,19 @@ typedef struct {
  uint8_t norefresh:1;	// Next update does not need full refresh, can be set in init to avoid normal startup process (e.g. from deep sleep)
  uint8_t update:1;	// Controls update, cleared when updated
  uint8_t asleep:1;	// Device is asleep
+ uint8_t pause:1;	// Pause needed before next operation
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);
 
-// locking atomic drawing functions
+// locking, etc
 void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white on black
-void gfx_unlock(void);	// unlocks display allowing it to be sent if there has been any change
+void gfx_unlock(void);	// unlocks display allowing it to be sent if there has been any change (draws if changed and direct mode)
 void gfx_refresh(void);	// E-paper mainly, do full mode update
 void gfx_wait(void);	// Wait for updates to be done
 int gfx_ok(void);	// GFX is enabled
 void gfx_sleep(void);	// Put device to sleep
+void gfx_flip(uint8_t flip);	// Change flip
 
 // Overall display contrast setting if supported by display
 void gfx_set_contrast(gfx_intensity_t);
