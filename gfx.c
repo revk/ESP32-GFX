@@ -1270,6 +1270,6 @@ gfx_flip (uint8_t flip)
 void
 gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_t l)
 {                               // Draw a line
-
+ // WTF
 }
 #endif
