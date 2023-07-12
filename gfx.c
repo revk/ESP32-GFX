@@ -1014,8 +1014,8 @@ gfx_text (int8_t size, const char *fmt, ...)
 static void
 gfx_update (void)
 {                               // Update
-   gfx_settings.changed = 0;
-   gfx_driver_send ();
+   if (!gfx_driver_send ())
+      gfx_settings.changed = 0;
    gfx_settings.norefresh = 1;
 }
 
@@ -1197,8 +1197,15 @@ gfx_refresh (void)
 void
 gfx_wait (void)
 {                               // Wait for changes to be applied
-   while (gfx_settings.changed)
+   if (gfx_settings.direct)
+      gfx_update ();
+   int try = 100;
+   while (gfx_settings.changed && try--)
+   {
       usleep (10000);
+      if (gfx_settings.direct)
+         gfx_update ();
+   }
 }
 
 void

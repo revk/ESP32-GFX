@@ -72,10 +72,7 @@ gfx_driver_send (void)
          uint64_t ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
          ms -= sleepms;
          if (ms < 1000)
-         {
-            ms = 1000 - ms;
-            usleep (ms * 1000);
-         }
+            return "Wait";
          sleepms = 0;
       }
       ESP_LOGD (TAG, "Reset");
