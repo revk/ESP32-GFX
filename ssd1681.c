@@ -32,6 +32,9 @@
 #define SSD1681_SET_RAMXCOUNT 0x4E
 #define SSD1681_SET_RAMYCOUNT 0x4F
 
+#include <driver/rtc_io.h>
+RTC_NOINIT_ATTR uint64_t sleepms;       // Sleeping in low power, needs delay before reset after mode 2
+
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
@@ -60,13 +63,21 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   if (gfx_settings.pause)
-   {
-      gfx_settings.pause = 0;
-      usleep (500000);
-   }
    if (gfx_settings.asleep && gfx_settings.rst)
    {                            // Needs a reset
+      if (sleepms)
+      {
+         struct timeval tv;
+         gettimeofday (&tv, NULL);
+         uint64_t ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+         ms -= sleepms;
+         if (ms < 1000)
+         {
+            ms = 1000 - ms;
+            usleep (ms * 1000);
+         }
+         sleepms = 0;
+      }
       ESP_LOGD (TAG, "Reset");
       gfx_settings.asleep = 0;
       gpio_set_level (gfx_settings.rst, 0);
@@ -91,14 +102,20 @@ gfx_driver_send (void)
          return "Display ctrl failed";
       if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
          return "Master activate failed";
-      gfx_settings.asleep = 1;
-      gfx_settings.pause = 1;
-      usleep (2000);
-      // If we wait here, even wait busy as you would expect, we actually get a flicker display. Sending sleep right away works way better, silly
-      if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
-         return "Sleep fail";
+      if (gfx_settings.sleep)
+      {
+         gfx_settings.asleep = 1;
+         struct timeval tv;
+         gettimeofday (&tv, NULL);
+         sleepms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+         // If we wait here, even wait busy as you would expect, we actually get a flicker display. Sending sleep right away works way better, silly
+         if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
+            return "Sleep fail";
+      } else
+         sleepms = 0;
    } else
    {                            // mode 1
+      sleepms = 0;
       ESP_LOGD (TAG, "Mode1");
       if (gfx_command1 (SSD1681_DISP_CTRL2, 0xF7))
          return "Display ctrl failed";
@@ -123,6 +140,9 @@ gfx_driver_sleep (void)
    if (gfx_settings.asleep)
       return NULL;
    gfx_settings.sleep = 1;
+   struct timeval tv;
+   gettimeofday (&tv, NULL);
+   sleepms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
    ESP_LOGD (TAG, "Sleep");
    gfx_settings.asleep = 1;
    if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
