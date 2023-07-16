@@ -233,10 +233,18 @@ static void gfx_busy_wait (const char *);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -306,7 +314,8 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -744,6 +753,23 @@ gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, 
 }
 
 static __attribute__((unused))
+     void gfx_mask_block (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
+                          const uint8_t * data, int l, int c)
+{                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
+   if (!l)
+      l = (w + 7) / 8;          // default is pixels width
+   for (gfx_pos_t row = 0; row < h; row++)
+   {
+      for (gfx_pos_t col = 0; col < w; col++)
+         if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
+            for (uint8_t qx = 0; qx < mx; qx++)
+               for (uint8_t qy = 0; qy < mx; qy++)
+                  gfx_pixel (x + col * mx + qx, y + row * my + qy, c);
+      data += l;
+   }
+}
+
+static __attribute__((unused))
      void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l, int c)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
@@ -887,11 +913,10 @@ gfx_7seg (int8_t size, const char *fmt, ...)
          if (p[1] == ':' || p[1] == '.')
             w += size;
       }
-
+   w--;
    gfx_pos_t x,
      y;
    gfx_draw (w, 9 * size, size, size, &x, &y);  // starting point
-
    for (char *p = temp; *p; p++)
    {
       if (*p != ' ' && *p != '-' && !isdigit ((int) *p))
@@ -918,24 +943,10 @@ gfx_7seg (int8_t size, const char *fmt, ...)
 }
 
 void
-gfx_text (int8_t size, const char *fmt, ...)
+gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 {                               // Size negative for descenders
-   int z = 7;                   // effective height
-   if (size < 0)
-   {                            // indicates descenders allowed
-      size = -size;
-      z = 9;
-   } else if (!size)
-      z = 5;
-   if (size > sizeof (fonts) / sizeof (*fonts))
-      size = sizeof (fonts) / sizeof (*fonts);
    if (!gfx || !fonts[size])
       return;
-   va_list ap;
-   char temp[gfx_settings.width / 4 + 2];
-   va_start (ap, fmt);
-   vsnprintf (temp, sizeof (temp), fmt, ap);
-   va_end (ap);
 
    int fontw = (size ? 6 * size : 4);   // pixel width of characters in font file
    int fonth = (size ? 9 * size : 5);   // pixel height of characters in font file
@@ -964,15 +975,15 @@ gfx_text (int8_t size, const char *fmt, ...)
 #endif
       return d;
    }
-   for (char *p = temp; *p; p++)
+   for (const char *p = text; *p; p++)
       w += cwidth (*p);
    gfx_pos_t x,
      y;
    if (w)
       w -= (size ? : 1);        // Margin right hand pixel needs removing from width
-   gfx_draw (w, h, size ? : 1, size ? : 1, &x, &y);     // starting point
    if (!w)
       return;                   // nothing to print
+   gfx_draw (w, h, size ? : 1, size ? : 1, &x, &y);     // starting point
 #if     GFX_BPP > 1
    // Border
    for (gfx_pos_t n = -1; n <= w; n++)
@@ -986,7 +997,7 @@ gfx_text (int8_t size, const char *fmt, ...)
       gfx_pixel (x + w, y + n, 0);
    }
 #endif
-   for (char *p = temp; *p; p++)
+   for (const char *p = text; *p; p++)
    {
       int c = *p;
       int charw = cwidth (c);
@@ -997,14 +1008,60 @@ gfx_text (int8_t size, const char *fmt, ...)
          if (!p[1])
             charw -= (size ? : 1);
          int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
+         if (blocky)
+         {
 #if	GFX_BPP == 1
-         gfx_mask (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8, bw);
-#else
-         gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
+            gfx_mask_block (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1, bw);
 #endif
+         } else
+         {
+#if	GFX_BPP == 1
+            gfx_mask (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8, bw);
+#else
+            gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
+#endif
+         }
          x += charw;
       }
    }
+}
+
+void
+gfx_text (int8_t size, const char *fmt, ...)
+{                               // Size negative for descenders
+   int z = 7;                   // effective height
+   if (size < 0)
+   {                            // indicates descenders allowed
+      size = -size;
+      z = 9;
+   } else if (!size)
+      z = 5;
+   if (size > sizeof (fonts) / sizeof (*fonts))
+      size = sizeof (fonts) / sizeof (*fonts);
+   va_list ap;
+   char temp[gfx_settings.width / 4 + 2];
+   va_start (ap, fmt);
+   vsnprintf (temp, sizeof (temp), fmt, ap);
+   va_end (ap);
+   gfx_text_draw (size, z, 0, temp);
+}
+
+void
+gfx_blocky (int8_t size, const char *fmt, ...)
+{                               // Size negative for descenders, blocky text
+   int z = 7;                   // effective height
+   if (size < 0)
+   {                            // indicates descenders allowed
+      size = -size;
+      z = 9;
+   } else if (!size)
+      z = 5;
+   va_list ap;
+   char temp[gfx_settings.width / 4 + 2];
+   va_start (ap, fmt);
+   vsnprintf (temp, sizeof (temp), fmt, ap);
+   va_end (ap);
+   gfx_text_draw (size, z, 1, temp);
 }
 
 static void
