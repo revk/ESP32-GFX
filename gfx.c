@@ -907,7 +907,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    gfx_pos_t x,
      y;
    gfx_draw (w, 9 * size, size, size, &x, &y);  // starting point
-   x -= size / 2;               // Better alignment in box
+   x += size / 2;               // Better alignment in box
    for (char *p = temp; *p; p++)
    {
       if (*p != ' ' && *p != '-' && !isdigit ((int) *p))
