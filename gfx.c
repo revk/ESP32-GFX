@@ -33,7 +33,7 @@ static __attribute__((unused))
 #include "freertos/task.h"
 #include "gfx.h"
 
-#ifdef	CONFIG_GFX_NONE
+#ifdef	CONFIG_GFX_BUILD_SUFFIX_GFXNONE
      const char *gfx_init_opts (gfx_init_t o)
 {                               // Dummy - no driver
    return "Not configured";

@@ -3,7 +3,7 @@ menu "GFX"
 	choice
 		prompt "Driver"
 
-	config GFX_NONE
+	config GFX_BUILD_SUFFIX_GFXNONE
 		bool "No GFX driver"
 
 	config GFX_BUILD_SUFFIX_SSD1351
