@@ -171,52 +171,6 @@ gfx_flip (uint8_t flip)
 void
 gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_t l)
 {                               // Draw a line
-   gfx_pos_t dx = x2 - x1,
-      adx = dx,
-      sdx = 1;
-   gfx_pos_t dy = y2 - y1,
-      ady = dy,
-      sdy = 1;
-   if (dx < 0)
-      adx = (sgx = -1) * dx;
-   if (dy < 0)
-      ady = (sgy = -1) * dy;
-   if (!dx && !dy)
-   {                            // dot!
-      gfx_pixel (x1, y1, l);
-      return;
-   }
-   if (adx > ady)
-   {
-      gfx_pos_t d = ady / 2;
-      while (x1 != x2)
-      {
-         gfx_pixel (x1, y1, l);
-         d += ady;
-         if (d >= adx)
-         {
-            d -= adx;
-            y1 += sdy;
-         }
-         x1 += sdx;
-      }
-      gfx_pixel (x1, y1, l);
-   } else
-   {
-      gfx_pos_t d = adx / 2;
-      while (y1 != y2)
-      {
-         gfx_pixel (x1, y1, l);
-         d += adx;
-         if (d >= ady)
-         {
-            d -= ady;
-            x1 += sdx;
-         }
-         y1 += sdy;
-      }
-      gfx_pixel (x1, y1, l);
-   }
 }
 #else
 
