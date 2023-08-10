@@ -356,10 +356,9 @@ static char f = 0,              // colour
    b = 0;
 #if GFX_BPP > 1
 static uint32_t f_mul = 0;
-b_mul = 0;                      // actual f/b colour multiplier
-#else
-static uint8_t bw = 0;          // 1bpp foregrund colour
+static uint32_t b_mul = 0;                      // actual f/b colour multiplier
 #endif
+static uint8_t bw = 0;          // 1bpp foreground colour
 
 
 // Driver support
@@ -558,9 +557,8 @@ gfx_colour (char newf)
 {                               // Set foreground
 #if GFX_BPP > 1
    f_mul = gfx_colour_lookup (f = newf);
-#else
-   bw = (newf == 'K' || newf == 'k' ? 255 : 0);
 #endif
+   bw = (newf == 'K' || newf == 'k' ? 255 : 0);
 }
 
 void
@@ -1041,8 +1039,13 @@ gfx_init_opts (gfx_init_t o)
    // Defaults
    if (!o.contrast)
       o.contrast = 255;
+#ifdef	CONFIG_IDF_TARGET_ESP32S3
+   if (!o.port)
+      o.port = SPI3_HOST;
+#else
    if (!o.port)
       o.port = HSPI_HOST;
+#endif
    if (!o.sck)
       o.sck = CONFIG_GFX_SCK;
    if (!o.rst)
