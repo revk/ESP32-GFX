@@ -1100,8 +1100,10 @@ gfx_init_opts (gfx_init_t o)
       .max_transfer_sz = 8 * (GFX_SIZE + 8),
       .flags = SPICOMMON_BUSFLAG_MASTER,
    };
+#ifndef  CONFIG_IDF_TARGET_ESP32S3
    if (gfx_settings.port == HSPI_HOST && gfx_settings.mosi == 22 && gfx_settings.sck == 18 && gfx_settings.cs == 5)
       config.flags |= SPICOMMON_BUSFLAG_IOMUX_PINS;
+#endif
    if (spi_bus_initialize (gfx_settings.port, &config, 2))
       return "Init?";
    spi_device_interface_config_t devcfg = {
