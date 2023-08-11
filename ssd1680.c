@@ -75,7 +75,7 @@ gfx_driver_send (void)
       return "Display ctrl failed";
    if (gfx_command (SSD1680_MASTER_ACTIVATE, NULL, 0))
       return "Master activate failed";
-   gfx_busy_wait ();
+   gfx_busy_wait ("send");
    return NULL;
 }
 
