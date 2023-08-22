@@ -179,7 +179,7 @@ gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_
 
 static TaskHandle_t gfx_task_id = NULL;
 static SemaphoreHandle_t gfx_mutex = NULL;
-static int8_t gfx_locks = 0;
+static int8_t volatile gfx_locks = 0;
 static spi_device_handle_t gfx_spi;
 
 // Driver support
@@ -187,10 +187,18 @@ static void gfx_busy_wait (const char *);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -260,7 +268,8 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -356,7 +365,7 @@ static char f = 0,              // colour
    b = 0;
 #if GFX_BPP > 1
 static uint32_t f_mul = 0;
-static uint32_t b_mul = 0;                      // actual f/b colour multiplier
+static uint32_t b_mul = 0;      // actual f/b colour multiplier
 #endif
 static uint8_t bw = 0;          // 1bpp foreground colour
 
@@ -1086,10 +1095,11 @@ gfx_init_opts (gfx_init_t o)
    if (o.rst && !GPIO_IS_VALID_OUTPUT_GPIO (o.rst))
       return "RST not output";
    gfx_settings = o;
-   gfx_mutex = xSemaphoreCreateMutex ();        // Shared text access
    gfx = malloc (GFX_SIZE);
    if (!gfx)
       return "Malloc fail!";
+   gfx_mutex = xSemaphoreCreateMutex ();        // Shared text access
+   xSemaphoreGive (gfx_mutex);
    memset (gfx, 0, GFX_SIZE);
    spi_bus_config_t config = {
       .mosi_io_num = gfx_settings.mosi,
@@ -1164,9 +1174,8 @@ gfx_init_opts (gfx_init_t o)
 void
 gfx_lock (void)
 {                               // Lock display task
-   if (!gfx_locks && gfx_mutex)
+   if (!gfx_locks++ && gfx_mutex)
       xSemaphoreTake (gfx_mutex, portMAX_DELAY);
-   gfx_locks++;
    // preset state
 #if GFX_BPP > 1
    gfx_background ('k');
@@ -1180,9 +1189,8 @@ gfx_lock (void)
 void
 gfx_unlock (void)
 {                               // Unlock display task
-   if (gfx_locks)
+   if (gfx_locks--)
    {
-      gfx_locks--;
       if (!gfx_locks && gfx_mutex)
          xSemaphoreGive (gfx_mutex);
    }
