@@ -179,7 +179,6 @@ gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_
 
 static TaskHandle_t gfx_task_id = NULL;
 static SemaphoreHandle_t gfx_mutex = NULL;
-static int8_t volatile gfx_locks = 0;
 static spi_device_handle_t gfx_spi;
 
 // Driver support
@@ -1098,9 +1097,14 @@ gfx_init_opts (gfx_init_t o)
    gfx = malloc (GFX_SIZE);
    if (!gfx)
       return "Malloc fail!";
-   gfx_mutex = xSemaphoreCreateMutex ();        // Shared text access
-   xSemaphoreGive (gfx_mutex);
-   memset (gfx, 0, GFX_SIZE);
+   if(o.direct)
+   gfx_mutex = xSemaphoreCreateCounting (10,10);        // Shared text access
+   else
+   {
+	   gfx_mutex=xSemaphoreCreateMutex();
+         xSemaphoreGive (gfx_mutex);
+   }
+	   memset (gfx, 0, GFX_SIZE);
    spi_bus_config_t config = {
       .mosi_io_num = gfx_settings.mosi,
       .miso_io_num = -1,
@@ -1174,7 +1178,6 @@ gfx_init_opts (gfx_init_t o)
 void
 gfx_lock (void)
 {                               // Lock display task
-   if (!gfx_locks++ && gfx_mutex)
       xSemaphoreTake (gfx_mutex, portMAX_DELAY);
    // preset state
 #if GFX_BPP > 1
@@ -1189,12 +1192,8 @@ gfx_lock (void)
 void
 gfx_unlock (void)
 {                               // Unlock display task
-   if (gfx_locks--)
-   {
-      if (!gfx_locks && gfx_mutex)
          xSemaphoreGive (gfx_mutex);
-   }
-   if (!gfx_locks && gfx_settings.direct && gfx_settings.changed)
+   if ( gfx_settings.changed&&gfx_settings.direct&&uxSemaphoreGetCount(gfx_mutex)==10)
       gfx_update ();
 }
 
