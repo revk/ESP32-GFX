@@ -186,18 +186,10 @@ static void gfx_busy_wait (const char *);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -267,8 +259,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -631,6 +622,8 @@ gfx_b (void)
 inline void
 gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 {                               // set a pixel
+   if (!gfx)
+      return;
    if (gfx_settings.flip & 4)
    {
       gfx_pos_t t = x;
@@ -673,6 +666,8 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 void
 gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp)
 {                               // move x/y based on drawing a box w/h, set x/y as top left of said box
+   if (!gfx)
+      return;
    gfx_pos_t l = x,
       t = y;
    if ((a & GFX_C) == GFX_C)
@@ -772,6 +767,8 @@ gfx_clear (gfx_intensity_t i)
 void
 gfx_set_contrast (gfx_intensity_t contrast)
 {
+   if (!gfx)
+      return;
    if (!contrast)
       contrast = 255;
    if (!gfx || gfx_settings.contrast == contrast)
@@ -784,6 +781,8 @@ gfx_set_contrast (gfx_intensity_t contrast)
 void
 gfx_box (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 {                               // draw a box, not filled
+   if (!gfx)
+      return;
    gfx_pos_t x,
      y;
    gfx_draw (w, h, 0, 0, &x, &y);
@@ -802,6 +801,8 @@ gfx_box (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 void
 gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 {                               // draw a filled rectangle
+   if (!gfx)
+      return;
    gfx_pos_t x,
      y;
    gfx_draw (w, h, 0, 0, &x, &y);
@@ -823,6 +824,8 @@ gfx_icon2 (gfx_pos_t w, gfx_pos_t h, const void *data)
 void
 gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
 {                               // Icon, 16 bit packed
+   if (!gfx)
+      return;
    if (!data)
       gfx_fill (w, h, 0);       // No icon
    else
@@ -837,6 +840,8 @@ gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
 void
 gfx_7seg (int8_t size, const char *fmt, ...)
 {                               // Plot 7 segment digits
+   if (!gfx)
+      return;
    if (size < 1)
       size = 1;
    if (size > sizeof (sevenseg) / sizeof (*sevenseg))
@@ -980,6 +985,8 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 void
 gfx_text (int8_t size, const char *fmt, ...)
 {                               // Size negative for descenders
+   if (!gfx)
+      return;
    int z = 7;                   // effective height
    if (size < 0)
    {                            // indicates descenders allowed
@@ -1000,6 +1007,8 @@ gfx_text (int8_t size, const char *fmt, ...)
 void
 gfx_blocky (int8_t size, const char *fmt, ...)
 {                               // Size negative for descenders, blocky text
+   if (!gfx)
+      return;
    int z = 7;                   // effective height
    if (size < 0)
    {                            // indicates descenders allowed
@@ -1018,6 +1027,8 @@ gfx_blocky (int8_t size, const char *fmt, ...)
 static void
 gfx_update (void)
 {                               // Update
+   if (!gfx)
+      return;
    if (!gfx_driver_send ())
       gfx_settings.changed = 0;
    gfx_settings.norefresh = 1;
@@ -1097,14 +1108,14 @@ gfx_init_opts (gfx_init_t o)
    gfx = malloc (GFX_SIZE);
    if (!gfx)
       return "Malloc fail!";
-   if(o.direct)
-   gfx_mutex = xSemaphoreCreateCounting (10,10);        // Shared text access
+   if (o.direct)
+      gfx_mutex = xSemaphoreCreateCounting (10, 10);    // Shared text access
    else
    {
-	   gfx_mutex=xSemaphoreCreateMutex();
-         xSemaphoreGive (gfx_mutex);
+      gfx_mutex = xSemaphoreCreateMutex ();
+      xSemaphoreGive (gfx_mutex);
    }
-	   memset (gfx, 0, GFX_SIZE);
+   memset (gfx, 0, GFX_SIZE);
    spi_bus_config_t config = {
       .mosi_io_num = gfx_settings.mosi,
       .miso_io_num = -1,
@@ -1178,7 +1189,9 @@ gfx_init_opts (gfx_init_t o)
 void
 gfx_lock (void)
 {                               // Lock display task
-      xSemaphoreTake (gfx_mutex, portMAX_DELAY);
+   if (!gfx)
+      return;
+   xSemaphoreTake (gfx_mutex, portMAX_DELAY);
    // preset state
 #if GFX_BPP > 1
    gfx_background ('k');
@@ -1192,14 +1205,18 @@ gfx_lock (void)
 void
 gfx_unlock (void)
 {                               // Unlock display task
-         xSemaphoreGive (gfx_mutex);
-   if ( gfx_settings.changed&&gfx_settings.direct&&uxSemaphoreGetCount(gfx_mutex)==10)
+   if (!gfx)
+      return;
+   xSemaphoreGive (gfx_mutex);
+   if (gfx_settings.changed && gfx_settings.direct && uxSemaphoreGetCount (gfx_mutex) == 10)
       gfx_update ();
 }
 
 void
 gfx_refresh (void)
 {                               // For e-paper force full refresh
+   if (!gfx)
+      return;
    gfx_settings.norefresh = 0;
    gfx_settings.changed = 1;
 }
@@ -1207,6 +1224,8 @@ gfx_refresh (void)
 void
 gfx_wait (void)
 {                               // Wait for changes to be applied
+   if (!gfx)
+      return;
    if (gfx_settings.direct && gfx_settings.changed)
       gfx_update ();
    int try = 100;
@@ -1221,6 +1240,8 @@ gfx_wait (void)
 void
 gfx_message (const char *m)
 {
+   if (!gfx)
+      return;
    gfx_lock ();
    gfx_pos (gfx_settings.width / 2, 0, GFX_T | GFX_C | GFX_V);
    uint8_t size = 2;
@@ -1267,13 +1288,16 @@ gfx_ok (void)
 void
 gfx_sleep (void)
 {
-   if (gfx)
-      gfx_driver_sleep ();
+   if (!gfx)
+      return;
+   gfx_driver_sleep ();
 }
 
 void
 gfx_flip (uint8_t flip)
 {
+   if (!gfx)
+      return;
    gfx_settings.flip = flip;
    gfx_settings.changed = 1;
 }
@@ -1281,6 +1305,8 @@ gfx_flip (uint8_t flip)
 void
 gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_t l)
 {                               // Draw a line
+   if (!gfx)
+      return;
    gfx_pos_t dx = (x2 - x1),
       adx = dx,
       sdx = 1;
