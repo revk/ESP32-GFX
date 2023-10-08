@@ -54,8 +54,8 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   gfx_command2 (0x15, 0, 127);
-   gfx_command2 (0x75, 0, 127);
+   gfx_command2 (0x15, 0, gfx_width () - 1);
+   gfx_command2 (0x75, 0, gfx_height () - 1);
    gfx_send_command (0x5C);
    gfx_send_gfx ();
    if (gfx_settings.update)
