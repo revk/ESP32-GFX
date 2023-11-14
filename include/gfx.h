@@ -26,8 +26,8 @@ typedef struct {
  uint8_t ena;	// The GPIO port for ENA (Enable), if 0 then default / not used
  uint8_t busy;	// The GPIO port for BUSY (Busy), if 0 then default / not used
  uint8_t contrast;	// Contracts, if display supports it, 0 for default
- uint8_t width;	// Display width
- uint8_t height;	// Display width
+ uint16_t width;	// Display width
+ uint16_t height;	// Display width
  uint8_t flip:3;	// Display flipping
  uint8_t partial:1;	// E-Paper partial updates
  uint8_t mode2:1;	// E-Paper mode 2 updates
@@ -64,8 +64,8 @@ void gfx_colour(char);	// Set foreground - colour is a character
 void gfx_background(char);	// Set background - colour is a character
 
 // State get
-uint8_t	gfx_width(void);	// Display width
-uint8_t	gfx_height(void);	// Display height
+uint16_t	gfx_width(void);	// Display width
+uint16_t	gfx_height(void);	// Display height
 uint8_t	gfx_bpp(void);	// Display bpp
 gfx_pos_t gfx_x(void);	// Current x
 gfx_pos_t gfx_y(void); // Current y

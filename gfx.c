@@ -69,13 +69,13 @@ gfx_background (char c)
 {                               // Dummy - no driver
 }
 
-uint8_t
+uint16_t
 gfx_width (void)
 {                               // Dummy - no driver
    return 0;
 }
 
-uint8_t
+uint16_t
 gfx_height (void)
 {                               // Dummy - no driver
    return 0;
@@ -185,19 +185,12 @@ static spi_device_handle_t gfx_spi;
 static void gfx_busy_wait (const char *);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
-static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint16_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_list (const uint8_t * init_code);
+static esp_err_t gfx_send_data (const void *data, uint32_t len);
+static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -208,6 +201,9 @@ static __attribute__((unused))
 #endif
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1681
 #include "ssd1681.c"
+#endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_GD7965
+#include "gd7965.c"
 #endif
 
 #ifdef	CONFIG_GFX_7SEG
@@ -267,8 +263,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -351,10 +346,9 @@ typedef uint16_t gfx_cell_t;
 #define GFX_SIZE (gfx_settings.width * gfx_settings.height * sizeof(gfx_cell_t))
 #else
 typedef uint8_t gfx_cell_t;
-#define GFX_SIZE ((gfx_settings.height * GFX_BPP + 7) / 8 * gfx_settings.width)
+#define GFX_SIZE ((gfx_settings.width * GFX_BPP + 7) / 8 * gfx_settings.height)
 #endif
 static gfx_cell_t *gfx = NULL;
-
 
 // drawing state
 static gfx_pos_t x = 0,
@@ -390,6 +384,7 @@ gfx_busy_wait (const char *why)
 static esp_err_t
 gfx_send_command (uint8_t cmd)
 {
+   ESP_LOGE (TAG, "Command %02X", cmd);
    gpio_set_level (gfx_settings.dc, 0);
    spi_transaction_t t = {
       .length = 8,
@@ -401,17 +396,30 @@ gfx_send_command (uint8_t cmd)
 }
 
 static esp_err_t
-gfx_send_data (const void *data, uint16_t len)
+gfx_send_data (const void *data, uint32_t len)
 {
+   ESP_LOGE (TAG, "Send %lu", len);
    gpio_set_level (gfx_settings.dc, 1);
-   spi_transaction_t c = {
-      .length = 8 * len,
-      .tx_buffer = data,
-   };
-   esp_err_t e = spi_device_transmit (gfx_spi, &c);
-   if (e)
-      ESP_LOGE (TAG, "Failed send data");
-   return e;
+   while (len)
+   {
+      uint32_t l = len;
+      if (l > SOC_SPI_MAXIMUM_BUFFER_SIZE)
+         l = SOC_SPI_MAXIMUM_BUFFER_SIZE;
+      spi_transaction_t c = {
+         .length = 8 * l,
+         .tx_buffer = data,
+      };
+      esp_err_t e = spi_device_transmit (gfx_spi, &c);
+      if (e)
+      {
+         ESP_LOGE (TAG, "Failed send data");
+         return e;
+      }
+      len -= l;
+      data += l;
+   }
+   ESP_LOGD (TAG, "Sent");
+   return 0;
 }
 
 static esp_err_t
@@ -421,7 +429,7 @@ gfx_send_gfx (void)
 }
 
 static esp_err_t
-gfx_command (uint8_t c, const uint8_t * buf, uint16_t len)
+gfx_command (uint8_t c, const uint8_t * buf, uint8_t len)
 {
    esp_err_t e = gfx_send_command (c);
    if (!e && len)
@@ -581,13 +589,13 @@ gfx_background (char newb)
 }
 
 // Basic settings
-uint8_t
+uint16_t
 gfx_width (void)
 {                               // Display width
    return gfx_settings.width;
 }
 
-uint8_t
+uint16_t
 gfx_height (void)
 {                               // Display height
    return gfx_settings.height;
@@ -656,9 +664,9 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 #endif
 #if GFX_BPP <= 8
    const int bits = (1 << GFX_BPP) - 1;
-   const int shift = 8 - (y % (8 / GFX_BPP)) - GFX_BPP;
-   const int line = (gfx_settings.height * GFX_BPP + 7) / 8;
-   const int addr = line * (gfx_settings.width - 1 - x) + y * GFX_BPP / 8;      // Note this is all a bit twisted around on the epaper
+   const int shift = 8 - (x % (8 / GFX_BPP)) - GFX_BPP;
+   const int line = (gfx_settings.width * GFX_BPP + 7) / 8;
+   const int addr = line * y + x * GFX_BPP / 8;
    i >>= (8 - GFX_BPP);
    i &= bits;
    i ^= bits;
@@ -1137,12 +1145,17 @@ gfx_init_opts (gfx_init_t o)
       .max_transfer_sz = 8 * (GFX_SIZE + 8),
       .flags = SPICOMMON_BUSFLAG_MASTER,
    };
+   if (config.max_transfer_sz > SOC_SPI_MAXIMUM_BUFFER_SIZE)
+      config.max_transfer_sz = SOC_SPI_MAXIMUM_BUFFER_SIZE;
 #ifndef  CONFIG_IDF_TARGET_ESP32S3
    if (gfx_settings.port == HSPI_HOST && gfx_settings.mosi == 22 && gfx_settings.sck == 18 && gfx_settings.cs == 5)
       config.flags |= SPICOMMON_BUSFLAG_IOMUX_PINS;
-#endif
    if (spi_bus_initialize (gfx_settings.port, &config, 2))
       return "Init?";
+#else
+   if (spi_bus_initialize (gfx_settings.port, &config, SPI_DMA_CH_AUTO))
+      return "Init?";
+#endif
    spi_device_interface_config_t devcfg = {
       .clock_speed_hz = SPI_MASTER_FREQ_20M,
       .mode = 0,
@@ -1194,7 +1207,7 @@ gfx_init_opts (gfx_init_t o)
       gfx_settings.update = 1;
    }
    if (!gfx_settings.direct && gfx)
-      xTaskCreate (gfx_task, "GFX", 2 * 1024, NULL, 2, &gfx_task_id);   // Start update task
+      xTaskCreate (gfx_task, "GFX", 4 * 1024, NULL, 2, &gfx_task_id);   // Start update task
    return NULL;
 }
 
