@@ -36,7 +36,7 @@ gfx_driver_init (void)
       e += gfx_command1 (0xBE, 0x05);   // COM deselect voltage
 #endif
       e += gfx_command1 (0xFD, 0xB0);   // lock
-      gfx_command2 (0x15, 0,  gfx_settings.width - 1);
+      gfx_command2 (0x15, 0, gfx_settings.width - 1);
       gfx_command2 (0x75, 0, gfx_settings.height - 1);
       //gfx_send_command(0x5C);
       //gfx_send_data(gfx, GFX_SIZE);
@@ -54,8 +54,8 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   gfx_command2 (0x15, 0, gfx_width () - 1);
-   gfx_command2 (0x75, 0, gfx_height () - 1);
+   gfx_command2 (0x15, 0, gfx_settings.width - 1);
+   gfx_command2 (0x75, 0, gfx_settings.height - 1);
    gfx_send_command (0x5C);
    gfx_send_gfx ();
    if (gfx_settings.update)

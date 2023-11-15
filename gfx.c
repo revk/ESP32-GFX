@@ -626,13 +626,13 @@ gfx_background (char newb)
 uint16_t
 gfx_width (void)
 {                               // Display width
-   return (flip & 4) ? gfx_settings.height : gfx_settings.width;
+   return (gfx_settings.flip & 4) ? gfx_settings.height : gfx_settings.width;
 }
 
 uint16_t
 gfx_height (void)
 {                               // Display height
-   return (flip & 4) ? gfx_settings.width : gfx_settings.height;
+   return (gfx_settings.flip & 4) ? gfx_settings.width : gfx_settings.height;
 }
 
 uint8_t
