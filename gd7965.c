@@ -4,6 +4,8 @@
 #define GFX_DEFAULT_WIDTH	800
 #define GFX_DEFAULT_HEIGHT	480
 #define GFX_BPP			1
+#define	GFX_BUSY_LOW
+//#define	GFX_INVERT
 
 #define	GD7965_PSR	0x00
 #define	GD7965_PWR	0x01
@@ -51,6 +53,9 @@
 
 #include <driver/rtc_io.h>
 
+#define	USE_AUTO		// Auto PON/POFF sequence
+#define	USE_DSLP		// Deep sleep
+
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
@@ -58,11 +63,15 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t ssd1681_default_init_code[] = {
+      //0xFF, 0,                 // busy wait
       GD7965_BTST, 4, 0x17, 0x17, 0x27, 0x17,   //
-      GD7965_PWR, 5, 0x07, 0x17, 0x3F, 0x3F, 0x03,      //
+      GD7965_PWR, 4, 0x07, 0x17, 0x3F, 0x3F,    // Data sheet says 5 fields, but example and other drivers say 4
+#ifndef	USE_AUTO
       GD7965_PON, 0,            //
-      0xFF, 20,                 // busy wait
-      GD7965_PSR, 1, 0x3F,      //
+      0xFF, 0,                  // busy wait
+#endif
+      //GD7965_PSR, 1, 0x3F,      // KW LUT=REG
+      GD7965_PSR, 1, 0x1F,      // KW LUT=OTP
       GD7965_PLL, 1, 0x06,      //
       GD7965_TRES, 4, W / 256, W & 255, H / 256, H & 255,       //
       GD7965_DSPI, 1, 0x00,     //
@@ -80,13 +89,28 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   gfx_busy_wait ("Pre draw");
+#ifdef	USE_DSLP
+   gpio_set_level (gfx_settings.rst, 0);
+   usleep (1000);
+   gpio_set_level (gfx_settings.rst, 1);
+   usleep (1000);
+   gfx_driver_init();
+#endif
    if (gfx_send_command (GD7965_DTM2))
-      return "Data start 2 failed";
+      return "DTM2 failed";
    if (gfx_send_gfx ())
-      return "Data send 2 failed";
+      return "Data send failed";
+#ifdef	USE_AUTO
+#ifdef	USE_DSLP
+   if (gfx_command1 (GD7965_AUTO, 0xA7))        // PON->DRF->POFF->DSLP
+#else
+   if (gfx_command1 (GD7965_AUTO, 0xA5))        // PON->DRF->POFF
+#endif
+      return "AUTO failed";
+#else
    if (gfx_send_command (GD7965_DRF))
-      return "Data start 2 failed";
+      return "DRF failed";
+#endif
    gfx_busy_wait ("Post draw");
    return NULL;
 }

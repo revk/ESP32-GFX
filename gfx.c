@@ -33,6 +33,8 @@ static __attribute__((unused))
 #include "freertos/task.h"
 #include "gfx.h"
 
+#define	SPI_MAX	32768
+
 #ifdef	CONFIG_GFX_BUILD_SUFFIX_GFXNONE
      const char *gfx_init_opts (gfx_init_t o)
 {                               // Dummy - no driver
@@ -373,12 +375,34 @@ gfx_busy_wait (const char *why)
       sleep (5);
       return;
    }
-   //uint64_t a = esp_timer_get_time ();
-   int try = 5000;
+#ifdef	GFX_BUSY_LOW
+   if (gpio_get_level (gfx_settings.busy))
+#else
+   if (!gpio_get_level (gfx_settings.busy))
+#endif
+   {
+      ESP_LOGE (TAG, "Not busy (%s)", why);
+      return;
+   }
+   uint64_t a = esp_timer_get_time ();
+   int try = 10000;
+#ifdef	GFX_BUSY_LOW
+   while (try-- && !gpio_get_level (gfx_settings.busy))
+#else
    while (try-- && gpio_get_level (gfx_settings.busy))
+#endif
       usleep (1000);
-   //uint64_t b = esp_timer_get_time ();
-   //ESP_LOGE (TAG, "Busy waited %s %lldms", why, (b - a + 500) / 1000);
+#ifdef	GFX_BUSY_LOW
+   if (!gpio_get_level (gfx_settings.busy))
+#else
+   if (gpio_get_level (gfx_settings.busy))
+#endif
+   {
+      ESP_LOGE (TAG, "Busy stuck (%s)", why);
+      return;
+   }
+   uint64_t b = esp_timer_get_time ();
+   ESP_LOGE (TAG, "Busy waited (%s) %lldms", why, (b - a + 500) / 1000);
 }
 
 static esp_err_t
@@ -398,13 +422,13 @@ gfx_send_command (uint8_t cmd)
 static esp_err_t
 gfx_send_data (const void *data, uint32_t len)
 {
-   ESP_LOGE (TAG, "Send %lu", len);
    gpio_set_level (gfx_settings.dc, 1);
    while (len)
    {
       uint32_t l = len;
-      if (l > SOC_SPI_MAXIMUM_BUFFER_SIZE)
-         l = SOC_SPI_MAXIMUM_BUFFER_SIZE;
+      if (l > SPI_MAX)
+         l = SPI_MAX;
+      ESP_LOGE (TAG, "Send %lu", l);
       spi_transaction_t c = {
          .length = 8 * l,
          .tx_buffer = data,
@@ -495,8 +519,9 @@ static __attribute__((unused))
       init_code++;
       if (cmd == 0xFF)
       {
-         gfx_busy_wait ("Command list");
-         usleep (num_args * 1000);
+         gfx_busy_wait ("command_list");
+         if (num_args)
+            usleep (num_args * 1000);
          continue;
       }
       if (num_args > sizeof (buf))
@@ -669,7 +694,9 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    const int addr = line * y + x * GFX_BPP / 8;
    i >>= (8 - GFX_BPP);
    i &= bits;
+#ifndef	GFX_INVERT
    i ^= bits;
+#endif
    if (((gfx[addr] >> shift) & bits) == i)
       return;
    gfx[addr] = ((gfx[addr] & ~(bits << shift)) | (i << shift));
@@ -1142,11 +1169,11 @@ gfx_init_opts (gfx_init_t o)
       .sclk_io_num = gfx_settings.sck,
       .quadwp_io_num = -1,
       .quadhd_io_num = -1,
-      .max_transfer_sz = 8 * (GFX_SIZE + 8),
+      .max_transfer_sz = GFX_SIZE,
       .flags = SPICOMMON_BUSFLAG_MASTER,
    };
-   if (config.max_transfer_sz > SOC_SPI_MAXIMUM_BUFFER_SIZE)
-      config.max_transfer_sz = SOC_SPI_MAXIMUM_BUFFER_SIZE;
+   if (config.max_transfer_sz > SPI_MAX)
+      config.max_transfer_sz = SPI_MAX;
 #ifndef  CONFIG_IDF_TARGET_ESP32S3
    if (gfx_settings.port == HSPI_HOST && gfx_settings.mosi == 22 && gfx_settings.sck == 18 && gfx_settings.cs == 5)
       config.flags |= SPICOMMON_BUSFLAG_IOMUX_PINS;
@@ -1161,7 +1188,7 @@ gfx_init_opts (gfx_init_t o)
       .mode = 0,
       .spics_io_num = gfx_settings.cs ? : -1,
       .queue_size = 1,
-      .flags = SPI_DEVICE_3WIRE,
+      //.flags = SPI_DEVICE_3WIRE,
    };
    if (spi_bus_add_device (gfx_settings.port, &devcfg, &gfx_spi))
       return "Add?";
