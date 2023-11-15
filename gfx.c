@@ -381,7 +381,7 @@ gfx_busy_wait (const char *why)
    if (!gpio_get_level (gfx_settings.busy))
 #endif
    {
-      ESP_LOGE (TAG, "Not busy (%s)", why);
+      ESP_LOGD (TAG, "Not busy (%s)", why);
       return;
    }
    uint64_t a = esp_timer_get_time ();
@@ -398,17 +398,17 @@ gfx_busy_wait (const char *why)
    if (gpio_get_level (gfx_settings.busy))
 #endif
    {
-      ESP_LOGE (TAG, "Busy stuck (%s)", why);
+      ESP_LOGD (TAG, "Busy stuck (%s)", why);
       return;
    }
    uint64_t b = esp_timer_get_time ();
-   ESP_LOGE (TAG, "Busy waited (%s) %lldms", why, (b - a + 500) / 1000);
+   ESP_LOGD (TAG, "Busy waited (%s) %lldms", why, (b - a + 500) / 1000);
 }
 
 static esp_err_t
 gfx_send_command (uint8_t cmd)
 {
-   ESP_LOGE (TAG, "Command %02X", cmd);
+   ESP_LOGD (TAG, "Command %02X", cmd);
    gpio_set_level (gfx_settings.dc, 0);
    spi_transaction_t t = {
       .length = 8,
@@ -428,7 +428,7 @@ gfx_send_data (const void *data, uint32_t len)
       uint32_t l = len;
       if (l > SPI_MAX)
          l = SPI_MAX;
-      ESP_LOGE (TAG, "Send %lu", l);
+      ESP_LOGD (TAG, "Send %lu", l);
       spi_transaction_t c = {
          .length = 8 * l,
          .tx_buffer = data,
