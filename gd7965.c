@@ -133,7 +133,6 @@ gfx_driver_init (void)
 #endif
       GD7965_TRES, 4, W / 256, W & 255, H / 256, H & 255,       //
       GD7965_DSPI, 1, 0x00,     //
-      //GD7965_CDI, 2, 0x29, 0x07,        // N2OCP (copy new to old on refresh) - set for border in driver_send
       GD7965_BTST, 4, 0x17, 0x17, 0x27, 0x17,   //
       GD7965_TCON, 1, 0x22,     //
       GD7965_PLL, 1, 0x06,      //
@@ -158,7 +157,7 @@ gfx_driver_send (void)
 #ifdef	FAST
    gfx_command1 (GD7965_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);     //  KW LUT=REG (fast update) or KW LIT=OTP (slow)
 #endif
-   gfx_command2 (GD7965_CDI, gfx_settings.border ? 0x19 : 0x29, 0x07);
+   gfx_command2 (GD7965_CDI, gfx_settings.norefresh ? 0x39 : gfx_settings.border ? 0x19 : 0x29, 0x07);
    if (gfx_send_command (GD7965_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx ())
