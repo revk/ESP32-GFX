@@ -78,7 +78,7 @@ gfx_driver_init (void)
       GD7965_TCON, 1, 0x22,     //
       GD7965_VDCS, 1, 0x26,     //
       //GD7965_CDI, 2, 0x31, 0x07,        //
-      GD7965_CDI, 2, 0x39, 0x07,        // N2OCP (copy new to old on refresh)
+      GD7965_CDI, 2, 0x29, 0x07,        // N2OCP (copy new to old on refresh) (white border)
       0xFE                      // End
    };
    if (gfx_command_list (ssd1681_default_init_code))
