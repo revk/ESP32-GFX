@@ -111,7 +111,7 @@ gfx_driver_send (void)
    if (gfx_send_command (GD7965_DRF))
       return "DRF failed";
 #endif
-   gfx_busy_wait ("Post draw");
+   //gfx_busy_wait ("Post draw");
    return NULL;
 }
 
