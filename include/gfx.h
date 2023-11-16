@@ -39,6 +39,7 @@ typedef struct {
  uint8_t update:1;	// Controls update, cleared when updated
  uint8_t asleep:1;	// Device is asleep
  uint8_t pause:1;	// Pause needed before next operation
+ uint8_t border:1;	// Border black (e-paper)
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);
@@ -51,6 +52,7 @@ void gfx_wait(void);	// Wait for updates to be done
 int gfx_ok(void);	// GFX is enabled
 void gfx_sleep(void);	// Put device to sleep
 void gfx_flip(uint8_t flip);	// Change flip
+void gfx_flip(uint8_t border);	// Change border
 
 // Overall display contrast setting if supported by display
 void gfx_set_contrast(gfx_intensity_t);
