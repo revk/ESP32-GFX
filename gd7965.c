@@ -59,7 +59,7 @@
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
-   ESP_LOGD (TAG, "Init");
+   ESP_LOGE (TAG, "Init");
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t ssd1681_default_init_code[] = {
@@ -78,7 +78,7 @@ gfx_driver_init (void)
       GD7965_TCON, 1, 0x22,     //
       GD7965_VDCS, 1, 0x26,     //
       //GD7965_CDI, 2, 0x31, 0x07,        //
-      GD7965_CDI, 2, 0x29, 0x07,        // N2OCP (copy new to old on refresh) (white border)
+      GD7965_CDI, 2, 0x29, 0x07,        // N2OCP (copy new to old on refresh)
       0xFE                      // End
    };
    if (gfx_command_list (ssd1681_default_init_code))
@@ -111,7 +111,7 @@ gfx_driver_send (void)
    if (gfx_send_command (GD7965_DRF))
       return "DRF failed";
 #endif
-   //gfx_busy_wait ("Post draw");
+   gfx_busy_wait ("Post draw");
    return NULL;
 }
 
