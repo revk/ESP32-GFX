@@ -59,7 +59,7 @@
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
-   ESP_LOGE (TAG, "Init");
+   ESP_LOGD (TAG, "Init");
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t ssd1681_default_init_code[] = {
