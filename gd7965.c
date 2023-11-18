@@ -71,7 +71,7 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t ssd1681_default_init_code[] = {
-      0xFF, 0,                 // busy wait
+      //0xFF, 0,                 // busy wait
 #ifndef	USE_AUTO
       GD7965_PON, 0,            //
       0xFF, 0,                  // busy wait
