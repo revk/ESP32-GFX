@@ -1218,10 +1218,11 @@ gfx_init_opts (gfx_init_t o)
       gpio_set_direction (gfx_settings.rst, GPIO_MODE_OUTPUT);
       if (!gfx_settings.sleep)
       {
+         usleep (10000);
          gpio_set_level (gfx_settings.rst, 0);
-         usleep (1000);
+         usleep (10000);
          gpio_set_level (gfx_settings.rst, 1);
-         usleep (1000);
+         usleep (10000);
       }
    }
    if (gfx_settings.sleep)
