@@ -149,9 +149,9 @@ gfx_driver_send (void)
 {                               // Send buffer and update display
 #ifdef	USE_DSLP
    gpio_set_level (gfx_settings.rst, 0);
-   usleep (1000);
+   usleep (10000);
    gpio_set_level (gfx_settings.rst, 1);
-   usleep (1000);
+   usleep (10000);
    gfx_driver_init ();
 #endif
 #ifdef	FAST
