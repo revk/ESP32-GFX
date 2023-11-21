@@ -157,7 +157,7 @@ gfx_driver_send (void)
 #ifdef	FAST
    gfx_command1 (GD7965_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);     //  KW LUT=REG (fast update) or KW LIT=OTP (slow)
 #endif
-   gfx_command2 (GD7965_CDI, gfx_settings.norefresh ? 0x39 : gfx_settings.border ? 0x19 : 0x29, 0x07);
+   gfx_command2 (GD7965_CDI, gfx_settings.norefresh ? 0x39 : gfx_settings.border ^ gfx_settings.invert ? 0x19 : 0x29, 0x07);
    if (gfx_send_command (GD7965_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx ())
