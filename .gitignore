@@ -2,4 +2,6 @@
 *~
 *.swp
 .DS_Store
-KiCad/*-backups
+*/*-backups
+*/*/*-backups
+*/*/fp-info-cache
