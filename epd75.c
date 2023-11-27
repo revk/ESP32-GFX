@@ -1,4 +1,4 @@
-// GD7965 driver code
+// Waveshare EPD75 (7.5" e-paper) driver
 // https://files.waveshare.com/upload/6/60/7.5inch_e-Paper_V2_Specification.pdf
 // Also https://github.com/bitbank2/OneBitDisplay/blob/5d3d41b6de167f7bc51228f4710f78a31b6c8002/src/obd.inl#L2842
 
@@ -8,55 +8,55 @@
 #define	GFX_BUSY_LOW
 //#define       GFX_INVERT
 
-#define	GD7965_PSR	0x00
-#define	GD7965_PWR	0x01
-#define	GD7965_POF	0x02
-#define	GD7965_PFS	0x03
-#define	GD7965_PON	0x04
-#define	GD7965_PMES	0x05
-#define	GD7965_BTST	0x06
-#define	GD7965_DSLP	0x07
-#define	GD7965_DTM1	0x10
-#define	GD7965_DSP	0x11
-#define	GD7965_DRF	0x12
-#define	GD7965_DTM2	0x13
-#define	GD7965_DSPI	0x15
-#define	GD7965_AUTO	0x17
-#define	GD7965_LUT_VCOM	0x20
-#define	GD7965_LUT_WW	0x21
-#define	GD7965_LUT_BW	0x22
-#define	GD7965_LUT_WB	0x23
-#define	GD7965_LUT_BB	0x24
-#define	GD7965_LUT_VCOM2	0x25
-#define	GD7965_KWOPT	0x2B
-#define	GD7965_PLL	0x30
-#define	GD7965_TSC	0x40
-#define	GD7965_TSE	0x41
-#define	GD7965_TSW	0x42
-#define	GD7965_TSR	0x43
-#define	GD7965_PBC	0x44
-#define	GD7965_CDI	0x50
-#define	GD7965_LPD	0x51
-#define	GD7965_EVS	0x52
-#define	GD7965_TCON	0x60
-#define	GD7965_TRES	0x61
-#define	GD7965_GSST	0x65
-#define	GD7965_REV	0x70
-#define	GD7965_FLG	0x71
-#define	GD7965_AMV	0x80
-#define	GD7965_VV	0x81
-#define	GD7965_VDCS	0x82
-#define	GD7965_PTL	0x90
-#define	GD7965_PTIN	0x91
-#define	GD7965_PTOUT	0x92
-#define	GD7965_PGM	0xA0
-#define	GD7965_APG	0xA1
-#define	GD7965_ROTP	0xA2
-#define	GD7965_CCSET	0xE0
-#define	GD7965_PWS	0xE3
-#define	GD7965_LVSEL	0xE4
-#define	GD7965_TSSET	0xE5
-#define	GD7965_TSBDRY	0xE7
+#define	EPD75_PSR	0x00
+#define	EPD75_PWR	0x01
+#define	EPD75_POF	0x02
+#define	EPD75_PFS	0x03
+#define	EPD75_PON	0x04
+#define	EPD75_PMES	0x05
+#define	EPD75_BTST	0x06
+#define	EPD75_DSLP	0x07
+#define	EPD75_DTM1	0x10
+#define	EPD75_DSP	0x11
+#define	EPD75_DRF	0x12
+#define	EPD75_DTM2	0x13
+#define	EPD75_DSPI	0x15
+#define	EPD75_AUTO	0x17
+#define	EPD75_LUT_VCOM	0x20
+#define	EPD75_LUT_WW	0x21
+#define	EPD75_LUT_BW	0x22
+#define	EPD75_LUT_WB	0x23
+#define	EPD75_LUT_BB	0x24
+#define	EPD75_LUT_VCOM2	0x25
+#define	EPD75_KWOPT	0x2B
+#define	EPD75_PLL	0x30
+#define	EPD75_TSC	0x40
+#define	EPD75_TSE	0x41
+#define	EPD75_TSW	0x42
+#define	EPD75_TSR	0x43
+#define	EPD75_PBC	0x44
+#define	EPD75_CDI	0x50
+#define	EPD75_LPD	0x51
+#define	EPD75_EVS	0x52
+#define	EPD75_TCON	0x60
+#define	EPD75_TRES	0x61
+#define	EPD75_GSST	0x65
+#define	EPD75_REV	0x70
+#define	EPD75_FLG	0x71
+#define	EPD75_AMV	0x80
+#define	EPD75_VV	0x81
+#define	EPD75_VDCS	0x82
+#define	EPD75_PTL	0x90
+#define	EPD75_PTIN	0x91
+#define	EPD75_PTOUT	0x92
+#define	EPD75_PGM	0xA0
+#define	EPD75_APG	0xA1
+#define	EPD75_ROTP	0xA2
+#define	EPD75_CCSET	0xE0
+#define	EPD75_PWS	0xE3
+#define	EPD75_LVSEL	0xE4
+#define	EPD75_TSSET	0xE5
+#define	EPD75_TSBDRY	0xE7
 
 #include <driver/rtc_io.h>
 
@@ -73,12 +73,12 @@ gfx_driver_init (void)
    const uint8_t ssd1681_default_init_code[] = {
       //0xFF, 0,                 // busy wait
 #ifndef	USE_AUTO
-      GD7965_PON, 0,            //
+      EPD75_PON, 0,            //
       0xFF, 0,                  // busy wait
 #endif
 #ifdef	FAST
-      GD7965_PWR, 5, 0x17, 0x17, 0x3F, 0x3F, 0x11,
-      GD7965_LUT_VCOM, 0x2c,    // VCOM LUT
+      EPD75_PWR, 5, 0x17, 0x17, 0x3F, 0x3F, 0x11,
+      EPD75_LUT_VCOM, 0x2c,    // VCOM LUT
       0x00, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -87,7 +87,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00,
-      GD7965_LUT_WW, 0x2a,      // WW LUT
+      EPD75_LUT_WW, 0x2a,      // WW LUT
       0x00, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -95,7 +95,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      GD7965_LUT_BW, 0x2a,
+      EPD75_LUT_BW, 0x2a,
       0x5a, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -103,7 +103,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      GD7965_LUT_WB, 0x2a,
+      EPD75_LUT_WB, 0x2a,
       0x84, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -111,7 +111,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      GD7965_LUT_BB, 0x2a,
+      EPD75_LUT_BB, 0x2a,
       0x00, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -119,7 +119,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-      GD7965_LUT_VCOM2, 0x2a,
+      EPD75_LUT_VCOM2, 0x2a,
       0x00, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -128,15 +128,15 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #else
-      GD7965_PWR, 5, 0x07, 0x17, 0x3F, 0x3F, 0x03,
-      GD7965_PSR, 1, 0x1F,      // KW LUT=OTP (slow update for first display)
+      EPD75_PWR, 5, 0x07, 0x17, 0x3F, 0x3F, 0x03,
+      EPD75_PSR, 1, 0x1F,      // KW LUT=OTP (slow update for first display)
 #endif
-      GD7965_TRES, 4, W / 256, W & 255, H / 256, H & 255,       //
-      GD7965_DSPI, 1, 0x00,     //
-      GD7965_BTST, 4, 0x17, 0x17, 0x27, 0x17,   //
-      GD7965_TCON, 1, 0x22,     //
-      GD7965_PLL, 1, 0x06,      //
-      GD7965_VDCS, 1, 0x26,     //
+      EPD75_TRES, 4, W / 256, W & 255, H / 256, H & 255,       //
+      EPD75_DSPI, 1, 0x00,     //
+      EPD75_BTST, 4, 0x17, 0x17, 0x27, 0x17,   //
+      EPD75_TCON, 1, 0x22,     //
+      EPD75_PLL, 1, 0x06,      //
+      EPD75_VDCS, 1, 0x26,     //
       0xFE                      // End
    };
    if (gfx_command_list (ssd1681_default_init_code))
@@ -155,22 +155,22 @@ gfx_driver_send (void)
    gfx_driver_init ();
 #endif
 #ifdef	FAST
-   gfx_command1 (GD7965_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);     //  KW LUT=REG (fast update) or KW LIT=OTP (slow)
+   gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);     //  KW LUT=REG (fast update) or KW LIT=OTP (slow)
 #endif
-   gfx_command2 (GD7965_CDI, gfx_settings.norefresh ? 0x39 : gfx_settings.border ^ gfx_settings.invert ? 0x19 : 0x29, 0x07);
-   if (gfx_send_command (GD7965_DTM2))
+   gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0x39 : gfx_settings.border ^ gfx_settings.invert ? 0x19 : 0x29, 0x07);
+   if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx ())
       return "Data send failed";
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
-   if (gfx_command1 (GD7965_AUTO, 0xA7))        // PON->DRF->POFF->DSLP
+   if (gfx_command1 (EPD75_AUTO, 0xA7))        // PON->DRF->POFF->DSLP
 #else
-   if (gfx_command1 (GD7965_AUTO, 0xA5))        // PON->DRF->POFF
+   if (gfx_command1 (EPD75_AUTO, 0xA5))        // PON->DRF->POFF
 #endif
       return "AUTO failed";
 #else
-   if (gfx_send_command (GD7965_DRF))
+   if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
 #endif
 #ifndef	USE_DSLP

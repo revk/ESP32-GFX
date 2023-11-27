@@ -217,8 +217,8 @@ static __attribute__((unused))
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1681
 #include "ssd1681.c"
 #endif
-#ifdef  CONFIG_GFX_BUILD_SUFFIX_GD7965
-#include "gd7965.c"
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD75
+#include "epd75.c"
 #endif
 
 #ifdef	CONFIG_GFX_7SEG
