@@ -425,7 +425,7 @@ gfx_send_command (uint8_t cmd)
 }
 
 void
-gfx_load_data (const void *data)
+gfx_load(const void *data)
 {
    if (!data)
       return;
