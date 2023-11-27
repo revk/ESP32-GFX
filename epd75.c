@@ -1,12 +1,14 @@
 // Waveshare EPD75 (7.5" e-paper) driver
 // https://files.waveshare.com/upload/6/60/7.5inch_e-Paper_V2_Specification.pdf
+// https://www.waveshare.com/w/upload/8/8c/7.5inch-e-paper-b-v3-specification.pdf
+// https://files.waveshare.com/upload/8/87/E-Paper-Driver-HAT-Schematic.pdf
+// https://files.waveshare.com/upload/8/8e/E-Paper_Driver_HAT.pdf
 // Also https://github.com/bitbank2/OneBitDisplay/blob/5d3d41b6de167f7bc51228f4710f78a31b6c8002/src/obd.inl#L2842
 
 #define GFX_DEFAULT_WIDTH	800
 #define GFX_DEFAULT_HEIGHT	480
 #define GFX_BPP			1
 #define	GFX_BUSY_LOW
-//#define       GFX_INVERT
 
 #define	EPD75_PSR	0x00
 #define	EPD75_PWR	0x01
@@ -60,9 +62,9 @@
 
 #include <driver/rtc_io.h>
 
-#define	USE_AUTO                // Auto PON/POFF sequence
-//#define       USE_DSLP                // Deep sleep
-#define	FAST                    // LUT from register
+#define USE_AUTO                // Auto PON/POFF sequence
+//#define USE_DSLP              // Deep sleep
+#define       FAST                    // LUT from register
 
 static const char *
 gfx_driver_init (void)
@@ -71,14 +73,22 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t ssd1681_default_init_code[] = {
-      //0xFF, 0,                 // busy wait
-#ifndef	USE_AUTO
-      EPD75_PON, 0,            //
+#if 0
+      EPD75_PSR, 1, 0x1E,       // KW LUT=OTP RST
       0xFF, 0,                  // busy wait
 #endif
-#ifdef	FAST
-      EPD75_PWR, 5, 0x17, 0x17, 0x3F, 0x3F, 0x11,
-      EPD75_LUT_VCOM, 0x2c,    // VCOM LUT
+      EPD75_PWR, 4, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red
+      EPD75_VDCS, 1, 0x26,      //
+      EPD75_PFS,1,0x30, // Power off sequence
+#ifndef	USE_AUTO
+      EPD75_PON, 0,             //
+      0xFF, 0,                  // busy wait
+#endif
+      EPD75_CDI, 2, 0xB9, 0x08, //
+#ifndef	FAST
+      EPD75_PSR, 1, 0x1F,       // KW LUT=OTP (slow update for first display)
+#else
+      EPD75_LUT_VCOM, 0x2c,     // VCOM LUT
       0x00, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -87,7 +97,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00,
-      EPD75_LUT_WW, 0x2a,      // WW LUT
+      EPD75_LUT_WW, 0x2a,       // WW LUT
       0x00, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -127,16 +137,12 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-#else
-      EPD75_PWR, 5, 0x07, 0x17, 0x3F, 0x3F, 0x03,
-      EPD75_PSR, 1, 0x1F,      // KW LUT=OTP (slow update for first display)
 #endif
-      EPD75_TRES, 4, W / 256, W & 255, H / 256, H & 255,       //
-      EPD75_DSPI, 1, 0x00,     //
-      EPD75_BTST, 4, 0x17, 0x17, 0x27, 0x17,   //
-      EPD75_TCON, 1, 0x22,     //
-      EPD75_PLL, 1, 0x06,      //
-      EPD75_VDCS, 1, 0x26,     //
+      EPD75_TRES, 4, W / 256, W & 255, H / 256, H & 255,        //
+      EPD75_DSPI, 1, 0x00,      //
+      EPD75_BTST, 4, 0x17, 0x17, 0x27, 0x17,    //
+      EPD75_TCON, 1, 0x22,      //
+      EPD75_PLL, 1, 0x06,       //
       0xFE                      // End
    };
    if (gfx_command_list (ssd1681_default_init_code))
@@ -155,18 +161,18 @@ gfx_driver_send (void)
    gfx_driver_init ();
 #endif
 #ifdef	FAST
-   gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);     //  KW LUT=REG (fast update) or KW LIT=OTP (slow)
+   gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
 #endif
-   gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0x39 : gfx_settings.border ^ gfx_settings.invert ? 0x19 : 0x29, 0x07);
+   gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0xB9 : (gfx_settings.border ^ gfx_settings.invert) ? 0x19 : 0x29, 0x07);
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx ())
       return "Data send failed";
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
-   if (gfx_command1 (EPD75_AUTO, 0xA7))        // PON->DRF->POFF->DSLP
+   if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POFF->DSLP
 #else
-   if (gfx_command1 (EPD75_AUTO, 0xA5))        // PON->DRF->POFF
+   if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POFF
 #endif
       return "AUTO failed";
 #else
