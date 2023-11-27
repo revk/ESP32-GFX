@@ -50,7 +50,7 @@ void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white
 void gfx_unlock(void);	// unlocks display allowing it to be sent if there has been any change (draws if changed and direct mode)
 void gfx_refresh(void);	// E-paper mainly, do full mode update
 void gfx_wait(void);	// Wait for updates to be done
-void gfx_load_data(const void *data); // Block load whole image (does not allow for logical invert)
+void gfx_load(const void *data); // Block load whole image (does not allow for logical invert)
 int gfx_ok(void);	// GFX is enabled
 void gfx_sleep(void);	// Put device to sleep
 void gfx_flip(uint8_t flip);	// Change flip
