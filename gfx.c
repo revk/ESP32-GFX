@@ -1330,7 +1330,7 @@ gfx_message (const char *m)
             m++;
       }
       if (!gfx_y ())
-         gfx_clear (0);
+         gfx_clear (0); // Done after setting initial background
       const char *e = m;
       while (*e && *e != '/' && *e != '[')
          e++;
