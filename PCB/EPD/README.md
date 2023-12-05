@@ -13,3 +13,5 @@
 - pads for power (5V-35V) instead of USB
 
 Works with most waveshare e-paper (not quite all), including large 7.5" panel.
+
+[Amazon UK](https://www.amazon.co.uk/dp/B0CPFM1ZJJ)
