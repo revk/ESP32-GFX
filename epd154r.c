@@ -4,6 +4,7 @@
 #define GFX_DEFAULT_WIDTH	200
 #define GFX_DEFAULT_HEIGHT	200
 #define GFX_BPP			1
+#define GFX_BPP2		1
 #define	GFX_BUSY_LOW
 
 #define	EPD154_PSR	0x00
