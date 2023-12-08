@@ -212,6 +212,12 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD75
 #include "epd75.c"
 #endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154
+#include "epd154.c"
+#endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154R
+#include "epd154r.c"
+#endif
 
 #ifdef	CONFIG_GFX_7SEG
 #include "7seg1.h"
