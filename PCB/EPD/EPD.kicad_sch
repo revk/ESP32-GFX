@@ -4948,7 +4948,7 @@
     )
   )
 
-  (symbol (lib_id "Jumper:SolderJumper_3_Bridged12") (at 183.515 146.05 270) (mirror x) (unit 1)
+  (symbol (lib_id "Jumper:SolderJumper_3_Bridged12") (at 183.515 146.05 270) (unit 1)
     (in_bom no) (on_board yes) (dnp no)
     (uuid c30cae37-2678-4d6c-a12a-40ebecd2931d)
     (property "Reference" "JP1" (at 185.1659 146.05 90)
