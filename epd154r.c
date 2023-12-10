@@ -53,10 +53,10 @@ gfx_driver_init (void)
       2, EPD154_SET_GATE_TIME, 0x08,    //
       2, EPD154_DATA_MODE, 0x03,        // Ram data entry mode
       3, EPD154_SET_RAMXPOS, 0, (W + 7) / 8 - 1,        //
-      5, EPD154_SET_RAMYPOS, 0, 0, (H - 1) & 0xFF, (H - 1) >> 8,       //
+      5, EPD154_SET_RAMYPOS, 0, 0, (H - 1) & 0xFF, (H - 1) >> 8,        //
       31, EPD154_WRITE_LUT,     //
       0x02, 0x02, 0x01, 0x11, 0x12, 0x12, 0x22, 0x22, 0x66, 0x69, 0x69, 0x59, 0x58, 0x99, 0x99, 0x88, 0x00, 0x00, 0x00, 0x00, 0xF8, 0xB4, 0x13, 0x51, 0x35, 0x51, 0x51, 0x19, 0x01, 0x00,       // full update
-      2, EPD154_TEMP_CONTROL, 0x80,    // Temp control ?
+      2, EPD154_TEMP_CONTROL, 0x80,     // Temp control ?
       0
    };
    if (gfx_command_bulk (init))
@@ -68,7 +68,7 @@ static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
    const uint8_t init[] = {
-      2, EPD154_WRITE_BORDER, 0x05,    // border color
+      2, EPD154_WRITE_BORDER, 0x05,     // border color
       2, EPD154_SET_RAMXCOUNT, 0,
       3, EPD154_SET_RAMYCOUNT, 0, 0,
       0

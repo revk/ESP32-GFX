@@ -194,18 +194,10 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -285,8 +277,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -363,8 +354,8 @@ static uint8_t const *fonts[] = {
 
 #elif GFX_BPP == 2              // Black/red/white
 
-#define	BLACK	0
-#define WHITE   1
+#define	BLACK	1
+#define WHITE   0
 #define	RED	2
 
 #elif GFX_BPP <= 8              // Greyscale or mono
@@ -736,7 +727,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 #endif
    if (!gfx_settings.invert)
       i = 255 - i;
-#if GFX_BPP == 1	// Black/white
+#if GFX_BPP == 1                // Black/white
    const int shift = 7 - (x % 8);
    const int line = (gfx_settings.width + 7) / 8;
    const int addr = line * y + x / 8;
@@ -746,7 +737,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       gfx[addr] = ((gfx[addr] & ~(1 << shift)) | (k << shift));
       gfx_settings.changed = 1;
    }
-#elif GFX_BPP == 2	// Black/red/white
+#elif GFX_BPP == 2              // Black/red/white
    const int shift = 7 - (x % 8);
    const int line = (gfx_settings.width + 7) / 8;
    const int addr = line * y + x / 8;
@@ -757,12 +748,12 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       gfx_settings.changed = 1;
    }
    uint8_t r = (((i & 0x80) ? f_mul : b_mul) >> 1) & 1;
-   if (((gfx[GFX_PAGE+addr] >> shift) & 1) != r)
+   if (((gfx[GFX_PAGE + addr] >> shift) & 1) != r)
    {
       gfx[GFX_PAGE + addr] = ((gfx[addr] & ~(1 << shift)) | (r << shift));
       gfx_settings.changed = 1;
    }
-#elif GFX_BPP <= 8	// Grey
+#elif GFX_BPP <= 8              // Grey
    const int bits = (1 << GFX_BPP) - 1;
    const int shift = 8 - (x % (8 / GFX_BPP)) - GFX_BPP;
    const int line = (gfx_settings.width * GFX_BPP + 7) / 8;
@@ -776,7 +767,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       gfx[addr] = ((gfx[addr] & ~(bits << shift)) | (i << shift));
       gfx_settings.changed = 1;
    }
-#else			// COlour
+#else // COlour
    uint16_t v = ntohs (f_mul * (i >> (8 - GFX_INTENSITY_BPP)) + b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP)));
    if (v != gfx[(y * gfx_settings.width) + x])
    {
@@ -877,6 +868,9 @@ gfx_clear (gfx_intensity_t i)
 {
    if (!gfx)
       return;
+#if GFX_BPP <= 2
+   i = 255 - i;
+#endif
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
       for (gfx_pos_t x = 0; x < gfx_width (); x++)
          gfx_pixel (x, y, i);
