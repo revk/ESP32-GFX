@@ -34,24 +34,24 @@
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
-   const uint8_t ssd1680_default_init_code[] = {
-      SSD1680_SW_RESET, 0,      // soft reset
-      0xFF, 20,                 // busy wait
-      SSD1680_DATA_MODE, 1, 0x03,       // Ram data entry mode
-      SSD1680_WRITE_BORDER, 1, 0x05,    // border color
+   const uint8_t iniit[] = {
+      1, SSD1680_SW_RESET,      // soft reset
+      0xFF,                     // busy wait
+      2, SSD1680_DATA_MODE, 0x03,       // Ram data entry mode
+      2, SSD1680_WRITE_BORDER, 0x05,    // border color
 
-      SSD1680_WRITE_VCOM, 1, 0x36,      // Vcom Voltage
-      SSD1680_GATE_VOLTAGE, 1, 0x17,    // Set gate voltage
-      SSD1680_SOURCE_VOLTAGE, 3, 0x41, 0x00, 0x32,      // Set source voltage
-      SSD1680_SET_RAMXCOUNT, 1, 1,
-      SSD1680_SET_RAMYCOUNT, 2, 0, 0,
-      SSD1680_SET_RAMXPOS, 2, 1, (CONFIG_GFX_HEIGHT + 7) / 8,
-      SSD1680_SET_RAMYPOS, 4, 0, 0, (CONFIG_GFX_WIDTH - 1), (CONFIG_GFX_WIDTH - 1) >> 8,
-      SSD1680_DRIVER_CONTROL, 3, (CONFIG_GFX_WIDTH - 1), (CONFIG_GFX_WIDTH - 1) >> 8, 0,
-      0xFE
+      2, SSD1680_WRITE_VCOM, 0x36,      // Vcom Voltage
+      2, SSD1680_GATE_VOLTAGE, 0x17,    // Set gate voltage
+      4, SSD1680_SOURCE_VOLTAGE, 0x41, 0x00, 0x32,      // Set source voltage
+      2, SSD1680_SET_RAMXCOUNT, 1,
+      3, SSD1680_SET_RAMYCOUNT, 0, 0,
+      3, SSD1680_SET_RAMXPOS, 1, (CONFIG_GFX_HEIGHT + 7) / 8,
+      5, SSD1680_SET_RAMYPOS, 0, 0, (CONFIG_GFX_WIDTH - 1), (CONFIG_GFX_WIDTH - 1) >> 8,
+      4, SSD1680_DRIVER_CONTROL, (CONFIG_GFX_WIDTH - 1), (CONFIG_GFX_WIDTH - 1) >> 8, 0,
+      0
    };
 
-   if (gfx_command_list (ssd1680_default_init_code))
+   if (gfx_command_bulk (init))
       return "Init failed";
    return NULL;
 }

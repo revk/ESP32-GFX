@@ -194,10 +194,18 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (void);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -277,7 +285,8 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -393,7 +402,7 @@ gfx_busy_wait (const char *why)
    if (!gpio_get_level (gfx_settings.busy))
 #endif
    {
-      ESP_LOGD (TAG, "Not busy (%s)", why);
+      ESP_LOGE (TAG, "Not busy (%s)", why);
       return;
    }
    uint64_t a = esp_timer_get_time ();
@@ -410,7 +419,7 @@ gfx_busy_wait (const char *why)
    if (gpio_get_level (gfx_settings.busy))
 #endif
    {
-      ESP_LOGD (TAG, "Busy stuck (%s)", why);
+      ESP_LOGE (TAG, "Busy stuck (%s)", why);
       return;
    }
    uint64_t b = esp_timer_get_time ();
@@ -432,7 +441,7 @@ gfx_send_command (uint8_t cmd)
 }
 
 void
-gfx_load(const void *data)
+gfx_load (const void *data)
 {
    if (!data)
       return;
@@ -528,35 +537,30 @@ static __attribute__((unused))
 }
 
 static __attribute__((unused))
-     esp_err_t gfx_command_list (const uint8_t * init_code)
-{
+     esp_err_t gfx_command_bulk (const uint8_t * bulk)
+{                               // Bulk command
+   // bulk is a sequence of blocks of the form :-
+   // Len, 0x00 is end, 0xFF is busy wait with no command or data
+   // Command (included in len)
+   // Data (len-1 bytes)
    uint8_t buf[64];
 
-   while (init_code[0] != 0xFE)
+   while (*bulk)
    {
-      uint8_t cmd = init_code[0];
-      init_code++;
-      uint8_t num_args = init_code[0];
-      init_code++;
-      if (cmd == 0xFF)
+      uint8_t len = *bulk++;
+      if (len == 0xFF)
       {
-         gfx_busy_wait ("command_list");
-         if (num_args)
-            usleep (num_args * 1000);
+         gfx_busy_wait ("bulk wait");
          continue;
       }
-      if (num_args > sizeof (buf))
+      if (len > sizeof (buf))
       {
-         ESP_LOGE (TAG, "Bad command_list len %d", num_args);
+         ESP_LOGE (TAG, "Bad bulk command len %d", len);
          break;
       }
-
-      for (int i = 0; i < num_args; i++)
-      {
-         buf[i] = init_code[0];
-         init_code++;
-      }
-      esp_err_t e = gfx_command (cmd, buf, num_args);
+      memcpy (buf, bulk, len);
+      bulk += len;
+      esp_err_t e = gfx_command (*buf, buf, len - 1);
       if (e)
          return e;
    }
@@ -1337,7 +1341,7 @@ gfx_message (const char *m)
             m++;
       }
       if (!gfx_y ())
-         gfx_clear (0); // Done after setting initial background
+         gfx_clear (0);         // Done after setting initial background
       const char *e = m;
       while (*e && *e != '/' && *e != '[')
          e++;

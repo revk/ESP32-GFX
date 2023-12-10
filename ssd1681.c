@@ -41,21 +41,21 @@ gfx_driver_init (void)
    ESP_LOGD (TAG, "Init");
    int W = gfx_settings.width;
    int H = gfx_settings.height;
-   const uint8_t ssd1681_default_init_code[] = {
-      SSD1681_SW_RESET, 0,      // soft reset
-      0xFF, 20,                 // busy wait
-      SSD1681_DRIVER_CONTROL, 3, (W - 1), (W - 1) >> 8, 0,      //
-      SSD1681_DATA_MODE, 1, 0x03,       // Ram data entry mode
-      SSD1681_WRITE_BORDER, 1, 0x05,    // border color
-      SSD1681_TEMP_CONTROL, 1, 0x80,    // Temp control
-      SSD1681_SET_RAMXCOUNT, 1, 0,
-      SSD1681_SET_RAMYCOUNT, 2, 0, 0,
-      SSD1681_SET_RAMXPOS, 2, 0, (W + 7) / 8 - 1,       //
-      SSD1681_SET_RAMYPOS, 4, 0, 0, (H - 1) & 0xFF, (H - 1) / 256,      //
-      0xFE
+   const uint8_t init[] = {
+      1, SSD1681_SW_RESET,      // soft reset
+      0xFF,                     // busy wait
+      4, SSD1681_DRIVER_CONTROL, (W - 1), (W - 1) >> 8, 0,      //
+      2, SSD1681_DATA_MODE, 0x03,       // Ram data entry mode
+      2, SSD1681_WRITE_BORDER, 0x05,    // border color
+      2, SSD1681_TEMP_CONTROL, 0x80,    // Temp control
+      2, SSD1681_SET_RAMXCOUNT, 0,
+      3, SSD1681_SET_RAMYCOUNT, 0, 0,
+      3, SSD1681_SET_RAMXPOS, 0, (W + 7) / 8 - 1,       //
+      5, SSD1681_SET_RAMYPOS, 0, 0, (H - 1) & 0xFF, (H - 1) / 256,      //
+      0
    };
 
-   if (gfx_command_list (ssd1681_default_init_code))
+   if (gfx_command_bulk (init))
       return "Init failed";
    return NULL;
 }
