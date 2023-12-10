@@ -868,9 +868,6 @@ gfx_clear (gfx_intensity_t i)
 {
    if (!gfx)
       return;
-#if GFX_BPP <= 2
-   i = 255 - i;
-#endif
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
       for (gfx_pos_t x = 0; x < gfx_width (); x++)
          gfx_pixel (x, y, i);
