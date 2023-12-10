@@ -354,8 +354,8 @@ static uint8_t const *fonts[] = {
 
 #elif GFX_BPP == 2              // Black/red/white
 
-#define	BLACK	1
-#define WHITE   0
+#define	BLACK	0
+#define WHITE   1
 #define	RED	2
 
 #elif GFX_BPP <= 8              // Greyscale or mono
@@ -724,6 +724,8 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       i >>= (4 - gfx_settings.contrast + ((x ^ y) & 1));        // Extra dim and dithered
    else if (gfx_settings.contrast < 4)
       i >>= (8 - gfx_settings.contrast);        // Extra dim
+#else
+   i = 255 - i;
 #endif
    if (!gfx_settings.invert)
       i = 255 - i;
@@ -750,7 +752,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    uint8_t r = (((i & 0x80) ? f_mul : b_mul) >> 1) & 1;
    if (((gfx[GFX_PAGE + addr] >> shift) & 1) != r)
    {
-      gfx[GFX_PAGE + addr] = ((gfx[addr] & ~(1 << shift)) | (r << shift));
+      gfx[GFX_PAGE + addr] = ((gfx[GFX_PAGE + addr] & ~(1 << shift)) | (r << shift));
       gfx_settings.changed = 1;
    }
 #elif GFX_BPP <= 8              // Grey
