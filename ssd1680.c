@@ -68,7 +68,7 @@ gfx_driver_send (void)
       return "Set Y failed";
    if (gfx_command (SSD1680_WRITE_RAM1, NULL, 0))
       return "Write RAM failed";
-   if (gfx_send_gfx ())
+   if (gfx_send_gfx (0))
       return "Data send failed";
    buf[0] = 0xF7;
    if (gfx_command (SSD1680_DISP_CTRL2, buf, 1))

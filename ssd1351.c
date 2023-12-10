@@ -57,7 +57,7 @@ gfx_driver_send (void)
    gfx_command2 (0x15, 0, gfx_settings.width - 1);
    gfx_command2 (0x75, 0, gfx_settings.height - 1);
    gfx_send_command (0x5C);
-   gfx_send_gfx ();
+   gfx_send_gfx (0);
    if (gfx_settings.update)
    {
       gfx_settings.update = 0;

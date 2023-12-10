@@ -87,7 +87,7 @@ gfx_driver_send (void)
       return "Set Y failed";
    if (gfx_send_command (SSD1681_WRITE_RAM1))
       return "Data start failed";
-   if (gfx_send_gfx ())
+   if (gfx_send_gfx (0))
       return "Data send failed";
 
    if (gfx_settings.norefresh && gfx_settings.mode2)

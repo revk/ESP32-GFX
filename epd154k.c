@@ -77,7 +77,7 @@ gfx_driver_send (void)
    if (gfx_command_bulk (init))
       return "Init failed";
    gfx_send_command (EPD154_WRITE_RAM1);
-   gfx_send_gfx ();
+   gfx_send_gfx (0);
    gfx_command1 (EPD154_DISP_CTRL2, 0xF7);
    gfx_send_command (EPD154_MASTER_ACTIVATE);
    gfx_busy_wait ("send");

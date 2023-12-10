@@ -166,7 +166,7 @@ gfx_driver_send (void)
    gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0xB9 : (gfx_settings.border ^ gfx_settings.invert) ? 0x19 : 0x29, 0x07);
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
-   if (gfx_send_gfx ())
+   if (gfx_send_gfx (0))
       return "Data send failed";
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
