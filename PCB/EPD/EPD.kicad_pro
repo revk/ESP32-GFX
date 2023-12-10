@@ -488,6 +488,10 @@
       {
         "netclass": "Thick",
         "pattern": "PWR"
+      },
+      {
+        "netclass": "Thick",
+        "pattern": "GND"
       }
     ]
   },
@@ -552,7 +556,5 @@
       ""
     ]
   ],
-  "text_variables": {
-    "DATE": "2023-06-02"
-  }
+  "text_variables": {}
 }

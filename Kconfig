@@ -18,6 +18,12 @@ menu "GFX"
 	config GFX_BUILD_SUFFIX_EPD75
 		bool "Waveshare 7.5in epaper 800x480 1bpp"
 
+	config GFX_BUILD_SUFFIX_EPD154
+		bool "Waveshare 1.54in epaper 200x200 1bpp"
+
+	config GFX_BUILD_SUFFIX_EPD154R
+		bool "Waveshare 1.54in epaper 200x200 1bpp+1bpp red"
+
 	endchoice
 
 	config GFX_WIDTH
