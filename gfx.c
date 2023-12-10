@@ -816,7 +816,7 @@ gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, 
 
 static __attribute__((unused))
      void gfx_mask_block (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
-                          const uint8_t * data, int l, int c)
+                          const uint8_t * data, int l, gfx_intensity_t i)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
@@ -826,13 +826,13 @@ static __attribute__((unused))
          if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
             for (uint8_t qx = 0; qx < mx; qx++)
                for (uint8_t qy = 0; qy < mx; qy++)
-                  gfx_pixel (x + col * mx + qx, y + row * my + qy, c);
+                  gfx_pixel (x + col * mx + qx, y + row * my + qy, i);
       data += l;
    }
 }
 
 static __attribute__((unused))
-     void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l, int c)
+     void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l, gfx_intensity_t i)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
@@ -840,7 +840,7 @@ static __attribute__((unused))
    {
       for (gfx_pos_t col = 0; col < w; col++)
          if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
-            gfx_pixel (x + col, y + row, c);
+            gfx_pixel (x + col, y + row, i);
       data += l;
    }
 }
@@ -929,7 +929,7 @@ gfx_icon2 (gfx_pos_t w, gfx_pos_t h, const void *data)
      y;
    gfx_draw (w, h, 0, 0, &x, &y);
    if (data)
-      gfx_mask (x, y, w, h, 0, data, 0, f_mul);
+      gfx_mask (x, y, w, h, 0, data, 0, 255);
 }
 
 void
@@ -1004,7 +1004,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       if (map)
          for (int s = 0; s < segs; s++)
             if (map & (1 << s))
-               gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, f_mul);
+               gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, 255);
       x += (segs == 9 ? fontw : 6 * size);
    }
 }
@@ -1078,12 +1078,12 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          if (blocky)
          {
 #if	GFX_BPP == 1
-            gfx_mask_block (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1, f_mul);
+            gfx_mask_block (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1, 255);
 #endif
          } else
          {
 #if	GFX_BPP == 1
-            gfx_mask (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8, f_mul);
+            gfx_mask (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8, 255);
 #else
             gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
 #endif
