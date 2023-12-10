@@ -15,10 +15,10 @@ menu "GFX"
 	config GFX_BUILD_SUFFIX_SSD1681
 		bool "SSD1681 - e.g. 1.54in epaper 200x200 1bpp"
 
-	config GFX_BUILD_SUFFIX_EPD75
+	config GFX_BUILD_SUFFIX_EPD75K
 		bool "Waveshare 7.5in epaper 800x480 1bpp"
 
-	config GFX_BUILD_SUFFIX_EPD154
+	config GFX_BUILD_SUFFIX_EPD154K
 		bool "Waveshare 1.54in epaper 200x200 1bpp"
 
 	config GFX_BUILD_SUFFIX_EPD154R

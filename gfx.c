@@ -209,11 +209,11 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1681
 #include "ssd1681.c"
 #endif
-#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD75
-#include "epd75.c"
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD75K
+#include "epd75k.c"
 #endif
-#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154
-#include "epd154.c"
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154K
+#include "epd154k.c"
 #endif
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154R
 #include "epd154r.c"

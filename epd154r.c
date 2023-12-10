@@ -1,38 +1,41 @@
-// Waveshare 1.54" 200x200 black/red/white driver code
+// Waveshae 1.54" 200x200 1bpp (black/red/white) driver code
+// https://files.waveshare.com/upload/e/e5/1.54inch_e-paper_V2_Datasheet.pdf
+// https://github.com/waveshareteam/e-Paper/blob/master/Arduino/epd1in54_V2/epd1in54_V2.cpp
 
 #define GFX_DEFAULT_WIDTH	200
 #define GFX_DEFAULT_HEIGHT	200
 #define GFX_BPP			1
 
-#define SSD1681_DRIVER_CONTROL 0x01
-#define SSD1681_GATE_VOLTAGE 0x03
-#define SSD1681_SOURCE_VOLTAGE 0x04
-#define SSD1681_PROGOTP_INITIAL 0x08
-#define SSD1681_PROGREG_INITIAL 0x09
-#define SSD1681_READREG_INITIAL 0x0A
-#define SSD1681_BOOST_SOFTSTART 0x0C
-#define SSD1681_DEEP_SLEEP 0x10
-#define SSD1681_DATA_MODE 0x11
-#define SSD1681_SW_RESET 0x12
-#define SSD1681_TEMP_CONTROL 0x18
-#define SSD1681_TEMP_WRITE 0x1A
-#define SSD1681_MASTER_ACTIVATE 0x20
-#define SSD1681_DISP_CTRL1 0x21
-#define SSD1681_DISP_CTRL2 0x22
-#define SSD1681_WRITE_RAM1 0x24
-#define SSD1681_WRITE_RAM2 0x26
-#define SSD1681_WRITE_VCOM 0x2C
-#define SSD1681_READ_OTP 0x2D
-#define SSD1681_READ_STATUS 0x2F
-#define SSD1681_WRITE_LUT 0x32
-#define SSD1681_WRITE_BORDER 0x3C
-#define SSD1681_SET_RAMXPOS 0x44
-#define SSD1681_SET_RAMYPOS 0x45
-#define SSD1681_SET_RAMXCOUNT 0x4E
-#define SSD1681_SET_RAMYCOUNT 0x4F
+#define EPD154_DRIVER_CONTROL 0x01
+#define EPD154_GATE_VOLTAGE 0x03
+#define EPD154_SOURCE_VOLTAGE 0x04
+#define EPD154_PROGOTP_INITIAL 0x08
+#define EPD154_PROGREG_INITIAL 0x09
+#define EPD154_READREG_INITIAL 0x0A
+#define EPD154_BOOST_SOFTSTART 0x0C
+#define EPD154_DEEP_SLEEP 0x10
+#define EPD154_DATA_MODE 0x11
+#define EPD154_SW_RESET 0x12
+#define EPD154_TEMP_CONTROL 0x18
+#define EPD154_TEMP_WRITE 0x1A
+#define EPD154_MASTER_ACTIVATE 0x20
+#define EPD154_DISP_CTRL1 0x21
+#define EPD154_DISP_CTRL2 0x22
+#define EPD154_WRITE_RAM1 0x24
+#define EPD154_WRITE_RAM2 0x26
+#define EPD154_WRITE_VCOM 0x2C
+#define EPD154_READ_OTP 0x2D
+#define EPD154_READ_STATUS 0x2F
+#define EPD154_WRITE_LUT 0x32
+#define EPD154_DUMMY_LINE_PERIOD 0x3A
+#define EPD154_SET_GATE_TIME 0x3B
+#define EPD154_WRITE_BORDER 0x3C
+#define EPD154_SET_RAMXPOS 0x44
+#define EPD154_SET_RAMYPOS 0x45
+#define EPD154_SET_RAMXCOUNT 0x4E
+#define EPD154_SET_RAMYCOUNT 0x4F
 
 #include <driver/rtc_io.h>
-RTC_NOINIT_ATTR uint64_t sleepms;       // Sleeping in low power, needs delay before reset after mode 2
 
 static const char *
 gfx_driver_init (void)
@@ -41,19 +44,21 @@ gfx_driver_init (void)
    int W = gfx_settings.width;
    int H = gfx_settings.height;
    const uint8_t init[] = {
-      1, SSD1681_SW_RESET,      // soft reset
+      1, EPD154_SW_RESET,       // soft reset
       0xFF,                     // busy wait
-      4, SSD1681_DRIVER_CONTROL, (W - 1), (W - 1) >> 8, 0,      //
-      2, SSD1681_DATA_MODE, 0x03,       // Ram data entry mode
-      2, SSD1681_WRITE_BORDER, 0x05,    // border color
-      2, SSD1681_TEMP_CONTROL, 0x80,    // Temp control
-      2, SSD1681_SET_RAMXCOUNT, 0,
-      3, SSD1681_SET_RAMYCOUNT, 0, 0,
-      3, SSD1681_SET_RAMXPOS, 0, (W + 7) / 8 - 1,       //
-      5, SSD1681_SET_RAMYPOS, 0, 0, (H - 1) & 0xFF, (H - 1) / 256,      //
+      4, EPD154_DRIVER_CONTROL, (H - 1) & 0xFF, (H - 1) >> 8, 0,        //
+      4, EPD154_BOOST_SOFTSTART, 0xD7, 0xD6, 0x9D,      // 
+      2, EPD154_WRITE_VCOM, 0x7C,       // 
+      2, EPD154_DUMMY_LINE_PERIOD, 0xA8,        //
+      2, EPD154_SET_GATE_TIME, 0x08,    //
+      2, EPD154_DATA_MODE, 0x03,        // Ram data entry mode
+      3, EPD154_SET_RAMXPOS, 0, (W + 7) / 8 - 1,        //
+      5, EPD154_SET_RAMYPOS, 0, 0, (H - 1) & 0xFF, (H - 1) >> 8,       //
+      31, EPD154_WRITE_LUT,     //
+      0x02, 0x02, 0x01, 0x11, 0x12, 0x12, 0x22, 0x22, 0x66, 0x69, 0x69, 0x59, 0x58, 0x99, 0x99, 0x88, 0x00, 0x00, 0x00, 0x00, 0xF8, 0xB4, 0x13, 0x51, 0x35, 0x51, 0x51, 0x19, 0x01, 0x00,       // full update
+      2, EPD154_TEMP_CONTROL, 0x80,    // Temp control ?
       0
    };
-
    if (gfx_command_bulk (init))
       return "Init failed";
    return NULL;
@@ -62,87 +67,26 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   if (gfx_settings.asleep && gfx_settings.rst)
-   {                            // Needs a reset
-      if (sleepms)
-      {
-         struct timeval tv;
-         gettimeofday (&tv, NULL);
-         uint64_t ms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-         ms -= sleepms;
-         if (ms < 1000)
-            return "Wait";
-         sleepms = 0;
-      }
-      ESP_LOGD (TAG, "Reset");
-      gfx_settings.asleep = 0;
-      gpio_set_level (gfx_settings.rst, 0);
-      usleep (1000);
-      gpio_set_level (gfx_settings.rst, 1);
-      usleep (1000);
-   } else
-      gfx_busy_wait ("Pre draw");
-   if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
-      return "Set X failed";
-   if (gfx_command2 (SSD1681_SET_RAMYCOUNT, 0, 0))
-      return "Set Y failed";
-   if (gfx_send_command (SSD1681_WRITE_RAM1))
-      return "Data start failed";
-   if (gfx_send_gfx ())
-      return "Data send failed";
-
-   if (gfx_settings.norefresh && gfx_settings.mode2)
-   {                            // mode 2
-      ESP_LOGD (TAG, "Mode2");
-      if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
-         return "Display ctrl failed";
-      if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
-         return "Master activate failed";
-      if (gfx_settings.sleep)
-      {
-         gfx_settings.asleep = 1;
-         struct timeval tv;
-         gettimeofday (&tv, NULL);
-         sleepms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-         // If we wait here, even wait busy as you would expect, we actually get a flicker display. Sending sleep right away works way better, silly
-         if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
-            return "Sleep fail";
-      } else
-         sleepms = 0;
-   } else
-   {                            // mode 1
-      sleepms = 0;
-      ESP_LOGD (TAG, "Mode1");
-      if (gfx_command1 (SSD1681_DISP_CTRL2, 0xF7))
-         return "Display ctrl failed";
-      if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
-         return "Master activate failed";
-      gfx_busy_wait ("Draw");
-      if (gfx_settings.mode2)
-      {                         // Will revert
-         if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
-            return "Display ctrl failed";
-         if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
-            return "Master activate failed";
-         gfx_busy_wait ("Draw2");
-      }
-   }
+   const uint8_t init[] = {
+      2, EPD154_WRITE_BORDER, 0x05,    // border color
+      2, EPD154_SET_RAMXCOUNT, 0,
+      3, EPD154_SET_RAMYCOUNT, 0, 0,
+      0
+   };
+   if (gfx_command_bulk (init))
+      return "Init failed";
+   gfx_send_command (EPD154_WRITE_RAM1);
+   gfx_send_gfx ();
+   gfx_send_command (EPD154_WRITE_RAM2);
+   gfx_send_gfx ();
+   gfx_command1 (EPD154_DISP_CTRL2, 0xF7);
+   gfx_send_command (EPD154_MASTER_ACTIVATE);
+   gfx_busy_wait ("send");
    return NULL;
 }
 
 static const char *
 gfx_driver_sleep (void)
 {
-   if (gfx_settings.asleep)
-      return NULL;
-   gfx_settings.sleep = 1;
-   struct timeval tv;
-   gettimeofday (&tv, NULL);
-   sleepms = tv.tv_sec * 1000 + tv.tv_usec / 1000;
-   ESP_LOGD (TAG, "Sleep");
-   gfx_settings.asleep = 1;
-   if (gfx_command1 (SSD1681_DEEP_SLEEP, 1))
-      return "Sleep fail";
    return NULL;
-
 }

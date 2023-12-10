@@ -1,6 +1,5 @@
 // Waveshae 1.54" 200x200 1bpp (black/white) driver code
 // https://files.waveshare.com/upload/7/77/1.54inch_e-Paper_Datasheet.pdf
-// https://files.waveshare.com/upload/e/e5/1.54inch_e-paper_V2_Datasheet.pdf
 // https://github.com/waveshareteam/e-Paper/blob/master/Arduino/epd1in54/epd1in54.cpp
 // This is basically the same as SSD1681
 
