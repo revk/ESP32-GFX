@@ -222,6 +222,7 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #include "7seg6.h"
 #include "7seg7.h"
 #include "7seg8.h"
+#include "7seg9.h"
 #endif
 
 #if	GFX_BPP == 1

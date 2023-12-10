@@ -37,7 +37,7 @@ if(! -e /tmp/7seg) then
 		inkscape --actions="export-id:$s;export-id-only;export-area-page;export-background:white;export-filename:$s.png;export-do" $d/SevenSeg.svg >& /dev/null
 	end
 endif
-foreach n (1 2 3 4 5 6 7 8)
+foreach n (1 2 3 4 5 6 7 8 9)
 	if($n <= 6) then
 		cd /tmp/5x9JTD
 		if($n == 1) cd /tmp/5x9JTDBold
