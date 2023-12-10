@@ -2,6 +2,7 @@
 // https://files.waveshare.com/upload/7/77/1.54inch_e-Paper_Datasheet.pdf
 // https://files.waveshare.com/upload/e/e5/1.54inch_e-paper_V2_Datasheet.pdf
 // https://github.com/waveshareteam/e-Paper/blob/master/Arduino/epd1in54/epd1in54.cpp
+// This is basically the same as SSD1681
 
 #define GFX_DEFAULT_WIDTH	200
 #define GFX_DEFAULT_HEIGHT	200
@@ -58,6 +59,7 @@ gfx_driver_init (void)
       5, EPD154_SET_RAMYPOS, 0, 0, (H - 1) & 0xFF, (H - 1) / 256,       //
       31, EPD154_WRITE_LUT,     //
       0x02, 0x02, 0x01, 0x11, 0x12, 0x12, 0x22, 0x22, 0x66, 0x69, 0x69, 0x59, 0x58, 0x99, 0x99, 0x88, 0x00, 0x00, 0x00, 0x00, 0xF8, 0xB4, 0x13, 0x51, 0x35, 0x51, 0x51, 0x19, 0x01, 0x00,       // full update
+      2, EPD154_TEMP_CONTROL, 0x80,    // Temp control ?
       0
    };
    if (gfx_command_bulk (init))
@@ -69,7 +71,7 @@ static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
    const uint8_t init[] = {
-      //2, EPD154_WRITE_BORDER, 0x05,    // border color
+      2, EPD154_WRITE_BORDER, 0x05,    // border color
       2, EPD154_SET_RAMXCOUNT, 0,
       3, EPD154_SET_RAMYCOUNT, 0, 0,
       0
@@ -78,9 +80,8 @@ gfx_driver_send (void)
       return "Init failed";
    gfx_send_command (EPD154_WRITE_RAM1);
    gfx_send_gfx ();
-   gfx_command1 (EPD154_DISP_CTRL2, 0xC4);
+   gfx_command1 (EPD154_DISP_CTRL2, 0xFF);
    gfx_send_command (EPD154_MASTER_ACTIVATE);
-   gfx_send_command (0xFF);
    gfx_busy_wait ("send");
    return NULL;
 }
@@ -89,5 +90,4 @@ static const char *
 gfx_driver_sleep (void)
 {
    return NULL;
-
 }
