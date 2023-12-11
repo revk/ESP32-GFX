@@ -81,6 +81,7 @@ gfx_driver_send (void)
    gfx_send_gfx (1);
    gfx_command1 (EPD154_DISP_CTRL2, 0xF7);
    gfx_send_command (EPD154_MASTER_ACTIVATE);
+   gfx_send_command (0xFF);
    gfx_busy_wait ("send");
    return NULL;
 }

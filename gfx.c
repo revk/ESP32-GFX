@@ -423,13 +423,13 @@ gfx_busy_wait (const char *why)
       return;
    }
    uint64_t a = esp_timer_get_time ();
-   int try = 10000;
+   int try = 2000;
 #ifdef	GFX_BUSY_LOW
    while (try-- && !gpio_get_level (gfx_settings.busy))
 #else
    while (try-- && gpio_get_level (gfx_settings.busy))
 #endif
-      usleep (1000);
+      usleep (10000);
 #ifdef	GFX_BUSY_LOW
    if (!gpio_get_level (gfx_settings.busy))
 #else
