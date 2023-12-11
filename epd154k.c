@@ -1,10 +1,11 @@
-// Waveshae 1.54" 200x200 1bpp (black/red/white) driver code
-// https://files.waveshare.com/upload/e/e5/1.54inch_e-paper_V2_Datasheet.pdf
-// https://github.com/waveshareteam/e-Paper/blob/master/Arduino/epd1in54_V2/epd1in54_V2.cpp
+// Waveshae 1.54" 200x200 1bpp (black/white) driver code
+// https://files.waveshare.com/upload/7/77/1.54inch_e-Paper_Datasheet.pdf
+// https://github.com/waveshareteam/e-Paper/blob/master/Arduino/epd1in54/epd1in54.cpp
+// This is basically the same as SSD1681
 
 #define GFX_DEFAULT_WIDTH	200
 #define GFX_DEFAULT_HEIGHT	200
-#define GFX_BPP			2
+#define GFX_BPP			1
 
 #define EPD154_DRIVER_CONTROL 0x01
 #define EPD154_GATE_VOLTAGE 0x03
@@ -68,7 +69,8 @@ static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
    const uint8_t init[] = {
-      2, EPD154_WRITE_BORDER, 0x05,     // border color
+      2, EPD154_WRITE_BORDER, 0x05,     // border color (TODO)
+      // TODO LUT for fast update
       2, EPD154_SET_RAMXCOUNT, 0,
       3, EPD154_SET_RAMYCOUNT, 0, 0,
       0
@@ -77,8 +79,6 @@ gfx_driver_send (void)
       return "Init failed";
    gfx_send_command (EPD154_WRITE_RAM1);
    gfx_send_gfx (0);
-   gfx_send_command (EPD154_WRITE_RAM2);
-   gfx_send_gfx (1);
    gfx_command1 (EPD154_DISP_CTRL2, 0xF7);
    gfx_send_command (EPD154_MASTER_ACTIVATE);
    gfx_send_command (0xFF);

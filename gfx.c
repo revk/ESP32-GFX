@@ -191,13 +191,13 @@ static spi_device_handle_t gfx_spi;
 // Driver support
 static void gfx_busy_wait (const char *);
 static esp_err_t gfx_send_command (uint8_t cmd);
-static esp_err_t gfx_send_gfx (void);
+static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
 static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
 static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
 static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -209,14 +209,17 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1681
 #include "ssd1681.c"
 #endif
-#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD75
-#include "epd75.c"
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD75K
+#include "epd75k.c"
 #endif
-#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154
-#include "epd154.c"
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154K
+#include "epd154k.c"
 #endif
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154R
 #include "epd154r.c"
+#endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD29K
+#include "epd29k.c"
 #endif
 
 #ifdef	CONFIG_GFX_7SEG
@@ -228,9 +231,10 @@ static __attribute__((unused)) esp_err_t gfx_command_list (const uint8_t * init_
 #include "7seg6.h"
 #include "7seg7.h"
 #include "7seg8.h"
+#include "7seg9.h"
 #endif
 
-#if	GFX_BPP == 1
+#if	GFX_BPP <= 2
 #ifdef	CONFIG_GFX_FONT0
 #include "mono0.h"
 #endif
@@ -329,7 +333,6 @@ static uint8_t const *fonts[] = {
 #endif
 };
 
-#define	BLACK	0
 #if GFX_BPP == 16               // 16 bit RGB
 #define GFX_INTENSITY_BPP  4    // We work on each colour being 4 bits intensity based on one of a set of colours
 #define R       (1<<11)
@@ -344,22 +347,48 @@ static uint8_t const *fonts[] = {
 #define MAGENTA (RED+BLUE)
 #define YELLOW  (RED+GREEN)
 
+#define	BLACK	0
 #define WHITE   (RED+GREEN+BLUE)
 
-#elif GFX_BPP <= 8              // Greyscale or mono
+#elif GFX_BPP == 1              // Mono
+
+#define	BLACK	0
 #define WHITE   1
+
+#elif GFX_BPP == 2              // Black/red/white
+
+#define	BLACK	0
+#define WHITE   1
+#define	RED	2
+
+#elif GFX_BPP <= 8              // Greyscale or mono
+
+#define	BLACK	0
+#define WHITE   255
 #define GFX_INTENSITY_BPP  GFX_BPP
+
 #endif
 
 #if GFX_BPP > 16
 typedef uint32_t gfx_cell_t;
 #define GFX_SIZE (gfx_settings.width * gfx_settings.height * sizeof(gfx_cell_t))
+#define	GFX_PAGE	GFX_SIZE
 #elif GFX_BPP > 8
 typedef uint16_t gfx_cell_t;
 #define GFX_SIZE (gfx_settings.width * gfx_settings.height * sizeof(gfx_cell_t))
-#else
+#define	GFX_PAGE	GFX_SIZE
+#elif GFX_BPP == 2
+typedef uint8_t gfx_cell_t;
+#define GFX_PAGE ((gfx_settings.width + 7) / 8 * gfx_settings.height)
+#define GFX_SIZE (GFX_PAGE*2)
+#elif GFX_BPP == 1
+typedef uint8_t gfx_cell_t;
+#define GFX_SIZE ((gfx_settings.width + 7) / 8 * gfx_settings.height)
+#define	GFX_PAGE	GFX_SIZE
+#else // Grey, etc
 typedef uint8_t gfx_cell_t;
 #define GFX_SIZE ((gfx_settings.width * GFX_BPP + 7) / 8 * gfx_settings.height)
+#define	GFX_PAGE	GFX_SIZE
 #endif
 static gfx_cell_t *gfx = NULL;
 
@@ -369,12 +398,13 @@ static gfx_pos_t x = 0,
 static gfx_align_t a = 0;       // alignment and movement
 static char f = 0,              // colour
    b = 0;
-#if GFX_BPP > 1
+#if GFX_BPP <= 8
+static uint8_t f_mul = 0;
+static uint8_t b_mul = 0;       // actual f/b colour multiplier
+#else
 static uint32_t f_mul = 0;
 static uint32_t b_mul = 0;      // actual f/b colour multiplier
 #endif
-static uint8_t bw = 0;          // 1bpp foreground colour
-
 
 // Driver support
 
@@ -392,24 +422,24 @@ gfx_busy_wait (const char *why)
    if (!gpio_get_level (gfx_settings.busy))
 #endif
    {
-      ESP_LOGD (TAG, "Not busy (%s)", why);
+      ESP_LOGE (TAG, "Not busy (%s)", why);
       return;
    }
    uint64_t a = esp_timer_get_time ();
-   int try = 10000;
+   int try = 2000;
 #ifdef	GFX_BUSY_LOW
    while (try-- && !gpio_get_level (gfx_settings.busy))
 #else
    while (try-- && gpio_get_level (gfx_settings.busy))
 #endif
-      usleep (1000);
+      usleep (10000);
 #ifdef	GFX_BUSY_LOW
    if (!gpio_get_level (gfx_settings.busy))
 #else
    if (gpio_get_level (gfx_settings.busy))
 #endif
    {
-      ESP_LOGD (TAG, "Busy stuck (%s)", why);
+      ESP_LOGE (TAG, "Busy stuck (%s)", why);
       return;
    }
    uint64_t b = esp_timer_get_time ();
@@ -431,7 +461,7 @@ gfx_send_command (uint8_t cmd)
 }
 
 void
-gfx_load(const void *data)
+gfx_load (const void *data)
 {
    if (!data)
       return;
@@ -467,9 +497,9 @@ gfx_send_data (const void *data, uint32_t len)
 }
 
 static esp_err_t
-gfx_send_gfx (void)
+gfx_send_gfx (uint8_t page)
 {
-   return gfx_send_data (gfx, GFX_SIZE);
+   return gfx_send_data (gfx + page * GFX_PAGE, GFX_PAGE);
 }
 
 static esp_err_t
@@ -527,35 +557,30 @@ static __attribute__((unused))
 }
 
 static __attribute__((unused))
-     esp_err_t gfx_command_list (const uint8_t * init_code)
-{
+     esp_err_t gfx_command_bulk (const uint8_t * bulk)
+{                               // Bulk command
+   // bulk is a sequence of blocks of the form :-
+   // Len, 0x00 is end, 0xFF is busy wait with no command or data
+   // Command (included in len)
+   // Data (len-1 bytes)
    uint8_t buf[64];
 
-   while (init_code[0] != 0xFE)
+   while (*bulk)
    {
-      uint8_t cmd = init_code[0];
-      init_code++;
-      uint8_t num_args = init_code[0];
-      init_code++;
-      if (cmd == 0xFF)
+      uint8_t len = *bulk++;
+      if (len == 0xFF)
       {
-         gfx_busy_wait ("command_list");
-         if (num_args)
-            usleep (num_args * 1000);
+         gfx_busy_wait ("bulk wait");
          continue;
       }
-      if (num_args > sizeof (buf))
+      if (len > sizeof (buf))
       {
-         ESP_LOGE (TAG, "Bad command_list len %d", num_args);
+         ESP_LOGE (TAG, "Bad bulk command len %d", len);
          break;
       }
-
-      for (int i = 0; i < num_args; i++)
-      {
-         buf[i] = init_code[0];
-         init_code++;
-      }
-      esp_err_t e = gfx_command (cmd, buf, num_args);
+      memcpy (buf, bulk, len);
+      bulk += len;
+      esp_err_t e = gfx_command (*buf, buf + 1, len - 1);
       if (e)
          return e;
    }
@@ -571,7 +596,6 @@ gfx_pos (gfx_pos_t newx, gfx_pos_t newy, gfx_align_t newa)
    a = (newa ? : (GFX_L | GFX_T | GFX_H));
 }
 
-#if	GFX_BPP > 1
 static uint32_t
 gfx_colour_lookup (char c)
 {                               // character to colour mapping, default is white
@@ -580,7 +604,10 @@ gfx_colour_lookup (char c)
    case 'k':
    case 'K':
       return BLACK;
-#if GFX_BPP > 8
+#if GFX_BPP ==2
+   case 'R':
+      return RED;
+#elif GFX_BPP > 8
    case 'r':
       return (RED >> 1);
    case 'R':
@@ -614,23 +641,17 @@ gfx_colour_lookup (char c)
    }
    return WHITE;
 }
-#endif
 
 void
 gfx_colour (char newf)
 {                               // Set foreground
-#if GFX_BPP > 1
    f_mul = gfx_colour_lookup (f = newf);
-#endif
-   bw = (newf == 'K' || newf == 'k' ? 255 : 0);
 }
 
 void
 gfx_background (char newb)
 {                               // Set background
-#if GFX_BPP >1
    b_mul = gfx_colour_lookup (b = newb);
-#endif
 }
 
 // Basic settings
@@ -701,13 +722,41 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       y = gfx_settings.height - 1 - y;
    if (!gfx || x < 0 || x >= gfx_settings.width || y < 0 || y >= gfx_settings.height)
       return;                   // out of display
-#if GFX_BPP > 1
+#if GFX_BPP > 2
    if (gfx_settings.contrast < 4)
       i >>= (4 - gfx_settings.contrast + ((x ^ y) & 1));        // Extra dim and dithered
    else if (gfx_settings.contrast < 4)
       i >>= (8 - gfx_settings.contrast);        // Extra dim
 #endif
-#if GFX_BPP <= 8
+   if (gfx_settings.invert)
+      i = 255 - i;
+#if GFX_BPP == 1                // Black/white
+   const int shift = 7 - (x % 8);
+   const int line = (gfx_settings.width + 7) / 8;
+   const int addr = line * y + x / 8;
+   uint8_t k = ((i & 0x80) ? f_mul : b_mul) & 1;
+   if (((gfx[addr] >> shift) & 1) != k)
+   {
+      gfx[addr] = ((gfx[addr] & ~(1 << shift)) | (k << shift));
+      gfx_settings.changed = 1;
+   }
+#elif GFX_BPP == 2              // Black/red/white
+   const int shift = 7 - (x % 8);
+   const int line = (gfx_settings.width + 7) / 8;
+   const int addr = line * y + x / 8;
+   uint8_t k = ((i & 0x80) ? f_mul : b_mul) & 1;
+   if (((gfx[addr] >> shift) & 1) != k)
+   {
+      gfx[addr] = ((gfx[addr] & ~(1 << shift)) | (k << shift));
+      gfx_settings.changed = 1;
+   }
+   uint8_t r = (((i & 0x80) ? f_mul : b_mul) >> 1) & 1;
+   if (((gfx[GFX_PAGE + addr] >> shift) & 1) != r)
+   {
+      gfx[GFX_PAGE + addr] = ((gfx[GFX_PAGE + addr] & ~(1 << shift)) | (r << shift));
+      gfx_settings.changed = 1;
+   }
+#elif GFX_BPP <= 8              // Grey
    const int bits = (1 << GFX_BPP) - 1;
    const int shift = 8 - (x % (8 / GFX_BPP)) - GFX_BPP;
    const int line = (gfx_settings.width * GFX_BPP + 7) / 8;
@@ -716,16 +765,18 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    i &= bits;
    if (!gfx_settings.invert)
       i ^= bits;
-   if (((gfx[addr] >> shift) & bits) == i)
-      return;
-   gfx[addr] = ((gfx[addr] & ~(bits << shift)) | (i << shift));
-   gfx_settings.changed = 1;
-#else
+   if (((gfx[addr] >> shift) & bits) != i)
+   {
+      gfx[addr] = ((gfx[addr] & ~(bits << shift)) | (i << shift));
+      gfx_settings.changed = 1;
+   }
+#else // COlour
    uint16_t v = ntohs (f_mul * (i >> (8 - GFX_INTENSITY_BPP)) + b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP)));
-   if (v == gfx[(y * gfx_settings.width) + x])
-      return;
-   gfx[(y * gfx_settings.width) + x] = v;
-   gfx_settings.changed = 1;
+   if (v != gfx[(y * gfx_settings.width) + x])
+   {
+      gfx[(y * gfx_settings.width) + x] = v;
+      gfx_settings.changed = 1;
+   }
 #endif
 }
 
@@ -765,24 +816,24 @@ gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, 
 }
 
 static __attribute__((unused))
-     void gfx_mask_block (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
-                          const uint8_t * data, int l, int c)
+     void gfx_block2N (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
+                       const uint8_t * data, int l)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
       for (gfx_pos_t col = 0; col < w; col++)
-         if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
-            for (uint8_t qx = 0; qx < mx; qx++)
-               for (uint8_t qy = 0; qy < mx; qy++)
-                  gfx_pixel (x + col * mx + qx, y + row * my + qy, c);
+         for (uint8_t qx = 0; qx < mx; qx++)
+            for (uint8_t qy = 0; qy < mx; qy++)
+               gfx_pixel (x + col * mx + qx, y + row * my + qy, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
       data += l;
    }
 }
 
 static __attribute__((unused))
-     void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l, int c)
+     void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l,
+                    gfx_intensity_t i)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
@@ -790,7 +841,20 @@ static __attribute__((unused))
    {
       for (gfx_pos_t col = 0; col < w; col++)
          if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
-            gfx_pixel (x + col, y + row, c);
+            gfx_pixel (x + col, y + row, i);
+      data += l;
+   }
+}
+
+static __attribute__((unused))
+     void gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
+{                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
+   if (!l)
+      l = (w + 7) / 8;          // default is pixels width
+   for (gfx_pos_t row = 0; row < h; row++)
+   {
+      for (gfx_pos_t col = 0; col < w; col++)
+         gfx_pixel (x + col, y + row, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
       data += l;
    }
 }
@@ -823,11 +887,6 @@ gfx_clear (gfx_intensity_t i)
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
       for (gfx_pos_t x = 0; x < gfx_width (); x++)
          gfx_pixel (x, y, i);
-#if GFX_BPP > 1
-   gfx_colour ('w');
-#else
-   gfx_colour ('K');            // Default colour black
-#endif
 }
 
 void
@@ -884,7 +943,7 @@ gfx_icon2 (gfx_pos_t w, gfx_pos_t h, const void *data)
      y;
    gfx_draw (w, h, 0, 0, &x, &y);
    if (data)
-      gfx_mask (x, y, w, h, 0, data, 0, bw);
+      gfx_block2 (x, y, w, h, 0, data, 0);
 }
 
 void
@@ -956,10 +1015,8 @@ gfx_7seg (int8_t size, const char *fmt, ...)
          if (p[1] == ':')
             map |= 0x100;
       }
-      if (map)
-         for (int s = 0; s < segs; s++)
-            if (map & (1 << s))
-               gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, bw);
+      for (int s = 0; s < segs; s++)
+         gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, (map & (1 << s)) ? 255 : 0);
       x += (segs == 9 ? fontw : 6 * size);
    }
 }
@@ -990,7 +1047,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    }
    const uint8_t *fontdata (char c)
    {
-#if	GFX_BPP == 1
+#if	GFX_BPP <= 2
       const uint8_t *d = fonts[size] + (c - ' ') * ((fontw + 7) / 8) * fonth;
 #else
       const uint8_t *d = fonts[size] + (c - ' ') * fonth * fontw / 2;
@@ -1006,7 +1063,6 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    if (!w)
       return;                   // nothing to print
    gfx_draw (w, h, size ? : 1, size ? : 1, &x, &y);     // starting point
-#if     GFX_BPP > 1
    // Border
    for (gfx_pos_t n = -1; n <= w; n++)
    {
@@ -1018,7 +1074,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       gfx_pixel (x - 1, y + n, 0);
       gfx_pixel (x + w, y + n, 0);
    }
-#endif
+   // Text
    for (const char *p = text; *p; p++)
    {
       int c = *p;
@@ -1032,13 +1088,13 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
          if (blocky)
          {
-#if	GFX_BPP == 1
-            gfx_mask_block (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1, bw);
+#if	GFX_BPP <= 2            // TODO should really do full colour
+            gfx_block2N (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1);
 #endif
          } else
          {
-#if	GFX_BPP == 1
-            gfx_mask (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8, bw);
+#if    GFX_BPP <= 2
+            gfx_block2 (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8);
 #else
             gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
 #endif
@@ -1188,7 +1244,7 @@ gfx_init_opts (gfx_init_t o)
       .sclk_io_num = gfx_settings.sck,
       .quadwp_io_num = -1,
       .quadhd_io_num = -1,
-      .max_transfer_sz = GFX_SIZE,
+      .max_transfer_sz = GFX_PAGE,
       .flags = SPICOMMON_BUSFLAG_MASTER,
    };
    if (config.max_transfer_sz > SPI_MAX)
@@ -1265,10 +1321,11 @@ gfx_lock (void)
       return;
    xSemaphoreTake (gfx_mutex, portMAX_DELAY);
    // preset state
-#if GFX_BPP > 1
+#if GFX_BPP > 2                 // Assume dark
    gfx_background ('k');
    gfx_colour ('w');
-#else
+#else // Assume light
+   gfx_background ('W');
    gfx_colour ('K');
 #endif
    gfx_pos (0, 0, GFX_L | GFX_T | GFX_H);
@@ -1336,7 +1393,7 @@ gfx_message (const char *m)
             m++;
       }
       if (!gfx_y ())
-         gfx_clear (0); // Done after setting initial background
+         gfx_clear (0);         // Done after setting initial background
       const char *e = m;
       while (*e && *e != '/' && *e != '[')
          e++;
