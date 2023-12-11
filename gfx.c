@@ -1051,7 +1051,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    if (!w)
       return;                   // nothing to print
    gfx_draw (w, h, size ? : 1, size ? : 1, &x, &y);     // starting point
-#if     GFX_BPP > 2
+#if	GFX_BPP != 1		// TODO should 1 bpp change to have background as well now?
    // Border
    for (gfx_pos_t n = -1; n <= w; n++)
    {
@@ -1064,6 +1064,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       gfx_pixel (x + w, y + n, 0);
    }
 #endif
+   // Text
    for (const char *p = text; *p; p++)
    {
       int c = *p;
@@ -1077,12 +1078,12 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
          if (blocky)
          {
-#if	GFX_BPP == 1
+#if	GFX_BPP == 1		// TODO should 1 bpp change to have background as well now?
             gfx_mask_block (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1, 255);
 #endif
          } else
          {
-#if	GFX_BPP == 1
+#if	GFX_BPP == 1		// TODO should 1 bpp change to have background as well now?
             gfx_mask (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8, 255);
 #else
             gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
