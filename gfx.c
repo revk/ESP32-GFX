@@ -395,7 +395,7 @@ static gfx_pos_t x = 0,
 static gfx_align_t a = 0;       // alignment and movement
 static char f = 0,              // colour
    b = 0;
-#if GFX_BPP>8
+#if GFX_BPP <= 8
 static uint8_t f_mul = 0;
 static uint8_t b_mul = 0;       // actual f/b colour multiplier
 #else
@@ -724,10 +724,8 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       i >>= (4 - gfx_settings.contrast + ((x ^ y) & 1));        // Extra dim and dithered
    else if (gfx_settings.contrast < 4)
       i >>= (8 - gfx_settings.contrast);        // Extra dim
-#else
-   i = 255 - i;
 #endif
-   if (!gfx_settings.invert)
+   if (gfx_settings.invert)
       i = 255 - i;
 #if GFX_BPP == 1                // Black/white
    const int shift = 7 - (x % 8);
