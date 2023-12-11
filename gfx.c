@@ -194,18 +194,10 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -285,8 +277,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -838,6 +829,21 @@ static __attribute__((unused))
 }
 
 static __attribute__((unused))
+     void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l,
+                    gfx_intensity_t i)
+{                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
+   if (!l)
+      l = (w + 7) / 8;          // default is pixels width
+   for (gfx_pos_t row = 0; row < h; row++)
+   {
+      for (gfx_pos_t col = 0; col < w; col++)
+         if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
+            gfx_pixel (x + col, y + row, i);
+      data += l;
+   }
+}
+
+static __attribute__((unused))
      void gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
@@ -1006,10 +1012,8 @@ gfx_7seg (int8_t size, const char *fmt, ...)
          if (p[1] == ':')
             map |= 0x100;
       }
-      if (map)
-         for (int s = 0; s < segs; s++)
-            if (map & (1 << s))
-               gfx_block2 (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8);
+      for (int s = 0; s < segs; s++)
+         gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, (map & (1 << s)) ? 255 : 0);
       x += (segs == 9 ? fontw : 6 * size);
    }
 }
