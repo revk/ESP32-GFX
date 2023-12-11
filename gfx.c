@@ -194,10 +194,18 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -277,7 +285,8 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -813,32 +822,30 @@ gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, 
 }
 
 static __attribute__((unused))
-     void gfx_mask_block (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
-                          const uint8_t * data, int l, gfx_intensity_t i)
+     void gfx_block2N (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
+                       const uint8_t * data, int l)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
       for (gfx_pos_t col = 0; col < w; col++)
-         if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
-            for (uint8_t qx = 0; qx < mx; qx++)
-               for (uint8_t qy = 0; qy < mx; qy++)
-                  gfx_pixel (x + col * mx + qx, y + row * my + qy, i);
+         for (uint8_t qx = 0; qx < mx; qx++)
+            for (uint8_t qy = 0; qy < mx; qy++)
+               gfx_pixel (x + col * mx + qx, y + row * my + qy, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
       data += l;
    }
 }
 
 static __attribute__((unused))
-     void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l, gfx_intensity_t i)
+     void gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
       for (gfx_pos_t col = 0; col < w; col++)
-         if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
-            gfx_pixel (x + col, y + row, i);
+         gfx_pixel (x + col, y + row, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
       data += l;
    }
 }
@@ -927,7 +934,7 @@ gfx_icon2 (gfx_pos_t w, gfx_pos_t h, const void *data)
      y;
    gfx_draw (w, h, 0, 0, &x, &y);
    if (data)
-      gfx_mask (x, y, w, h, 0, data, 0, 255);
+      gfx_block2 (x, y, w, h, 0, data, 0);
 }
 
 void
@@ -1002,7 +1009,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       if (map)
          for (int s = 0; s < segs; s++)
             if (map & (1 << s))
-               gfx_mask (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8, 255);
+               gfx_block2 (x, y, fontw, fonth, 0, fontdata (s), (fontw + 7) / 8);
       x += (segs == 9 ? fontw : 6 * size);
    }
 }
@@ -1049,7 +1056,6 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    if (!w)
       return;                   // nothing to print
    gfx_draw (w, h, size ? : 1, size ? : 1, &x, &y);     // starting point
-#if	GFX_BPP != 1		// TODO should 1 bpp change to have background as well now?
    // Border
    for (gfx_pos_t n = -1; n <= w; n++)
    {
@@ -1061,7 +1067,6 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       gfx_pixel (x - 1, y + n, 0);
       gfx_pixel (x + w, y + n, 0);
    }
-#endif
    // Text
    for (const char *p = text; *p; p++)
    {
@@ -1076,13 +1081,13 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
          if (blocky)
          {
-#if	GFX_BPP == 1		// TODO should 1 bpp change to have background as well now?
-            gfx_mask_block (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1, 255);
+#if	GFX_BPP <= 2            // TODO should really do full colour
+            gfx_block2N (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1);
 #endif
          } else
          {
-#if	GFX_BPP == 1		// TODO should 1 bpp change to have background as well now?
-            gfx_mask (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8, 255);
+#if    GFX_BPP <= 2
+            gfx_block2 (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8);
 #else
             gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
 #endif
