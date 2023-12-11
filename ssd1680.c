@@ -34,7 +34,7 @@
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
-   const uint8_t iniit[] = {
+   const uint8_t init[] = {
       1, SSD1680_SW_RESET,      // soft reset
       0xFF,                     // busy wait
       2, SSD1680_DATA_MODE, 0x03,       // Ram data entry mode
