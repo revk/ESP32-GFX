@@ -69,7 +69,8 @@ static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
    const uint8_t init[] = {
-      2, EPD154_WRITE_BORDER, 0x05,     // border color
+      2, EPD154_WRITE_BORDER, 0x05,     // border color (TODO)
+      // TODO LUT for fast update
       2, EPD154_SET_RAMXCOUNT, 0,
       3, EPD154_SET_RAMYCOUNT, 0, 0,
       0
@@ -80,6 +81,7 @@ gfx_driver_send (void)
    gfx_send_gfx (0);
    gfx_command1 (EPD154_DISP_CTRL2, 0xF7);
    gfx_send_command (EPD154_MASTER_ACTIVATE);
+   gfx_send_command (0xFF);
    gfx_busy_wait ("send");
    return NULL;
 }
