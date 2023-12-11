@@ -218,6 +218,9 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154R
 #include "epd154r.c"
 #endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD29K
+#include "epd29k.c"
+#endif
 
 #ifdef	CONFIG_GFX_7SEG
 #include "7seg1.h"
@@ -231,7 +234,7 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #include "7seg9.h"
 #endif
 
-#if	GFX_BPP == 1
+#if	GFX_BPP <= 2
 #ifdef	CONFIG_GFX_FONT0
 #include "mono0.h"
 #endif
@@ -1044,7 +1047,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    }
    const uint8_t *fontdata (char c)
    {
-#if	GFX_BPP == 1
+#if	GFX_BPP <= 2
       const uint8_t *d = fonts[size] + (c - ' ') * ((fontw + 7) / 8) * fonth;
 #else
       const uint8_t *d = fonts[size] + (c - ' ') * fonth * fontw / 2;
