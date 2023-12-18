@@ -640,16 +640,6 @@
           (stroke (width 0.254) (type default))
           (fill (type none))
         )
-        (polyline
-          (pts
-            (xy 3.175 0.635)
-            (xy 3.81 0)
-            (xy 3.175 -0.635)
-            (xy 3.175 0.635)
-          )
-          (stroke (width 0) (type default))
-          (fill (type none))
-        )
       )
       (symbol "ES05D1MC10_1_1"
         (polyline
@@ -662,7 +652,7 @@
           (stroke (width 0.254) (type default))
           (fill (type none))
         )
-        (pin power_in line (at 3.81 0 180) (length 1.27)
+        (pin passive line (at 3.81 0 180) (length 1.27)
           (name "~" (effects (font (size 1.27 1.27))))
           (number "1" (effects (font (size 1.27 1.27))))
         )
