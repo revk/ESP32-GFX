@@ -1,6 +1,6 @@
 // Generated case design for EPD/EPD.kicad_pcb
 // By https://github.com/revk/PCBCase
-// Generated 2023-12-21 16:12:27
+// Generated 2023-12-21 17:14:25
 // title:	Waveshare EPD adapter
 // rev:	1
 // company:	Adrian Kennard, Andrews & Arnold Ltd
@@ -113,6 +113,10 @@ translate([-15.4/2,-15.45/2,0])
 		cube([15.4,20.5,0.8]);
 		translate([0.7,0.5,0])cube([14,13.55,2.4]);
 	}
+	if(hole)
+	{
+		cube([15.4,20.5,0.8]);
+	}
 }
 }
 
@@ -184,6 +188,10 @@ module m8(part=false,hole=false,block=false)
 	{
 		b(0,0,0,11.8,3.9,0.5); // Pins
 		b(0,-0.6,0,15.8,5.2,2.1); // Connector
+	}
+	if(hole)
+	{
+		b(0,0,0.5,15,25,0.1); // Ribbon
 	}
 }
 }
