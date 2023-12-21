@@ -1,6 +1,6 @@
 // Generated case design for EPD/EPD.kicad_pcb
 // By https://github.com/revk/PCBCase
-// Generated 2023-12-21 17:14:25
+// Generated 2023-12-21 17:23:09
 // title:	Waveshare EPD adapter
 // rev:	1
 // company:	Adrian Kennard, Andrews & Arnold Ltd
