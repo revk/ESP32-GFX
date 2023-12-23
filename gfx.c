@@ -212,6 +212,9 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD75K
 #include "epd75k.c"
 #endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD75R
+#include "epd75r.c"
+#endif
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_EPD154K
 #include "epd154k.c"
 #endif
