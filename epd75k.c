@@ -144,6 +144,9 @@ gfx_driver_init (void)
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
       2, EPD75_TCON, 0x22,      //
       2, EPD75_PLL, 0x06,       //
+      //2, EPD75_TSE, 0x00,	//
+      //2, EPD75_EVS, 0x0B, 	//
+      //2, EPD75_AMV, 0x19,	//
       0
    };
    if (gfx_command_bulk (init))
@@ -164,7 +167,8 @@ gfx_driver_send (void)
 #ifdef	FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
 #endif
-   gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0xB9 : (gfx_settings.border ^ gfx_settings.invert) ? 0x19 : 0x29, 0x07);
+   gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0xB9 : (gfx_settings.border ^ gfx_settings.invert) ? 0x1B : 0x2B, 0x07);
+   gfx_send_command(EPD75_TSC);
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx (0))
