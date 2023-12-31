@@ -150,7 +150,7 @@ gfx_driver_init (void)
       2, EPD75_PLL, 0x06,       //
       //2, EPD75_TSE, 0x00,	//
       //2, EPD75_EVS, 0x02, 	//
-      2, EPD75_AMV, 0x11,	// VCOM cal
+      2, EPD75_AMV, 0x11,  0xFF,	// VCOM cal and wait
       0
    };
    if (gfx_command_bulk (init))
