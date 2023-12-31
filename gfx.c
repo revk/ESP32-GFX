@@ -949,6 +949,7 @@ static __attribute__((unused))
    uint8_t ly = *data++;
    uint8_t hy = *data++;
    uint8_t d = 0;
+   w += dx;
    for (gfx_pos_t row = 0; row < h; row++)
       for (gfx_pos_t col = 0; col < w || col < hx; col++)
       {
@@ -987,6 +988,7 @@ static __attribute__((unused))
    uint8_t ly = *data++;
    uint8_t hy = *data++;
    uint8_t d = 0;
+   w += dx;
    for (gfx_pos_t row = 0; row < h; row++)
       for (gfx_pos_t col = 0; col < w || col < hx; col++)
       {
