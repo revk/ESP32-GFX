@@ -194,10 +194,18 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -296,7 +304,8 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -901,7 +910,7 @@ static __attribute__((unused))
 }
 
 static __attribute__((unused))
-     void gfx_mask_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, gfx_intensity_t i)
+     void gfx_mask_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t dx, const uint8_t * data, gfx_intensity_t i)
 {                               // Draw a block from 2 bit image data, c is colour to plot where icon is black/set - data is packed
    uint8_t lx = *data++ * 8;
    uint8_t hx = *data++ * 8;
@@ -941,11 +950,11 @@ static __attribute__((unused))
    uint8_t hy = *data++;
    uint8_t d = 0;
    for (gfx_pos_t row = 0; row < h; row++)
-      for (gfx_pos_t col = 0; col < w; col++)
+      for (gfx_pos_t col = 0; col < w || col < hx; col++)
       {
          if (row >= ly && row < hy && col >= lx && col < hx && !(col & 7))
             d = *data++;
-         if (col >= dx)
+         if (col >= dx && col < w)
             gfx_pixel (x + col - dx, y + row, (d & 1) ? 255 : 0);
          d >>= 1;
       }
@@ -979,11 +988,12 @@ static __attribute__((unused))
    uint8_t hy = *data++;
    uint8_t d = 0;
    for (gfx_pos_t row = 0; row < h; row++)
-      for (gfx_pos_t col = 0; col < w; col++)
+      for (gfx_pos_t col = 0; col < w || col < hx; col++)
       {
          if (row >= ly && row < hy && col >= lx && col < hx && !(col & 7))
             d = *data++;
-         gfx_pixel (x + col, y + row, (d & 0xF0) | (d >> 4));
+         if (col < w)
+            gfx_pixel (x + col, y + row, (d & 0xF0) | (d >> 4));
          d >>= 4;
       }
 }
@@ -1126,7 +1136,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
             map |= 0x100;
       }
       for (int s = 0; s < segs; s++)
-         gfx_mask_pack (x, y, fontw, fonth, 0, fontdata (s), (map & (1 << s)) ? 255 : 0);
+         gfx_mask_pack (x, y, 0, fontdata (s), (map & (1 << s)) ? 255 : 0);
       x += (segs == 9 ? fontw : 6 * size);
    }
 }
@@ -1193,14 +1203,14 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          if (blocky)
          {
 #if	GFX_BPP <= 2            // TODO should really do full colour
-            gfx_block2N_pack (x, y, fontw / size, z, dx / size, size, size, fonts[1][c - ' ']);
+            gfx_block2N_pack (x, y, charw / size, z, dx / size, size, size, fonts[1][c - ' ']);
 #endif
          } else
          {
 #if    GFX_BPP <= 2
-            gfx_block2_pack (x, y, fontw, h, dx, fontdata (c));
+            gfx_block2_pack (x, y, charw, h, dx, fontdata (c));
 #else
-            gfx_block16_pack (x, y, fontw, h, dx, fontdata (c));
+            gfx_block16_pack (x, y, charw, h, dx, fontdata (c));
 #endif
          }
          x += charw;
