@@ -325,7 +325,7 @@ static uint8_t const *const *sevenseg[] = {
 #endif
 };
 
-static uint8_t const * const *fonts[] = {
+static uint8_t const *const *fonts[] = {
 #ifdef	CONFIG_GFX_FONT0
    gfx_font_pack0,
 #else
@@ -876,9 +876,10 @@ static __attribute__((unused))
       {
          if (row >= ly && row < hy && col >= lx && col < hx && !(col & 7))
             d = *data++;
-         for (uint8_t qx = 0; qx < mx; qx++)
-            for (uint8_t qy = 0; qy < mx; qy++)
-               gfx_pixel (x + col * mx + qx, y + row * my + qy, (d & 1) ? 255 : 0);
+         if (col >= dx)
+            for (uint8_t qx = 0; qx < mx; qx++)
+               for (uint8_t qy = 0; qy < mx; qy++)
+                  gfx_pixel (x + (col - dx) * mx + qx, y + row * my + qy, (d & 1) ? 255 : 0);
          d >>= 1;
       }
    }
@@ -912,8 +913,8 @@ static __attribute__((unused))
       {
          if (!(col & 7))
             d = *data++;
-         if (d & 1)
-            gfx_pixel (x + col, y + row, i);
+         if ((d & 1) && col >= dx)
+            gfx_pixel (x + col - dx, y + row, i);
          d >>= 1;
       }
 }
@@ -944,7 +945,8 @@ static __attribute__((unused))
       {
          if (row >= ly && row < hy && col >= lx && col < hx && !(col & 7))
             d = *data++;
-         gfx_pixel (x + col, y + row, (d& 1) ? 255 : 0);
+         if (col >= dx)
+            gfx_pixel (x + col - dx, y + row, (d & 1) ? 255 : 0);
          d >>= 1;
       }
 }
@@ -1154,7 +1156,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    }
    const uint8_t *fontdata (char c)
    {
-      return fonts[size][c-' '];
+      return fonts[size][c - ' '];
    }
    for (const char *p = text; *p; p++)
       w += cwidth (*p);
@@ -1191,14 +1193,14 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          if (blocky)
          {
 #if	GFX_BPP <= 2            // TODO should really do full colour
-            gfx_block2N_pack (x, y, charw / size, z, dx / size, size, size, fonts[1] [c - ' ']);
+            gfx_block2N_pack (x, y, fontw / size, z, dx / size, size, size, fonts[1][c - ' ']);
 #endif
          } else
          {
 #if    GFX_BPP <= 2
-            gfx_block2_pack (x, y, charw, h, dx, fontdata (c));
+            gfx_block2_pack (x, y, fontw, h, dx, fontdata (c));
 #else
-            gfx_block16_pack (x, y, charw, h, dx, fontdata (c) ;
+            gfx_block16_pack (x, y, fontw, h, dx, fontdata (c));
 #endif
          }
          x += charw;
