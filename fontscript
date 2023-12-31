@@ -1,5 +1,6 @@
 #!/bin/csh -f
 # Bodgy script to make fonts... Use the fonts I commit, probably easier
+make fontpack
 setenv d `pwd`
 if(! -e include) then
 	echo run in main dir
@@ -37,7 +38,7 @@ if(! -e /tmp/7seg) then
 		inkscape --actions="export-id:$s;export-id-only;export-area-page;export-background:white;export-filename:$s.png;export-do" $d/SevenSeg.svg >& /dev/null
 	end
 endif
-foreach n (1 2 3 4 5 6 7 8 9)
+foreach n (1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
 	if($n <= 6) then
 		cd /tmp/5x9JTD
 		if($n == 1) cd /tmp/5x9JTDBold
@@ -46,49 +47,53 @@ foreach n (1 2 3 4 5 6 7 8 9)
 		@ b = $W * $H / 2
 		set f="grey$n.h"
 		echo "$f"
-		echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
 		foreach u (u00[0-7]*.svg)
-			convert $u:r.png -flatten -negate -scale ${W}x${H}'!' char.gray
-			echo "// $u:r" >> $f
-			od -v -tx1 -w$W -Anone char.gray | sed -e 's/\([0-9a-f]\)[0-9a-f] \([0-9a-f]\)[0-9a-f]/0x\1\2,/g' >> $f
+			convert $u:r.png -flatten -negate -scale ${W}x${H}'!' $u:r.gray
 		end
-		echo "};" >> $f
+
+		$d/fontpack -w$W -h$H -b4 u00[0-7]*.gray --head="gfx_font$n" >> "$f"
 		mv -f "$f" "$d/include"
+
+		$d/fontpack -w$W -h$H -b4 u00[0-7]*.gray --pack --head="gfx_font_pack$n" > "pack$f"
+		mv -f "pack$f" "$d/include"
+
 		if($n == 1) cd /tmp/5x9LCD
 		@ b = ( $W + 7 ) / 8 * $H
 		set f="mono$n.h"
 		echo "$f"
-		echo "static const uint8_t gfx_font${n}[]={ // $W/$H ($b bytes per character)" > $f
 		foreach u (u00[0-7]*.svg)
-			convert $u:r.png -flatten -monochrome -dither None -scale ${W}x${H}'!' char.mono
-			echo "// $u:r" >> $f
-			od -v -tx1 -w$W -Anone char.mono | sed -e 's/\([0-9a-f][0-9a-f]\)/0x\1,/g' >> $f
+			convert $u:r.png -flatten -monochrome -dither None -scale ${W}x${H}'!' $u:r.mono
 		end
-		echo "};" >> $f
+
+		$d/fontpack -w$W -h$H -b1 u00[0-7]*.mono --head="gfx_font$n" > "$f"
 		mv -f "$f" "$d/include"
+
+		$d/fontpack -w$W -h$H -b1 u00[0-7]*.mono --pack --head="gfx_font_pack$n" > "pack$f"
+		mv -f "pack$f" "$d/include"
 	endif
 	@ W = $n * 7
 	@ H = $n * 9
 	cd /tmp/7seg
 	set f="7seg$n.h"
 	echo "$f"
-	echo "static const uint8_t gfx_7seg${n}[]={ // $W/$H ($b bytes per character)" > $f
-	foreach s (a b c d e f g h i)
-		convert $s:r.png -flatten -monochrome -dither None -scale ${W}x${H}'!' char.mono
-		echo "// $s:r" >> $f
-		od -v -tx1 -w$W -Anone char.mono | sed -e 's/\([0-9a-f][0-9a-f]\)/0x\1,/g' >> $f
+	foreach s ([a-i].png)
+		convert $s:r.png -flatten -monochrome -dither None -scale ${W}x${H}'!' $s:r.mono
 	end
-	echo "};" >> $f
+
+	$d/fontpack -w$W -h$H -b1 [a-i].mono --head="gfx_7seg$n" > "$f"
 	mv -f "$f" "$d/include"
+
+	$d/fontpack -w$W -h$H -b1 [a-i].mono --pack --head="gfx_7seg_pack$n" > "pack$f"
+	mv -f "pack$f" "$d/include"
 end
 sed "$d/include/grey0.h" \
-	    -e 's/0x00,0x00, /0x00, /g' \
-	    -e 's/0x00,0xF0, /0x04, /g' \
-	    -e 's/0x0F,0x00, /0x02, /g' \
-	    -e 's/0x0F,0xF0, /0x06, /g' \
-	    -e 's/0xF0,0x00, /0x01, /g' \
-	    -e 's/0xF0,0xF0, /0x05, /g' \
-	    -e 's/0xFF,0x00, /0x03, /g' \
-	    -e 's/0xFF,0xF0, /0x07, /g' \
+	    -e 's/0x00,0x00, /0x00,/g' \
+	    -e 's/0x00,0xF0, /0x04,/g' \
+	    -e 's/0x0F,0x00, /0x02,/g' \
+	    -e 's/0x0F,0xF0, /0x06,/g' \
+	    -e 's/0xF0,0x00, /0x01,/g' \
+	    -e 's/0xF0,0xF0, /0x05,/g' \
+	    -e 's/0xFF,0x00, /0x03,/g' \
+	    -e 's/0xFF,0xF0, /0x07,/g' \
 	    > mono0.h
 mv -f mono0.h "$d/include"

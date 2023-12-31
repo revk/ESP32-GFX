@@ -92,6 +92,12 @@ menu "GFX"
 	help
 		Extra large 30x54 font
 	
+	config GFX_BIGDIGIT
+	bool "Include large 7 segment digits"
+	default yn
+	help
+		Larger 7 segment digits
+	
 	config GFX_CS
 	int "GPIO pin for CS"
 	default 0
