@@ -252,47 +252,47 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 
 #if	GFX_BPP <= 2
 #ifdef	CONFIG_GFX_FONT0
-#include "mono0.h"
+#include "packmono0.h"
 #endif
 #ifdef	CONFIG_GFX_FONT1
-#include "mono1.h"
+#include "packmono1.h"
 #endif
 #ifdef	CONFIG_GFX_FONT2
-#include "mono2.h"
+#include "packmono2.h"
 #endif
 #ifdef	CONFIG_GFX_FONT3
-#include "mono3.h"
+#include "packmono3.h"
 #endif
 #ifdef	CONFIG_GFX_FONT4
-#include "mono4.h"
+#include "packmono4.h"
 #endif
 #ifdef	CONFIG_GFX_FONT5
-#include "mono5.h"
+#include "packmono5.h"
 #endif
 #ifdef	CONFIG_GFX_FONT6
-#include "mono6.h"
+#include "packmono6.h"
 #endif
 #else
 #ifdef	CONFIG_GFX_FONT0
-#include "grey0.h"
+#include "packgrey0.h"
 #endif
 #ifdef	CONFIG_GFX_FONT1
-#include "grey1.h"
+#include "packgrey1.h"
 #endif
 #ifdef	CONFIG_GFX_FONT2
-#include "grey2.h"
+#include "packgrey2.h"
 #endif
 #ifdef	CONFIG_GFX_FONT3
-#include "grey3.h"
+#include "packgrey3.h"
 #endif
 #ifdef	CONFIG_GFX_FONT4
-#include "grey4.h"
+#include "packgrey4.h"
 #endif
 #ifdef	CONFIG_GFX_FONT5
-#include "grey5.h"
+#include "packgrey5.h"
 #endif
 #ifdef	CONFIG_GFX_FONT6
-#include "grey6.h"
+#include "packgrey6.h"
 #endif
 #endif
 
@@ -325,39 +325,39 @@ static uint8_t const *const *sevenseg[] = {
 #endif
 };
 
-static uint8_t const *fonts[] = {
+static uint8_t const * const *fonts[] = {
 #ifdef	CONFIG_GFX_FONT0
-   gfx_font0,
+   gfx_font_pack0,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT1
-   gfx_font1,
+   gfx_font_pack1,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT2
-   gfx_font2,
+   gfx_font_pack2,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT3
-   gfx_font3,
+   gfx_font_pack3,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT4
-   gfx_font4,
+   gfx_font_pack4,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT5
-   gfx_font5,
+   gfx_font_pack5,
 #else
    NULL,
 #endif
 #ifdef	CONFIG_GFX_FONT6
-   gfx_font6,
+   gfx_font_pack6,
 #else
    NULL,
 #endif
@@ -1136,7 +1136,6 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       return;
 
    int fontw = (size ? 6 * size : 4);   // pixel width of characters in font file
-   int fonth = (size ? 9 * size : 5);   // pixel height of characters in font file
 
    int w = 0;                   // width of overall text
    int h = z * (size ? : 1);    // height of overall text
@@ -1155,12 +1154,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    }
    const uint8_t *fontdata (char c)
    {
-#if	GFX_BPP <= 2
-      const uint8_t *d = fonts[size] + (c - ' ') * ((fontw + 7) / 8) * fonth;
-#else
-      const uint8_t *d = fonts[size] + (c - ' ') * fonth * fontw / 2;
-#endif
-      return d;
+      return fonts[size][c-' '];
    }
    for (const char *p = text; *p; p++)
       w += cwidth (*p);
@@ -1197,14 +1191,14 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          if (blocky)
          {
 #if	GFX_BPP <= 2            // TODO should really do full colour
-            gfx_block2N (x, y, charw / size, z, dx / size, size, size, fonts[1] + (c - ' ') * 9, 1);
+            gfx_block2N_pack (x, y, charw / size, z, dx / size, size, size, fonts[1] [c - ' ']);
 #endif
          } else
          {
 #if    GFX_BPP <= 2
-            gfx_block2 (x, y, charw, h, dx, fontdata (c), (fontw + 7) / 8);
+            gfx_block2_pack (x, y, charw, h, dx, fontdata (c));
 #else
-            gfx_block16 (x, y, charw, h, dx, fontdata (c), fontw / 2);
+            gfx_block16_pack (x, y, charw, h, dx, fontdata (c) ;
 #endif
          }
          x += charw;
