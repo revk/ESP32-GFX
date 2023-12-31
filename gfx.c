@@ -1100,7 +1100,6 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    va_end (ap);
 
    int fontw = 7 * size;        // pixel width of characters in font file
-   int fonth = 9 * size;        // pixel height of characters in font file
    inline const uint8_t *fontdata (uint8_t s)
    {
       return sevenseg[size - 1][s];
