@@ -194,18 +194,10 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -304,8 +296,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -854,30 +845,33 @@ gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, 
       *yp = t;
 }
 
-static __attribute__((unused))
-     void gfx_block2N (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
-                       const uint8_t * data, int l)
-{                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
-   if (!l)
-      l = (w + 7) / 8;          // default is pixels width
-   for (gfx_pos_t row = 0; row < h; row++)
-   {
-      for (gfx_pos_t col = 0; col < w; col++)
-         for (uint8_t qx = 0; qx < mx; qx++)
-            for (uint8_t qy = 0; qy < mx; qy++)
-               gfx_pixel (x + col * mx + qx, y + row * my + qy, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
-      data += l;
+static const uint8_t *
+gfx_pack (const uint8_t * data, uint8_t * lx, uint8_t * hx, uint8_t * ly, uint8_t * hy, uint8_t bpp)
+{                               // Pack range bytes
+   if (!data)
+   {                            // No range
+      *lx = 1;
+      *hx = 0;
+      *ly = 1;
+      *hy = 0;
+      return data;
    }
+   *lx = ((data[0] >> 5) + ((data[2] & 0x80) >> 4)) * bpp;
+   *hx = *lx + ((data[0] & 0x1F) + 1) * bpp;
+   *ly = data[1];
+   *hy = *ly + (data[2] & 0x7F) + 1;
+   return data + 3;
 }
 
 static __attribute__((unused))
      void gfx_block2N_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
                             const uint8_t * data)
 {                               // Draw a block from 2 bit image data, c is colour to plot where icon is black/set
-   uint8_t lx = *data++ * 8;
-   uint8_t hx = *data++ * 8;
-   uint8_t ly = *data++;
-   uint8_t hy = *data++;
+   uint8_t lx,
+     hx,
+     ly,
+     hy;
+   data = gfx_pack (data, &lx, &hx, &ly, &hy, 8);
    uint8_t d = 0;
    for (gfx_pos_t row = 0; row < h; row++)
    {
@@ -888,43 +882,29 @@ static __attribute__((unused))
          if (col >= dx)
             for (uint8_t qx = 0; qx < mx; qx++)
                for (uint8_t qy = 0; qy < mx; qy++)
-                  gfx_pixel (x + (col - dx) * mx + qx, y + row * my + qy, (d & 1) ? 255 : 0);
-         d >>= 1;
+                  gfx_pixel (x + (col - dx) * mx + qx, y + row * my + qy, (d & 0x80) ? 255 : 0);
+         d <<= 1;
       }
-   }
-}
-
-static __attribute__((unused))
-     void gfx_mask (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l,
-                    gfx_intensity_t i)
-{                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
-   if (!l)
-      l = (w + 7) / 8;          // default is pixels width
-   for (gfx_pos_t row = 0; row < h; row++)
-   {
-      for (gfx_pos_t col = 0; col < w; col++)
-         if ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1)
-            gfx_pixel (x + col, y + row, i);
-      data += l;
    }
 }
 
 static __attribute__((unused))
      void gfx_mask_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t dx, const uint8_t * data, gfx_intensity_t i)
 {                               // Draw a block from 2 bit image data, c is colour to plot where icon is black/set - data is packed
-   uint8_t lx = *data++ * 8;
-   uint8_t hx = *data++ * 8;
-   uint8_t ly = *data++;
-   uint8_t hy = *data++;
+   uint8_t lx,
+     hx,
+     ly,
+     hy;
+   data = gfx_pack (data, &lx, &hx, &ly, &hy, 8);
    uint8_t d = 0;
    for (gfx_pos_t row = ly; row < hy; row++)
       for (gfx_pos_t col = lx; col < hx; col++)
       {
          if (!(col & 7))
             d = *data++;
-         if ((d & 1) && col >= dx)
+         if ((d & 0x80) && col >= dx)
             gfx_pixel (x + col - dx, y + row, i);
-         d >>= 1;
+         d <<= 1;
       }
 }
 
@@ -944,10 +924,11 @@ static __attribute__((unused))
 static __attribute__((unused))
      void gfx_block2_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data)
 {                               // Draw a block from 2 bit image data, c is colour to plot where icon is black/set
-   uint8_t lx = *data++ * 8;
-   uint8_t hx = *data++ * 8;
-   uint8_t ly = *data++;
-   uint8_t hy = *data++;
+   uint8_t lx,
+     hx,
+     ly,
+     hy;
+   data = gfx_pack (data, &lx, &hx, &ly, &hy, 8);
    uint8_t d = 0;
    w += dx;
    for (gfx_pos_t row = 0; row < h; row++)
@@ -956,8 +937,8 @@ static __attribute__((unused))
          if (row >= ly && row < hy && col >= lx && col < hx && !(col & 7))
             d = *data++;
          if (col >= dx && col < w)
-            gfx_pixel (x + col - dx, y + row, (d & 1) ? 255 : 0);
-         d >>= 1;
+            gfx_pixel (x + col - dx, y + row, (d & 0x80) ? 255 : 0);
+         d <<= 1;
       }
 }
 
@@ -968,35 +949,38 @@ static __attribute__((unused))
       l = (w + 1) / 2;          // default is pixels width
    for (gfx_pos_t row = 0; row < h; row++)
    {
+      uint8_t d = 0;
+      const uint8_t *dp = data;
+      data += l;
       for (gfx_pos_t col = 0; col < w; col++)
       {
-         uint8_t v = data[(col + dx) / 2];
-         gfx_pixel (x + col, y + row, (v & 0xF0) | (v >> 4));
-         col++;
-         if (col < w)
-            gfx_pixel (x + col, y + row, (v & 0xF) | (v << 4));
+         if (!(col & 1))
+            d = *dp++;
+         if (col >= dx)
+            gfx_pixel (x + col, y + row - dx, (d & 0xF0) | (d >> 4));
+         d <<= 4;
       }
-      data += l;
    }
 }
 
 static __attribute__((unused))
      void gfx_block16_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data)
 {                               // Draw a block from 16 bit greyscale data
-   uint8_t lx = *data++ * 4;
-   uint8_t hx = *data++ * 4;
-   uint8_t ly = *data++;
-   uint8_t hy = *data++;
+   uint8_t lx,
+     hx,
+     ly,
+     hy;
+   data = gfx_pack (data, &lx, &hx, &ly, &hy, 4);
    uint8_t d = 0;
    w += dx;
    for (gfx_pos_t row = 0; row < h; row++)
       for (gfx_pos_t col = 0; col < w || col < hx; col++)
       {
-         if (row >= ly && row < hy && col >= lx && col < hx && !(col & 7))
+         if (row >= ly && row < hy && col >= lx && col < hx && !(col & 1))
             d = *data++;
          if (col < w)
             gfx_pixel (x + col, y + row, (d & 0xF0) | (d >> 4));
-         d >>= 4;
+         d <<= 4;
       }
 }
 

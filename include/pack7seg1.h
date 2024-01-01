@@ -1,37 +1,27 @@
 const unsigned char * const gfx_7seg_pack1[]={// 7x9 (1 bpp), 9 bytes per character
-// a
-(const unsigned char[]){0,1,0,1,
-0x0E,},
-// b
-(const unsigned char[]){0,1,1,4,
-0x10,
-0x10,
-0x10,},
-// c
-(const unsigned char[]){0,1,5,8,
-0x10,
-0x10,
-0x10,},
-// d
-(const unsigned char[]){0,1,8,9,
-0x0E,},
-// e
-(const unsigned char[]){0,1,5,8,
-0x01,
-0x01,
-0x01,},
-// f
-(const unsigned char[]){0,1,1,4,
-0x01,
-0x01,
-0x01,},
-// g
-(const unsigned char[]){0,1,4,5,
-0x0E,},
-// h
-(const unsigned char[]){0,1,6,7,
-0x60,},
-// i
-(const unsigned char[]){0,1,2,3,
-0x60,},
+// packing bytes: 3 bits lx + 5 bits nx-1, 8 bits ly, 1 bit lx + 7 bits ny-1
+(const unsigned char[]){0x00,0x00,0x00,	// a  
+0x70},
+(const unsigned char[]){0x00,0x01,0x02,	// b  
+0x08,
+0x08,
+0x08},
+(const unsigned char[]){0x00,0x05,0x02,	// c  
+0x08,
+0x08,
+0x08},
+(const unsigned char[]){0x00,0x08,0x00,	// d  
+0x70},
+(const unsigned char[]){0x00,0x05,0x02,	// e  
+0x80,
+0x80,
+0x80},
+(const unsigned char[]){0x00,0x01,0x02,	// f  
+0x80,
+0x80,
+0x80},
+(const unsigned char[]){0x00,0x04,0x00,	// g  
+0x70},
+NULL,				// h  
+NULL,				// i  
 };

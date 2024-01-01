@@ -89,7 +89,7 @@ gfx_driver_init (void)
 #ifndef	FAST
       2, EPD75_PSR, 0x1F,       // KW LUT=OTP (slow update for first display)
 #else
-      61, EPD75_LUT_VCOM,     // VCOM LUT
+      61, EPD75_LUT_VCOM,       // VCOM LUT
       0x00, 30, 5, 30, 5, 0x01,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -118,7 +118,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_WK,
-      0x84, 30, 5, 30, 5, 0x01,	// 0x84 is default
+      0x84, 30, 5, 30, 5, 0x01, // 0x84 is default
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -148,9 +148,9 @@ gfx_driver_init (void)
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
       2, EPD75_TCON, 0x22,      //
       2, EPD75_PLL, 0x06,       //
-      //2, EPD75_TSE, 0x00,	//
-      //2, EPD75_EVS, 0x02, 	//
-      2, EPD75_AMV, 0x11,  0xFF,	// VCOM cal and wait
+      //2, EPD75_TSE, 0x00,     //
+      //2, EPD75_EVS, 0x02,     //
+      2, EPD75_AMV, 0x11, 0xFF, // VCOM cal and wait
       0
    };
    if (gfx_command_bulk (init))
@@ -168,11 +168,11 @@ gfx_driver_send (void)
    usleep (10000);
    gfx_driver_init ();
 #endif
-   gfx_send_command(EPD75_TSC);
+   gfx_send_command (EPD75_TSC);
 #ifdef	FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
 #endif
-   gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0xB1 : (gfx_settings.border ^ gfx_settings.invert) ? 0x13 : 0x23, 0x07); // N2OCP seems not to work
+   gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0xB1 : (gfx_settings.border ^ gfx_settings.invert) ? 0x13 : 0x23, 0x07);   // N2OCP seems not to work
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx (0))

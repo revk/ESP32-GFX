@@ -44,19 +44,19 @@ gfx_driver_init (void)
    int W = gfx_settings.width;
    int H = gfx_settings.height;
    const uint8_t init[] = {
-      1, EPD29_SW_RESET,       // soft reset
+      1, EPD29_SW_RESET,        // soft reset
       0xFF,                     // busy wait
-      4, EPD29_DRIVER_CONTROL, (H - 1) & 0xFF, (H - 1) >> 8, 0,        //
-      4, EPD29_BOOST_SOFTSTART, 0xD7, 0xD6, 0x9D,      // 
-      2, EPD29_WRITE_VCOM, 0xA8,       // 
-      2, EPD29_DUMMY_LINE_PERIOD, 0x1A,        //
-      2, EPD29_SET_GATE_TIME, 0x08,    //
-      2, EPD29_DATA_MODE, 0x03,        // Ram data entry mode
-      3, EPD29_SET_RAMXPOS, 0, (W + 7) / 8-1,        //
-      5, EPD29_SET_RAMYPOS, 0, 0, (H - 1) & 0xFF, (H - 1) >> 8,        //
-      31, EPD29_WRITE_LUT,     //
-          0x50, 0xAA, 0x55, 0xAA, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Full update
-      2, EPD29_TEMP_CONTROL, 0x80,     // Temp control ?
+      4, EPD29_DRIVER_CONTROL, (H - 1) & 0xFF, (H - 1) >> 8, 0, //
+      4, EPD29_BOOST_SOFTSTART, 0xD7, 0xD6, 0x9D,       // 
+      2, EPD29_WRITE_VCOM, 0xA8,        // 
+      2, EPD29_DUMMY_LINE_PERIOD, 0x1A, //
+      2, EPD29_SET_GATE_TIME, 0x08,     //
+      2, EPD29_DATA_MODE, 0x03, // Ram data entry mode
+      3, EPD29_SET_RAMXPOS, 0, (W + 7) / 8 - 1, //
+      5, EPD29_SET_RAMYPOS, 0, 0, (H - 1) & 0xFF, (H - 1) >> 8, //
+      31, EPD29_WRITE_LUT,      //
+      0x50, 0xAA, 0x55, 0xAA, 0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,       // Full update
+      2, EPD29_TEMP_CONTROL, 0x80,      // Temp control ?
       0
    };
    if (gfx_command_bulk (init))
@@ -68,7 +68,7 @@ static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
    const uint8_t init[] = {
-      2, EPD29_WRITE_BORDER, 0x05,     // border color (TODO)
+      2, EPD29_WRITE_BORDER, 0x05,      // border color (TODO)
       // TODO LUT for fast refresh?
       2, EPD29_SET_RAMXCOUNT, 0,
       3, EPD29_SET_RAMYCOUNT, 0, 0,
