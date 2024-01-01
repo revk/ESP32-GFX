@@ -194,10 +194,18 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -296,7 +304,8 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -846,7 +855,7 @@ gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, 
 }
 
 static const uint8_t *
-gfx_pack (const uint8_t * data, uint8_t * lx, uint8_t * hx, uint8_t * ly, uint8_t * hy, uint8_t bpp)
+gfx_pack (const uint8_t * data, uint8_t * lx, uint8_t * hx, uint8_t * ly, uint8_t * hy, uint8_t ppb)
 {                               // Pack range bytes
    if (!data)
    {                            // No range
@@ -856,8 +865,8 @@ gfx_pack (const uint8_t * data, uint8_t * lx, uint8_t * hx, uint8_t * ly, uint8_
       *hy = 0;
       return data;
    }
-   *lx = ((data[0] >> 5) + ((data[2] & 0x80) >> 4)) * bpp;
-   *hx = *lx + ((data[0] & 0x1F) + 1) * bpp;
+   *lx = ((data[0] >> 5) + ((data[2] & 0x80) >> 4)) * ppb;
+   *hx = *lx + ((data[0] & 0x1F) + 1) * ppb;
    *ly = data[1];
    *hy = *ly + (data[2] & 0x7F) + 1;
    return data + 3;
@@ -943,24 +952,17 @@ static __attribute__((unused))
 }
 
 static __attribute__((unused))
-     void gfx_block16 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
+     void gfx_block16 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const uint8_t * data)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
-   if (!l)
-      l = (w + 1) / 2;          // default is pixels width
+   uint8_t d = 0;
    for (gfx_pos_t row = 0; row < h; row++)
-   {
-      uint8_t d = 0;
-      const uint8_t *dp = data;
-      data += l;
       for (gfx_pos_t col = 0; col < w; col++)
       {
          if (!(col & 1))
-            d = *dp++;
-         if (col >= dx)
-            gfx_pixel (x + col, y + row - dx, (d & 0xF0) | (d >> 4));
+            d = *data++;
+         gfx_pixel (x + col, y + row, (d & 0xF0) | (d >> 4));
          d <<= 4;
       }
-   }
 }
 
 static __attribute__((unused))
@@ -970,7 +972,7 @@ static __attribute__((unused))
      hx,
      ly,
      hy;
-   data = gfx_pack (data, &lx, &hx, &ly, &hy, 4);
+   data = gfx_pack (data, &lx, &hx, &ly, &hy, 2);
    uint8_t d = 0;
    w += dx;
    for (gfx_pos_t row = 0; row < h; row++)
@@ -978,8 +980,8 @@ static __attribute__((unused))
       {
          if (row >= ly && row < hy && col >= lx && col < hx && !(col & 1))
             d = *data++;
-         if (col < w)
-            gfx_pixel (x + col, y + row, (d & 0xF0) | (d >> 4));
+         if (col >= dx && col < w)
+            gfx_pixel (x + col - dx, y + row, (d & 0xF0) | (d >> 4));
          d <<= 4;
       }
 }
@@ -1064,7 +1066,7 @@ gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
       gfx_pos_t x,
         y;
       gfx_draw (w, h, 0, 0, &x, &y);
-      gfx_block16 (x, y, w, h, 0, data, 0);
+      gfx_block16 (x, y, w, h, data);
    }
 }
 
