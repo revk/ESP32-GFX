@@ -1,6 +1,7 @@
 *.o
 *~
 *.swp
+fontpack
 .DS_Store
 */*-backups
 */*/*-backups
