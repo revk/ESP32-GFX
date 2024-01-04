@@ -5389,7 +5389,7 @@
     (property "Value" "C_Polarized" (at 248.666 102.4311 0)
       (effects (font (size 1.27 1.27)) (justify right))
     )
-    (property "Footprint" "Capacitor_Tantalum_SMD:CP_EIA-7343-31_Kemet-D" (at 244.7798 96.52 0)
+    (property "Footprint" "RevK:CP_EIA-7343-31_Kemet-D" (at 244.7798 96.52 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (at 245.745 100.33 0)
