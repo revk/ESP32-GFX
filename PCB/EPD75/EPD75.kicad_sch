@@ -8358,7 +8358,7 @@
     (property "Reference" "R1" (at 185.42 157.48 90)
       (effects (font (size 1.27 1.27)))
     )
-    (property "Value" "0R47" (at 183.515 157.48 90)
+    (property "Value" "0.47R" (at 183.515 157.48 90)
       (effects (font (size 1.27 1.27)))
     )
     (property "Footprint" "RevK:R_0402" (at 181.737 157.48 90)
