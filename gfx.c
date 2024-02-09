@@ -1393,7 +1393,7 @@ gfx_init_opts (gfx_init_t o)
          gpio_set_level (gfx_settings.rst, 0);
          usleep (10000);
          gpio_set_level (gfx_settings.rst, 1);
-         usleep (10000);
+         usleep (100000);
       }
    }
    if (gfx_settings.sleep)
