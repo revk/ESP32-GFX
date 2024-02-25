@@ -92,6 +92,24 @@ menu "GFX"
 	help
 		Extra large 30x54 font
 	
+	config GFX_FONT7
+	bool "Include 35x63 font"
+	default n
+	help
+		Extra large 35x63 font
+	
+	config GFX_FONT8
+	bool "Include 40x72 font"
+	default y n
+	help
+		Extra large 40x72 font
+	
+	config GFX_FONT9
+	bool "Include 45x81 font"
+	default y n
+	help
+		Extra large 45x81 font
+	
 	config GFX_BIGDIGIT
 	bool "Include large 7 segment digits"
 	default yn

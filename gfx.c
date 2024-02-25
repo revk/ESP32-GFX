@@ -280,6 +280,15 @@ static __attribute__((unused))
 #ifdef	CONFIG_GFX_FONT6
 #include "packmono6.h"
 #endif
+#ifdef	CONFIG_GFX_FONT7
+#include "packmono7.h"
+#endif
+#ifdef	CONFIG_GFX_FONT8
+#include "packmono8.h"
+#endif
+#ifdef	CONFIG_GFX_FONT9
+#include "packmono9.h"
+#endif
 #else
 #ifdef	CONFIG_GFX_FONT0
 #include "packgrey0.h"
@@ -301,6 +310,15 @@ static __attribute__((unused))
 #endif
 #ifdef	CONFIG_GFX_FONT6
 #include "packgrey6.h"
+#endif
+#ifdef	CONFIG_GFX_FONT7
+#include "packgrey7.h"
+#endif
+#ifdef	CONFIG_GFX_FONT8
+#include "packgrey8.h"
+#endif
+#ifdef	CONFIG_GFX_FONT9
+#include "packgrey9.h"
 #endif
 #endif
 
@@ -367,6 +385,21 @@ static uint8_t const *const *fonts[] = {
 #endif
 #ifdef	CONFIG_GFX_FONT6
    gfx_font_pack6,
+#else
+   NULL,
+#endif
+#ifdef	CONFIG_GFX_FONT7
+   gfx_font_pack7,
+#else
+   NULL,
+#endif
+#ifdef	CONFIG_GFX_FONT8
+   gfx_font_pack8,
+#else
+   NULL,
+#endif
+#ifdef	CONFIG_GFX_FONT9
+   gfx_font_pack9,
 #else
    NULL,
 #endif
