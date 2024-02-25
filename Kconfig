@@ -100,13 +100,13 @@ menu "GFX"
 	
 	config GFX_FONT8
 	bool "Include 40x72 font"
-	default y n
+	default n
 	help
 		Extra large 40x72 font
 	
 	config GFX_FONT9
 	bool "Include 45x81 font"
-	default y n
+	default n
 	help
 		Extra large 45x81 font
 	
