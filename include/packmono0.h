@@ -11,27 +11,27 @@ NULL,								//       047   39    27    '
 NULL,								//       050   40    28    (     
 NULL,								//       051   41    29    )     
 NULL,								//       052   42    2A    *     
-(const unsigned char[]){0,0,4,0x00,0x04,0x07,0x04,0x00},	//       053   43    2B    +     
-(const unsigned char[]){0,0,4,0x00,0x00,0x00,0x04,0x04},	//       054   44    2C    ,     
-(const unsigned char[]){0,0,4,0x00,0x00,0x07,0x00,0x00},	//       055   45    2D    -     
-(const unsigned char[]){0,0,4,0x00,0x00,0x00,0x00,0x04},	//       056   46    2E    .     
+(const unsigned char[]){0,0,4,0x00,0x40,0xE0,0x40,0x00},	//       053   43    2B    +     
+(const unsigned char[]){0,0,4,0x00,0x00,0x00,0x40,0x80},	//       054   44    2C    ,     
+(const unsigned char[]){0,0,4,0x00,0x00,0xE0,0x00,0x00},	//       055   45    2D    -     
+(const unsigned char[]){0,0,4,0x00,0x00,0x00,0x00,0x40},	//       056   46    2E    .     
 NULL,								//       057   47    2F    /     
-(const unsigned char[]){0,0,4,0x07,0x05,0x05,0x05,0x07},	//       060   48    30    0     
-(const unsigned char[]){0,0,4,0x06,0x04,0x04,0x04,0x07},	//       061   49    31    1     
-(const unsigned char[]){0,0,4,0x07,0x02,0x07,0x04,0x07},	//       062   50    32    2     
-(const unsigned char[]){0,0,4,0x07,0x02,0x07,0x02,0x07},	//       063   51    33    3     
-(const unsigned char[]){0,0,4,0x05,0x05,0x07,0x02,0x02},	//       064   52    34    4     
-(const unsigned char[]){0,0,4,0x07,0x04,0x07,0x02,0x07},	//       065   53    35    5     
-(const unsigned char[]){0,0,4,0x07,0x04,0x07,0x05,0x07},	//       066   54    36    6     
-(const unsigned char[]){0,0,4,0x07,0x02,0x02,0x02,0x02},	//       067   55    37    7     
-(const unsigned char[]){0,0,4,0x07,0x05,0x07,0x05,0x07},	//       070   56    38    8     
-(const unsigned char[]){0,0,4,0x07,0x05,0x07,0x02,0x07},	//       071   57    39    9     
-(const unsigned char[]){0,0,4,0x00,0x04,0x00,0x04,0x00},	//       072   58    3A    :     
-(const unsigned char[]){0,0,4,0x00,0x04,0x00,0x04,0x04},	//       073   59    3B    ;     
-(const unsigned char[]){0,0,4,0x02,0x04,0x04,0x04,0x02},	//       074   60    3C    <     
-(const unsigned char[]){0,0,4,0x00,0x07,0x00,0x07,0x00},	//       075   61    3D    =     
-(const unsigned char[]){0,0,4,0x04,0x04,0x02,0x04,0x04},	//       076   62    3E    >     
-(const unsigned char[]){0,0,4,0x07,0x05,0x02,0x03,0x04},	//       077   63    3F    ?     
+(const unsigned char[]){0,0,4,0xE0,0xA0,0xA0,0xA0,0xE0},	//       060   48    30    0     
+(const unsigned char[]){0,0,4,0xC0,0x40,0x40,0x40,0xE0},	//       061   49    31    1     
+(const unsigned char[]){0,0,4,0xE0,0x20,0xE0,0x80,0xE0},	//       062   50    32    2     
+(const unsigned char[]){0,0,4,0xE0,0x20,0xE0,0x20,0xE0},	//       063   51    33    3     
+(const unsigned char[]){0,0,4,0xA0,0xA0,0xE0,0x20,0x20},	//       064   52    34    4     
+(const unsigned char[]){0,0,4,0xE0,0x80,0xE0,0x20,0xE0},	//       065   53    35    5     
+(const unsigned char[]){0,0,4,0xE0,0x80,0xE0,0xA0,0xE0},	//       066   54    36    6     
+(const unsigned char[]){0,0,4,0xE0,0x20,0x20,0x20,0x20},	//       067   55    37    7     
+(const unsigned char[]){0,0,4,0xE0,0xA0,0xE0,0xA0,0xE0},	//       070   56    38    8     
+(const unsigned char[]){0,0,4,0xE0,0xA0,0xE0,0x20,0xE0},	//       071   57    39    9     
+(const unsigned char[]){0,0,4,0x00,0x40,0x00,0x40,0x00},	//       072   58    3A    :     
+(const unsigned char[]){0,0,4,0x00,0x40,0x00,0x40,0x80},	//       073   59    3B    ;     
+(const unsigned char[]){0,0,4,0x20,0x40,0x80,0x40,0x20},	//       074   60    3C    <     
+(const unsigned char[]){0,0,4,0x00,0xE0,0x00,0xE0,0x00},	//       075   61    3D    =     
+(const unsigned char[]){0,0,4,0x80,0x40,0x20,0x40,0x80},	//       076   62    3E    >     
+(const unsigned char[]){0,0,4,0xE0,0xA0,0x20,0x60,0x40},	//       077   63    3F    ?     
 NULL,								//       100   64    40    @
 NULL,								//       101   65    41    A
 NULL,								//       102   66    42    B
@@ -79,7 +79,7 @@ NULL,								//       153   107   6B    k
 NULL,								//       154   108   6C    l
 NULL,								//       155   109   6D    m
 NULL,								//       156   110   6E    n
-(const unsigned char[]){0,0,4,0x00,0x00,0x07,0x05,0x07},	//       157   111   6F    o
+(const unsigned char[]){0,0,4,0x00,0x00,0xE0,0xA0,0xE0},	//       157   111   6F    o
 NULL,								//       160   112   70    p
 NULL,								//       161   113   71    q
 NULL,								//       162   114   72    r
