@@ -90,6 +90,7 @@ void gfx_blocky (int8_t size, const char *fmt, ...); // blocky text
 
 void gfx_icon2(gfx_pos_t w,gfx_pos_t h,const void *data);	// Icon, 2 bit per pixel packed
 void gfx_icon16(gfx_pos_t w,gfx_pos_t h,const void *data);	// Icon, 16 bit per pixel packed
+const uint8_t * gfx_pack (const uint8_t * data, uint8_t * lx, uint8_t * hx, uint8_t * ly, uint8_t * hy, uint8_t ppb); // Unpacking
 
 // General tools
 void gfx_message(const char *);	// General full screen message display (lines separated with / and using [colour/size])

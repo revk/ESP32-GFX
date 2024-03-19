@@ -887,7 +887,7 @@ gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, 
       *yp = t;
 }
 
-static const uint8_t *
+const uint8_t *
 gfx_pack (const uint8_t * data, uint8_t * lx, uint8_t * hx, uint8_t * ly, uint8_t * hy, uint8_t ppb)
 {                               // Pack range bytes
    if (!data)
