@@ -33,7 +33,7 @@ endif
 if(! -e /tmp/7seg) then
 	mkdir /tmp/7seg
 	cd /tmp/7seg
-	foreach s (a b c d e f g h i)
+	foreach s (a b c d e f g h i j)
 		echo $s
 		inkscape --actions="export-id:$s;export-id-only;export-area-page;export-background:white;export-filename:$s.png;export-do" $d/SevenSeg.svg >& /dev/null
 	end
