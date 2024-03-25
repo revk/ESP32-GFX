@@ -97,10 +97,10 @@ foreach n (1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
 	cd /tmp/7seg
 	set f="7seg$n.h"
 	echo "$f"
-	foreach s ([a-i].png)
+	foreach s ([a-j].png)
 		convert $s:r.png -flatten -negate -monochrome -dither None -scale ${W}x${H}'!' $s:r.gray
 	end
 
-	$d/fontpack -w$W -h$H -b1 [a-i].gray --head="gfx_7seg$n" > "$d/include/$f"
-	$d/fontpack -w$W -h$H -b1 [a-i].gray --pack --head="gfx_7seg_pack$n" > "$d/include/pack$f"
+	$d/fontpack -w$W -h$H -b1 [a-j].gray --head="gfx_7seg$n" > "$d/include/$f"
+	$d/fontpack -w$W -h$H -b1 [a-j].gray --pack --head="gfx_7seg_pack$n" > "$d/include/pack$f"
 end

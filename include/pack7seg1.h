@@ -24,4 +24,5 @@ const unsigned char * const gfx_7seg_pack1[]={// 7x9 (1 bpp), 9 bytes per charac
 0x70},
 NULL,				// h  
 NULL,				// i  
+NULL,				// j  
 };

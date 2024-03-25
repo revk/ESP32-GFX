@@ -51,4 +51,7 @@ const unsigned char * const gfx_7seg_pack2[]={// 14x18 (1 bpp), 36 bytes per cha
 (const unsigned char[]){0x20,0x04,0x01,	// i  
 0x18,
 0x18},
+(const unsigned char[]){0x20,0x10,0x01,	// j  
+0x18,
+0x18},
 };

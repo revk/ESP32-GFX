@@ -194,18 +194,10 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -322,8 +314,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static uint8_t const
-     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -498,7 +489,7 @@ gfx_busy_wait (const char *why)
       return;
    }
    uint64_t a = esp_timer_get_time ();
-   int try = 3000; // 30s
+   int try = 3000;              // 30s
 #ifdef	GFX_BUSY_LOW
    while (try-- && !gpio_get_level (gfx_settings.busy))
 #else
@@ -558,7 +549,7 @@ gfx_send_data (const void *data, uint32_t len)
       esp_err_t e = spi_device_transmit (gfx_spi, &c);
       if (e)
       {
-         ESP_LOGE (TAG, "Failed send data (%lu)",l);
+         ESP_LOGE (TAG, "Failed send data (%lu)", l);
          return e;
       }
       len -= l;
@@ -1150,10 +1141,11 @@ gfx_7seg (int8_t size, const char *fmt, ...)
          map = sevensegmap[*p - '0'];
       if (p[1] == ':' || p[1] == '.')
       {
-         segs = 9;
-         map |= 0x80;
+         segs = 10;
          if (p[1] == ':')
-            map |= 0x100;
+            map |= 0x180;
+         else
+            map |= 0x200;
       }
       for (int s = 0; s < segs; s++)
          gfx_mask_pack (x, y, 0, fontdata (s), (map & (1 << s)) ? 255 : 0);
