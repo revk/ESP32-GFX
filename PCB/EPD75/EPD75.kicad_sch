@@ -15969,7 +15969,8 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
-		(at 99.06 131.445 0)
+		(at 99.06 133.985 0)
+		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -15977,7 +15978,7 @@
 		(dnp no)
 		(uuid "7653b6a8-08d0-4c20-b3c3-01647d1bd408")
 		(property "Reference" "J3"
-			(at 99.06 139.3995 0)
+			(at 99.06 126.0305 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15985,7 +15986,7 @@
 			)
 		)
 		(property "Value" "RELAY"
-			(at 99.06 136.9752 0)
+			(at 99.06 128.4548 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -15993,7 +15994,7 @@
 			)
 		)
 		(property "Footprint" "RevK:WAGO-2060-452-998-404"
-			(at 99.06 131.445 0)
+			(at 99.06 133.985 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16002,7 +16003,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 99.06 131.445 0)
+			(at 99.06 133.985 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16011,7 +16012,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 99.06 131.445 0)
+			(at 99.06 133.985 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -16020,7 +16021,7 @@
 			)
 		)
 		(property "LCSC Part #" "C2765055"
-			(at 99.06 131.445 0)
+			(at 99.06 133.985 0)
 			(effects
 				(font
 					(size 1.27 1.27)
