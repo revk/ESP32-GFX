@@ -1,15 +1,15 @@
 // Generated case design for EPDBat/EPDBat.kicad_pcb
 // By https://github.com/revk/PCBCase
-// Generated 2023-12-22 08:42:08
+// Generated 2025-01-12 15:03:04
 // title:	Waveshare EPD adapter
 // rev:	1
 // company:	Adrian Kennard, Andrews & Arnold Ltd
 //
 
 // Globals
-margin=0.500000;
+margin=0.200000;
 lip=2.000000;
-casebase=1.000000;
+casebottom=1.000000;
 casetop=6.000000;
 casewall=3.000000;
 fit=0.000000;
@@ -35,7 +35,7 @@ translate([17.450001,35.600001,1.200000])rotate([0,0,90.000000])m0(part,hole,blo
 translate([15.750001,35.600001,1.200000])rotate([0,0,90.000000])m0(part,hole,block,casetop); // RevK:C_0402 C_0402_1005Metric (back)
 translate([23.600001,11.500001,1.200000])rotate([0,0,-90.000000])m1(part,hole,block,casetop); // Q2 (back)
 translate([13.000001,18.000001,1.200000])rotate([0,0,90.000000])m2(part,hole,block,casetop); // U4 (back)
-translate([14.200001,9.800001,1.200000])m3(part,hole,block,casetop); // RevK:C_0603 C_0603_1608Metric (back)
+translate([14.300001,9.700001,1.200000])m3(part,hole,block,casetop); // RevK:C_0603 C_0603_1608Metric (back)
 translate([21.400001,14.400001,1.200000])rotate([0,0,90.000000])m4(part,hole,block,casetop); // RevK:R_0402 R_0402_1005Metric (back)
 translate([26.100001,12.900001,1.200000])m4(part,hole,block,casetop); // RevK:R_0402 R_0402_1005Metric (back)
 translate([25.700001,33.800001,1.200000])rotate([0,0,90.000000])m1(part,hole,block,casetop); // Q2 (back)
@@ -51,27 +51,27 @@ translate([26.500001,10.500001,1.200000])rotate([0,0,180.000000])m4(part,hole,bl
 translate([24.550001,14.500001,1.200000])m6(part,hole,block,casetop); // D5 (back)
 translate([25.400001,26.800001,1.200000])rotate([0,0,180.000000])m6(part,hole,block,casetop); // D5 (back)
 translate([26.500001,11.400001,1.200000])rotate([0,0,180.000000])m4(part,hole,block,casetop); // RevK:R_0402 R_0402_1005Metric (back)
-translate([4.800001,29.025001,1.200000])rotate([0,0,-90.000000])m0(part,hole,block,casetop); // RevK:C_0402 C_0402_1005Metric (back)
-// Missing model J10.1 JST_PH_S2B-PH-SM4-TB_1x02-1MP_P2.00mm_Horizontal
+translate([4.800001,29.025001,1.200000])rotate([0,0,-90.000000])m7(part,hole,block,casetop); // D6 (back)
+translate([5.800001,4.800001,1.200000])rotate([0,0,90.000000])m8(part,hole,block,casetop,02); // J10 (back)
 translate([26.800001,35.700001,1.200000])rotate([0,0,90.000000])m4(part,hole,block,casetop); // RevK:R_0402 R_0402_1005Metric (back)
 translate([18.300001,35.600001,1.200000])rotate([0,0,90.000000])m0(part,hole,block,casetop); // RevK:C_0402 C_0402_1005Metric (back)
-translate([17.800001,5.700001,1.200000])rotate([0,0,-90.000000])m7(part,hole,block,casetop); // U1 (back)
-translate([14.000001,28.300001,1.200000])rotate([0,0,180.000000])m8(part,hole,block,casetop); // J1 (back)
+translate([17.800001,5.700001,1.200000])rotate([0,0,-90.000000])m9(part,hole,block,casetop); // U1 (back)
+translate([14.000001,28.300001,1.200000])rotate([0,0,180.000000])m10(part,hole,block,casetop); // J1 (back)
 translate([25.400001,30.800001,1.200000])rotate([0,0,180.000000])m6(part,hole,block,casetop); // D5 (back)
 translate([25.600001,20.100001,1.200000])rotate([0,0,-90.000000])m4(part,hole,block,casetop); // RevK:R_0402 R_0402_1005Metric (back)
 translate([23.800001,35.700001,1.200000])rotate([0,0,-90.000000])m4(part,hole,block,casetop); // RevK:R_0402 R_0402_1005Metric (back)
 translate([21.500001,23.100001,1.200000])rotate([0,0,90.000000])m0(part,hole,block,casetop); // RevK:C_0402 C_0402_1005Metric (back)
-translate([23.600001,20.200001,1.200000])m9(part,hole,block,casetop); // Q3 (back)
+translate([23.600001,20.200001,1.200000])m11(part,hole,block,casetop); // Q3 (back)
 translate([18.200001,3.100001,1.200000])m4(part,hole,block,casetop); // RevK:R_0402 R_0402_1005Metric (back)
-translate([2.000001,35.000001,1.200000])rotate([0,0,90.000000])m10(part,hole,block,casetop); // D4 (back)
-translate([23.600001,5.200001,1.200000])rotate([0,0,90.000000])translate([0.000000,-1.050000,0.000000])rotate([90.000000,-0.000000,-0.000000])m11(part,hole,block,casetop); // RevK:USB-C-Socket-H CSP-USC16-TR (back)
-translate([24.400001,23.700001,1.200000])rotate([0,0,180.000000])rotate([-0.000000,-0.000000,-90.000000])m12(part,hole,block,casetop); // RevK:L_4x4 TYA4020 (back)
+translate([2.000001,35.000001,1.200000])rotate([0,0,90.000000])m12(part,hole,block,casetop); // D4 (back)
+translate([22.210001,5.200001,1.200000])rotate([0,0,90.000000])translate([0.000000,-2.400000,0.000000])rotate([90.000000,-0.000000,-0.000000])m13(part,hole,block,casetop); // RevK:USB-C-Socket-H CSP-USC16-TR (back)
+translate([24.400001,23.700001,1.200000])rotate([0,0,180.000000])rotate([-0.000000,-0.000000,-90.000000])m14(part,hole,block,casetop); // RevK:L_4x4 TYA4020 (back)
 translate([25.400001,28.800001,1.200000])rotate([0,0,180.000000])m6(part,hole,block,casetop); // D5 (back)
-translate([23.281251,17.250001,1.200000])m7(part,hole,block,casetop); // U1 (back)
+translate([23.281251,17.250001,1.200000])m9(part,hole,block,casetop); // U1 (back)
 translate([3.100001,27.300001,1.200000])m0(part,hole,block,casetop); // RevK:C_0402 C_0402_1005Metric (back)
 }
 
-parts_top=12;
+parts_top=14;
 // Parts to go on PCB (bottom)
 module parts_bottom(part=false,hole=false,block=false){
 }
@@ -83,8 +83,8 @@ module m0(part=false,hole=false,block=false,height)
 // 0402 Capacitor
 if(part)
 {
-	b(0,0,0,1.5,0.65,0.2); // Pad size
 	b(0,0,0,1.0,0.5,1); // Chip
+	b(0,0,0,1.5,0.65,0.2); // Pad size
 }
 }
 
@@ -122,8 +122,8 @@ module m3(part=false,hole=false,block=false,height)
 // 0603 Capacitor
 if(part)
 {
-	b(0,0,0,1.6,0.95,0.2); // Pad size
 	b(0,0,0,1.6,0.8,1); // Chip
+	b(0,0,0,1.6,0.95,0.2); // Pad size
 }
 }
 
@@ -142,8 +142,8 @@ module m5(part=false,hole=false,block=false,height)
 // 0805 Capacitor
 if(part)
 {
-	b(0,0,0,2,1.45,0.2); // Pad size
 	b(0,0,0,2,1.2,1); // Chip
+	b(0,0,0,2,1.45,0.2); // Pad size
 }
 }
 
@@ -158,6 +158,33 @@ if(part)
 }
 
 module m7(part=false,hole=false,block=false,height)
+{ // D6
+// DFN1006-2L
+if(part)
+{
+	b(0,0,0,1.0,0.6,0.45); // Chip
+}
+}
+
+module m8(part=false,hole=false,block=false,height,N=0)
+{ // J10
+translate([0,-4.5,0])rotate([90,0,0])
+{
+	if(part)
+	{
+		b(0,3,-6,3.9+2*N,6,6); // Body
+		b(-1.55-N,2,-7.6,0.8,4,1.6); // Tag
+		b(1.55+N,2,-7.6,0.8,4,1.6); // Tag
+		for(n=[0:N-1])b(-1+n*2,0.25,-9.5,1,0.5,3.5); // pins
+	}
+	if(hole)
+	{
+		b(0,3,0,1.3+N*2,4,10);
+	}
+}
+}
+
+module m9(part=false,hole=false,block=false,height)
 { // U1
 // SOT-23-5
 if(part)
@@ -167,7 +194,7 @@ if(part)
 }
 }
 
-module m8(part=false,hole=false,block=false,height)
+module m10(part=false,hole=false,block=false,height)
 { // J1
 // FPC 24 pin connector
 {
@@ -184,7 +211,7 @@ module m8(part=false,hole=false,block=false,height)
 }
 }
 
-module m9(part=false,hole=false,block=false,height)
+module m11(part=false,hole=false,block=false,height)
 { // Q3
 // SOT-323_SC-70
 if(part)
@@ -194,48 +221,49 @@ if(part)
 }
 }
 
-module m10(part=false,hole=false,block=false,height)
+module m12(part=false,hole=false,block=false,height)
 { // D4
 // 1x1mm LED
 if(part)
 {
-	b(0,0,0,1,1,.8);
+        b(0,0,0,1.2,1.2,.8);
 }
 if(hole)
 {
-	hull()
-	{
-		b(0,0,.8,1,1,1);
-		b(0,0,height,2,2,1);
-	}
+        hull()
+        {
+                b(0,0,.8,1.2,1.2,1);
+                translate([0,0,height])cylinder(d=2,h=1,$fn=16);
+        }
 }
 if(block)
 {
-	hull()
-	{
-		b(0,0,0,3,3,1);
-		b(0,0,height,4,4,1);
-	}
+        hull()
+        {
+                b(0,0,0,2.4,2.4,1);
+                translate([0,0,height])cylinder(d=4,h=1,$fn=16);
+        }
 }
 }
 
-module m11(part=false,hole=false,block=false,height)
+module m13(part=false,hole=false,block=false,height)
 { // RevK:USB-C-Socket-H CSP-USC16-TR
 // USB connector
 rotate([-90,0,0])translate([-4.47,-3.84,0])
 {
 	if(part)
 	{
-		translate([1.63,0,1.63])
+		b(4.47,7,0,7,2,0.2);	// Pads
+		translate([1.63,-0.2,1.63])
 		rotate([-90,0,0])
 		hull()
 		{
-			cylinder(d=3.26,h=7.75,$fn=24);
+			cylinder(d=3.26,h=7.55,$fn=24);
 			translate([5.68,0,0])
-			cylinder(d=3.26,h=7.75,$fn=24);
+			cylinder(d=3.26,h=7.55,$fn=24);
 		}
-		translate([0,6.65,0])cube([8.94,1.1,1.63]);
-		translate([0,2.2,0])cube([8.94,1.6,1.63]);
+		translate([0,6.2501,0])cube([8.94,1.1,1.6301]);
+		translate([0,1.7,0])cube([8.94,1.6,1.6301]);
 	}
 	if(hole)
 	{
@@ -258,10 +286,9 @@ rotate([-90,0,0])translate([-4.47,-3.84,0])
 		}
 	}
 }
-
 }
 
-module m12(part=false,hole=false,block=false,height)
+module m14(part=false,hole=false,block=false,height)
 { // RevK:L_4x4 TYA4020
 // 4x4 Inductor
 if(part)
@@ -272,7 +299,7 @@ if(part)
 
 // Generate PCB casework
 
-height=casebase+pcbthickness+casetop;
+height=casebottom+pcbthickness+casetop;
 $fn=48;
 
 module pyramid()
@@ -291,8 +318,8 @@ module solid_case(d=0)
 { // The case wall
 	hull()
         {
-                translate([0,0,-casebase])pcb_hulled(height,casewall-edge);
-                translate([0,0,edge-casebase])pcb_hulled(height-edge*2,casewall);
+                translate([0,0,-casebottom])pcb_hulled(height,casewall-edge);
+                translate([0,0,edge-casebottom])pcb_hulled(height-edge*2,casewall);
         }
 }
 
@@ -311,14 +338,14 @@ module top_half(step=false)
 {
 	difference()
 	{
-		translate([-casebase-100,-casewall-100,pcbthickness-lip/2+0.01]) cube([pcbwidth+casewall*2+200,pcblength+casewall*2+200,height]);
+		translate([-casebottom-100,-casewall-100,pcbthickness-lip/2+0.01]) cube([pcbwidth+casewall*2+200,pcblength+casewall*2+200,height]);
 		if(step)translate([0,0,pcbthickness-lip/2-0.01])pcb_hulled(lip,casewall/2+fit);
 	}
 }
 
 module bottom_half(step=false)
 {
-	translate([-casebase-100,-casewall-100,pcbthickness+lip/2-height-0.01]) cube([pcbwidth+casewall*2+200,pcblength+casewall*2+200,height]);
+	translate([-casebottom-100,-casewall-100,pcbthickness+lip/2-height-0.01]) cube([pcbwidth+casewall*2+200,pcblength+casewall*2+200,height]);
 	if(step)translate([0,0,pcbthickness-lip/2])pcb_hulled(lip,casewall/2-fit);
 }
 
@@ -378,7 +405,7 @@ module top_cut()
 			minkowski()
 			{
 				top_side_hole();
-				cylinder(d=margin,h=height,$fn=4);
+				rotate([0,0,45])cylinder(r=margin,h=height,$fn=4);
 			}
 		}
 	}
@@ -392,7 +419,7 @@ module top_cut()
 			minkowski()
 			{
 				bottom_side_hole();
-				translate([0,0,-height])cylinder(d=margin,h=height,$fn=4);
+				rotate([0,0,45])translate([0,0,-height])cylinder(r=margin,h=height,$fn=4);
 			}
 	}
 }
@@ -401,7 +428,7 @@ module bottom_cut()
 {
 	difference()
 	{
-		 translate([-casebase-50,-casewall-50,-height]) cube([pcbwidth+casewall*2+100,pcblength+casewall*2+100,height*2]);
+		 translate([-casebottom-50,-casewall-50,-height]) cube([pcbwidth+casewall*2+100,pcblength+casewall*2+100,height*2]);
 		 top_cut();
 	}
 }
@@ -482,13 +509,13 @@ module bottom_edge()
 	intersection()
 	{
 		case_wall();
-       		bottom_cut();
+		bottom_cut();
 	}
 }
 
 module bottom()
 {
-	translate([casewall,casewall,casebase])difference()
+	translate([casewall,casewall,casebottom])difference()
 	{
 		union()
 		{
