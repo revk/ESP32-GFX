@@ -1,5 +1,11 @@
-# EPD154
+# Epaper154
 
-![Top](Epaper154.png)
-![Top rotated](Epaper154-90.png)
-![Bottom](Epaper154-bottom.png)
+These files are for use in [KiCad](https://www.kicad.org).
+
+## Trademark
+
+This is an open source project, but bear in mind you cannot sell boards bearing the Andrews & Arnold Ltd name, the A&A logo, the registered trademark AJK logo, or the GS1 allocated EANs assigned to Andrews & Arnold Ltd.
+
+## Images
+
+<img src='Epaper154.png' width=32%><img src='Epaper154-90.png' width=32%><img src='Epaper154-bottom.png' width=32%>
