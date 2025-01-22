@@ -1659,7 +1659,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C5224170"
+		(property "MPN" "C5224170"
 			(at 13.1 206.1 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -2303,7 +2303,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C3013941"
+		(property "MPN" "C3013941"
 			(at 189 -9 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -4621,7 +4621,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C2938375"
+		(property "MPN" "C2938375"
 			(at 185.9 -37.5 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -7777,7 +7777,7 @@
 				)
 			)
 		)
-		(property "LCSC Part " "C5204746"
+		(property "MPN" "C5204746"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8063,7 +8063,7 @@
 				)
 			)
 		)
-		(property "LCSC Part " "C5204746"
+		(property "MPN" "C5204746"
 			(at 222.8 162.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -8907,7 +8907,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C5137770"
+		(property "MPN" "C5137770"
 			(at 11.825 169.775 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -9085,7 +9085,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C295747"
+		(property "MPN" "C295747"
 			(at 195 11.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -10031,7 +10031,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C668215"
+		(property "MPN" "C668215"
 			(at 1.5 206.1 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -10294,7 +10294,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C2856831"
+		(property "MPN" "C2856831"
 			(at 200 159.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -10623,7 +10623,7 @@
 				)
 			)
 		)
-		(property "LCSC Part " "C5204746"
+		(property "MPN" "C5204746"
 			(at 222.8 154.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -11908,7 +11908,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C179347"
+		(property "MPN" "C179347"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -12422,7 +12422,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C5349953"
+		(property "MPN" "C5349953"
 			(at 161 -15 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -12839,7 +12839,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C709357"
+		(property "MPN" "C709357"
 			(at 212.4 -6.8 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -13956,7 +13956,7 @@
 				)
 			)
 		)
-		(property "LCSC Part " "C5204746"
+		(property "MPN" "C5204746"
 			(at 222.8 158.4 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -14256,7 +14256,7 @@
 				)
 			)
 		)
-		(property "LCSC Part #" "C82942"
+		(property "MPN" "C82942"
 			(at 0 0 0)
 			(layer "F.Fab")
 			(hide yes)
