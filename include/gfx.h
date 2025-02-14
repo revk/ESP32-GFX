@@ -41,6 +41,7 @@ typedef struct {
  uint8_t asleep:1;	// Device is asleep
  uint8_t pause:1;	// Pause needed before next operation
  uint8_t invert:1;	// Invert  (e-paper)
+ uint8_t brutal:1;	// E-Paper fast update reset
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);

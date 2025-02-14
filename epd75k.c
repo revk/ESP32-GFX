@@ -188,6 +188,16 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
 #endif
+#ifdef FAST
+   if (gfx_settings.brutal && gfx_settings.norefresh)
+   {                            // Brutal - reset mid update
+      usleep (1500000);
+      gpio_set_level (gfx_settings.rst, 0);
+      usleep (10000);
+      gpio_set_level (gfx_settings.rst, 1);
+      usleep (10000);
+   }
+#endif
 #ifndef	USE_DSLP
    gfx_busy_wait ("Post draw");
 #endif
