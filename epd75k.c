@@ -189,7 +189,7 @@ gfx_driver_send (void)
       return "DRF failed";
 #endif
 #ifdef FAST
-   if (gfx_settings.norefresh)
+   if (gfx_settings.norefresh&&gfx_settings.brutal)
    {                            // Brutal - reset mid update
       //ESP_LOGE(TAG,"Wait");
       usleep (900000);
