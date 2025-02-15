@@ -70,7 +70,7 @@
 #define	T1	30
 #define	T2	5
 #define	T3	30
-#define	T4	5
+#define	T4	0
 #define	REPEAT	1
 
 static const char *
@@ -108,7 +108,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_WW,
       //0x22, T1, T2, T3, T4, REPEAT, // 0x00 is default, but greys out, 0x0a sort of works too
-      0x02, T1, T2, T3, T4, REPEAT,       // 0x00 is default, but greys out, 0x0a sort of works too
+      0x02, T1, T2, T3, T4, REPEAT,     // 0x00 is default, but greys out, 0x0a sort of works too
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -116,7 +116,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_KW,
-      0x48, T1, T2, T3, T4, REPEAT,       // 0x5a is default
+      0x48, T1, T2, T3, T4, REPEAT,     // 0x5a is default
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -124,7 +124,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_WK,
-      0x84, T1, T2, T3, T4, REPEAT,       // 0x84 is default
+      0x84, T1, T2, T3, T4, REPEAT,     // 0x84 is default
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -133,7 +133,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_KK,
       //0x11, T1, T2, T3, T4, REPEAT, // 0x00 is default, but greys out, 0x40 works too
-      0x40, T1, T2, T3, T4, REPEAT,       // 0x00 is default, but greys out, 0x40 works too
+      0x40, T1, T2, T3, T4, REPEAT,     // 0x00 is default, but greys out, 0x40 works too
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -194,24 +194,8 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
 #endif
-#ifdef FAST
-   if (gfx_settings.norefresh && gfx_settings.brutal)
-   {                            // Brutal - reset mid update
-      //ESP_LOGE(TAG,"Wait");
-      usleep (900000);
-      //ESP_LOGE(TAG,"Reset");
-      gpio_set_level (gfx_settings.rst, 0);
-      usleep (10000);
-      gpio_set_level (gfx_settings.rst, 1);
-      usleep (10000);
-      gfx_driver_init ();
-   }
 #ifndef	USE_DSLP
-   else
-#endif
-#endif
-#ifndef	USE_DSLP
-      gfx_busy_wait ("Post draw");
+   gfx_busy_wait ("Post draw");
 #endif
    // Set OLD (N2OCP seems not to work)
    if (gfx_send_command (EPD75_DTM1))
