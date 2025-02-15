@@ -63,7 +63,7 @@
 
 #include <driver/rtc_io.h>
 
-#define USE_AUTO                // Auto PON/POFF sequence
+//#define USE_AUTO                // Auto PON/POFF sequence
 //#define USE_DSLP              // Deep sleep
 #define       FAST              // LUT from register
 
@@ -189,17 +189,23 @@ gfx_driver_send (void)
       return "DRF failed";
 #endif
 #ifdef FAST
-   if (gfx_settings.brutal && gfx_settings.norefresh)
+   if (gfx_settings.norefresh)
    {                            // Brutal - reset mid update
-      usleep (1500000);
+      //ESP_LOGE(TAG,"Wait");
+      usleep (900000);
+      //ESP_LOGE(TAG,"Reset");
       gpio_set_level (gfx_settings.rst, 0);
       usleep (10000);
       gpio_set_level (gfx_settings.rst, 1);
       usleep (10000);
+      gfx_driver_init ();
    }
+#ifndef	USE_DSLP
+   else
+#endif
 #endif
 #ifndef	USE_DSLP
-   gfx_busy_wait ("Post draw");
+      gfx_busy_wait ("Post draw");
 #endif
    // Set OLD (N2OCP seems not to work)
    if (gfx_send_command (EPD75_DTM1))
