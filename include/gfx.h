@@ -49,6 +49,7 @@ const char *gfx_init_opts(gfx_init_t);
 void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white on black
 void gfx_unlock(void);	// unlocks display allowing it to be sent if there has been any change (draws if changed and direct mode)
 void gfx_refresh(void);	// E-paper mainly, do full mode update
+void gfx_force(void);	// Force update
 void gfx_wait(void);	// Wait for updates to be done
 void gfx_load(const void *data); // Block load whole image (does not allow for logical invert)
 int gfx_ok(void);	// GFX is enabled
