@@ -70,7 +70,7 @@
 #define	T1	30
 #define	T2	1
 #define	T3	30
-#define	T4	0
+#define	T4	1
 #define	REPEAT	1
 
 static const char *
@@ -131,7 +131,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_KK,
-      0x44, T1, T2, T3, T4, REPEAT,
+      0x04, T1, T2, T3, T4, REPEAT,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -172,6 +172,11 @@ gfx_driver_send (void)
    usleep (10000);
    gfx_driver_init ();
 #endif
+#ifndef USE_AUTO
+   if (gfx_send_command (EPD75_PON))
+      return "PON failed";
+   gfx_busy_wait ("PON");
+#endif
    gfx_send_command (EPD75_TSC);
 #ifdef	FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
@@ -200,6 +205,10 @@ gfx_driver_send (void)
       return "DTM1 failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
+#ifndef USE_AUTO
+   if (gfx_command1 (EPD75_POF, 0x30))
+      return "POF failed";
+#endif
    return NULL;
 }
 
