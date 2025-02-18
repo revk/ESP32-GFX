@@ -175,7 +175,6 @@ gfx_driver_send (void)
 #ifndef USE_AUTO
    if (gfx_send_command (EPD75_PON))
       return "PON failed";
-   gfx_busy_wait ("PON");
 #endif
    gfx_send_command (EPD75_TSC);
 #ifdef	FAST
