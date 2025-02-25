@@ -62,9 +62,13 @@ void gfx_set_contrast(gfx_intensity_t);
 
 // Drawing functions - do a lock first
 // State setting
-// For grey/colour displays you can set background and foreground colour, and text or icons are fully plotted as one or the other or some shade in between
-// For 1bpp (epaper) you set the foreground colour (black or white, or in some cases red) and only the pixels in your text/icon are plotted, i.e. background is not plotted
 void gfx_pos(gfx_pos_t x,gfx_pos_t y,gfx_align_t);	// Set position and alignment, note y=0 is TOP of display
+
+// For grey/colour displays you can set background and foreground colour.
+// For text foreground and background are normally plotted with a 1 pixel border around text (see mask mode below)
+// For 7seg, segments are plotted only, as foreground (on) or background (off)
+// For epaper (1bpp) you only set K/W (or R for 2bpp e-paper)
+// Setting background and foreground the same colour only plots for intensity 255 (using foreground) - i.e. mask mode
 void gfx_colour(char);	// Set foreground - colour is a character
 void gfx_background(char);	// Set background - colour is a character
 
