@@ -1223,13 +1223,13 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    // Border
    for (gfx_pos_t n = -1; n <= w; n++)
    {
-      gfx_pixel (ox + n, y - 1, 0);
-      gfx_pixel (ox + n, y + h, 0);
+      gfx_pixel (ox + n, oy - 1, 0);
+      gfx_pixel (ox + n, oy + h, 0);
    }
    for (gfx_pos_t n = 0; n < h; n++)
    {
-      gfx_pixel (ox - 1, y + n, 0);
-      gfx_pixel (ox + w, y + n, 0);
+      gfx_pixel (ox - 1, oy + n, 0);
+      gfx_pixel (ox + w, oy + n, 0);
    }
    // Text
    x = y = 0;
