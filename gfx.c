@@ -322,7 +322,7 @@ static __attribute__((unused))
 #endif
 #endif
 
-static const char const sevensegchar[] = "0123456789-_";
+static char const sevensegchar[] = "0123456789-_";
 static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x40, 0x08 };
 
 static uint8_t const *const *sevenseg[] = {
