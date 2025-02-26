@@ -194,10 +194,18 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -314,7 +322,8 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+static const char const sevensegchar[] = "0123456789-_";
+static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x40, 0x08 };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1123,7 +1132,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
 
    int w = 0;
    for (char *p = temp; *p; p++)
-      if (*p == ' ' || *p == '-' || *p == '_' || isdigit ((int) *p))
+      if (strchr (sevensegchar, *p))
       {
          w += 6 * size;
          if (p[1] == ':' || p[1] == '.')
@@ -1135,16 +1144,13 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    x += size / 2;               // Better alignment in box
    for (char *p = temp; *p; p++)
    {
-      if (*p != ' ' && *p != '-' && *p != '_' && !isdigit ((int) *p))
+      char *m = strchr (sevensegchar, *p);
+      if (!m)
          continue;
       uint8_t segs = 7;
       uint16_t map = 0;
-      if (*p == '-')
-         map = 0x40;
-      else if (*p == '_')
-         map = 0x08;
-      else if (isdigit ((int) *p))
-         map = sevensegmap[*p - '0'];
+      if (isdigit ((int) *p))
+         map = sevensegmap[m = sevensegchar];
       if (p[1] == ':' || p[1] == '.')
       {
          segs = 10;
