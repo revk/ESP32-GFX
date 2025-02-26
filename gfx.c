@@ -798,7 +798,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    const int line = (gfx_settings.width + 7) / 8;
    const int addr = line * y + x / 8;
    uint8_t k = ((i & 0x80) ? f_mul : b_mul) & 1;
-   if (!gfx_settings.invert)
+   if (gfx_settings.invert)
       k ^= 1;
    if (((gfx[addr] >> shift) & 1) != k)
    {
@@ -810,7 +810,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    const int line = (gfx_settings.width + 7) / 8;
    const int addr = line * y + x / 8;
    uint8_t k = ((i & 0x80) ? f_mul : b_mul) & 1;
-   if (!gfx_settings.invert)
+   if (gfx_settings.invert)
       k ^= 1;
    if (((gfx[addr] >> shift) & 1) != k)
    {
@@ -830,7 +830,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    const int addr = line * y + x * GFX_BPP / 8;
    i >>= (8 - GFX_BPP);
    i &= bits;
-   if (!gfx_settings.invert)
+   if (gfx_settings.invert)
       i ^= bits;
    if (((gfx[addr] >> shift) & bits) != i)
    {
