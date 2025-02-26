@@ -1142,7 +1142,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       if (*p == '-')
          map = 0x40;
       else if (*p == '_')
-         map = 0x02;
+         map = 0x08;
       else if (isdigit ((int) *p))
          map = sevensegmap[*p - '0'];
       if (p[1] == ':' || p[1] == '.')
