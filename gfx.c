@@ -1239,7 +1239,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       int charw = cwidth (c);
       if (charw)
       {
-         if (c < ' ')
+         if (c <=8)
             c = ' ';
          if (!p[1] || p[1] == '\n')
             charw -= (size ? : 1);      // End character
@@ -1263,7 +1263,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       {                         // End of line
          for (gfx_pos_t X = x; X < w; X++)
             for (gfx_pos_t Y = 0; Y < fonth; Y++)
-               gfx_pixel (ox + X, oy + y + Y, 0);       // Pack backgropund
+               gfx_pixel (ox + X, oy + y + Y, ((X+Y)&1)?255:0);       // Pack backgropund
          x = 0;
          y += fonth;
          continue;
