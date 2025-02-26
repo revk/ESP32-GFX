@@ -322,8 +322,10 @@ static __attribute__((unused))
 #endif
 #endif
 
-static char const sevensegchar[] = "0123456789-_";
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x40, 0x08 };
+     static char const
+        sevensegchar[] = "0123456789-_\"',";
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F, 0x40, 0x08, 0x22, 0x02, 0x04 };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1149,8 +1151,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
          continue;
       uint8_t segs = 7;
       uint16_t map = 0;
-      if (isdigit ((int) *p))
-         map = sevensegmap[m - sevensegchar];
+      map = sevensegmap[m - sevensegchar];
       if (p[1] == ':' || p[1] == '.')
       {
          segs = 10;
