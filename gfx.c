@@ -351,7 +351,7 @@ static __attribute__((unused))
         0x3D,                   // G
         0x76,                   // H
         0x30,                   // I
-        0x17,                   // J
+        0x1E,                   // J
         0x38,                   // L
         0x37,                   // N
         0x3F,                   // O
