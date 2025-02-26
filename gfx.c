@@ -194,10 +194,18 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -314,7 +322,8 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static uint8_t const sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
+     static uint8_t const
+     sevensegmap[] = { 0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -793,8 +802,6 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 #endif
    if (i < 255 && f == b)
       return;                   // Mask mode
-   if (gfx_settings.invert)
-      i = 255 - i;
 #if GFX_BPP == 1                // Black/white
    const int shift = 7 - (x % 8);
    const int line = (gfx_settings.width + 7) / 8;
@@ -828,8 +835,6 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    const int addr = line * y + x * GFX_BPP / 8;
    i >>= (8 - GFX_BPP);
    i &= bits;
-   if (!gfx_settings.invert)
-      i ^= bits;
    if (((gfx[addr] >> shift) & bits) != i)
    {
       gfx[addr] = ((gfx[addr] & ~(bits << shift)) | (i << shift));
@@ -1453,8 +1458,8 @@ gfx_lock (void)
    gfx_background ('k');
    gfx_colour ('w');
 #else // Assume light
-   gfx_background ('W');
-   gfx_colour ('K');
+   gfx_background (gfx_settings.invert ? 'K' : 'W');
+   gfx_colour (gfx_settings.invert ? 'W' : 'K');
 #endif
    gfx_pos (0, 0, GFX_L | GFX_T | GFX_H);
 }
