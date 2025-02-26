@@ -323,7 +323,7 @@ static __attribute__((unused))
 #endif
 
      static char const
-        sevensegchar[] = "0123456789-_\"',ACEFGHIJLNOPSU";
+        sevensegchar[] = "0123456789-_\"',[]ABCDEFGHIJLNOPSUZ";
      static uint8_t const
         sevensegmap[] = { 0x3F, // 0
         0x06,                   // 1
@@ -339,21 +339,26 @@ static __attribute__((unused))
         0x08,                   // _
         0x22,                   // "
         0x02,                   // '
-        0x04,                   //,
+        0x04,                   // ,
+        0x39,                   // [
+        0x0F,                   // ]
         0x77,                   // A
-        0x77,                   // C
-        0x77,                   // E
-        0x77,                   // F
-        0x77,                   // G
-        0x77,                   // H
-        0x77,                   // I
-        0x77,                   // J
-        0x77,                   // L
-        0x77,                   // N
-        0x77,                   // O
-        0x77,                   // P
-        0x77,                   // S
-        0x77,                   // U
+        0x7C,                   // B (b)
+        0x39,                   // C
+        0x5E,                   // D (d)
+        0x79,                   // E
+        0x71,                   // F
+        0x3D,                   // G
+        0x76,                   // H
+        0x30,                   // I
+        0x17,                   // J
+        0x38,                   // L
+        0x37,                   // N
+        0x3F,                   // O
+        0x73,                   // P
+        0x6D,                   // S
+        0x3E,                   // U
+        0x5B,                   // Z
 	};
 
         static uint8_t const *const *sevenseg[] = {
