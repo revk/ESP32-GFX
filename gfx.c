@@ -1150,7 +1150,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       uint8_t segs = 7;
       uint16_t map = 0;
       if (isdigit ((int) *p))
-         map = sevensegmap[m = sevensegchar];
+         map = sevensegmap[m - sevensegchar];
       if (p[1] == ':' || p[1] == '.')
       {
          segs = 10;
