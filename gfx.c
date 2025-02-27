@@ -194,10 +194,18 @@ static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -314,43 +322,45 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static char const sevensegchar[] = "0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
-static uint8_t const sevensegmap[] = { 0x3F,    // 0
-   0x06,                        // 1
-   0x5B,                        // 2
-   0x4F,                        // 3
-   0x66,                        // 4
-   0x6D,                        // 5
-   0x7D,                        // 6
-   0x07,                        // 7
-   0x7F,                        // 8
-   0x6F,                        // 9
-   0x40,                        // -
-   0x08,                        // _
-   0x22,                        // "
-   0x02,                        // '
-   0x04,                        // ,
-   0x39,                        // [
-   0x0F,                        // ]
-   0x77,                        // A
-   0x7C,                        // B (b)
-   0x39,                        // C
-   0x5E,                        // D (d)
-   0x79,                        // E
-   0x71,                        // F
-   0x3D,                        // G
-   0x76,                        // H
-   0x30,                        // I
-   0x1E,                        // J
-   0x38,                        // L
-   0x37,                        // N
-   0x3F,                        // O
-   0x73,                        // P
-   0x50,                        // R (r)
-   0x6D,                        // S
-   0x3E,                        // U
-   0x5B,                        // Z
-};
+     static char const
+        sevensegchar[] = "0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
+     static uint8_t const
+        sevensegmap[] = { 0x3F, // 0
+        0x06,                   // 1
+        0x5B,                   // 2
+        0x4F,                   // 3
+        0x66,                   // 4
+        0x6D,                   // 5
+        0x7D,                   // 6
+        0x07,                   // 7
+        0x7F,                   // 8
+        0x6F,                   // 9
+        0x40,                   // -
+        0x08,                   // _
+        0x22,                   // "
+        0x02,                   // '
+        0x04,                   // ,
+        0x39,                   // [
+        0x0F,                   // ]
+        0x77,                   // A
+        0x7C,                   // B (b)
+        0x39,                   // C
+        0x5E,                   // D (d)
+        0x79,                   // E
+        0x71,                   // F
+        0x3D,                   // G
+        0x76,                   // H
+        0x30,                   // I
+        0x1E,                   // J
+        0x38,                   // L
+        0x37,                   // N
+        0x3F,                   // O
+        0x73,                   // P
+        0x50,                   // R (r)
+        0x6D,                   // S
+        0x3E,                   // U
+        0x5B,                   // Z
+     };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1244,7 +1254,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    h = (y + 1) * fonth - (size ? : 1);  // Margin bottom needs removing
    gfx_pos_t ox = 0,
       oy = 0;
-   gfx_draw (w, h, size ? : 1, size ? : 1, &ox, &oy);   // starting point
+   gfx_draw (w, h, 1, 1, &ox, &oy);     // starting point
    // Border
    for (gfx_pos_t n = -1; n <= w; n++)
    {
@@ -1260,6 +1270,8 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    x = y = 0;
    for (const char *p = text; *p; p++)
    {
+      if (!x && y + fonth > h)
+         fonth = h - y;         // Last line
       int c = *p;
       int charw = cwidth (c);
       if (charw)
@@ -1272,7 +1284,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          if (blocky)
          {
 #if	GFX_BPP <= 2            // TODO should really do full colour
-            gfx_block2N_pack (ox + x, oy + y, charw / size, z, dx / size, size, size, fonts[1][c - ' ']);
+            gfx_block2N_pack (ox + x, oy + y, charw / size, fonth / (size ? : 1), dx / size, size, size, fonts[1][c - ' ']);
 #endif
          } else
          {
