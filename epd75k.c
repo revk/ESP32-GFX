@@ -206,10 +206,10 @@ gfx_driver_send (void)
 #ifndef USE_AUTO
    if (gfx_command1 (EPD75_POF, 0x30))
       return "POF failed";
-#ifndef	USE_DSLP
+#ifdef	USE_DSLP
    if (gfx_send_command (EPD75_DSLP))
       return "DSLP failed";
-   gpio_set_level (gfx_settings.rst, 0);
+   //gpio_set_level (gfx_settings.rst, 0);
 #endif
 #endif
    return NULL;
