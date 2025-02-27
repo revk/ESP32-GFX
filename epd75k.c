@@ -209,6 +209,7 @@ gfx_driver_send (void)
 #ifndef	USE_DSLP
    if (gfx_send_command (EPD75_DSLP))
       return "DSLP failed";
+   gpio_set_level (gfx_settings.rst, 0);
 #endif
 #endif
    return NULL;
