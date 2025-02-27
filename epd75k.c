@@ -64,7 +64,7 @@
 #include <driver/rtc_io.h>
 
 //#define USE_AUTO                // Auto PON/POFF sequence
-#define USE_DSLP              // Deep sleep
+#define USE_DSLP                // Deep sleep
 #define       FAST              // LUT from register
 
 #define	T1	30
@@ -190,13 +190,12 @@ gfx_driver_send (void)
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POFF->DSLP
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POFF
+      gfx_busy_wait ("Post draw");
 #endif
-      return "AUTO failed";
+   return "AUTO failed";
 #else
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
-#endif
-#ifndef	USE_DSLP
    gfx_busy_wait ("Post draw");
 #endif
    // Set OLD (N2OCP seems not to work)
