@@ -64,7 +64,7 @@
 #include <driver/rtc_io.h>
 
 //#define USE_AUTO                // Auto PON/POFF sequence
-//#define USE_DSLP              // Deep sleep
+#define USE_DSLP              // Deep sleep
 #define       FAST              // LUT from register
 
 #define	T1	30
@@ -207,6 +207,10 @@ gfx_driver_send (void)
 #ifndef USE_AUTO
    if (gfx_command1 (EPD75_POF, 0x30))
       return "POF failed";
+#ifndef	USE_DSLP
+   if (gfx_send_command (EPD75_DSLP))
+      return "DSLP failed";
+#endif
 #endif
    return NULL;
 }
