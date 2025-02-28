@@ -79,7 +79,7 @@ gfx_driver_init (void)
    uint64_t a = esp_timer_get_time ();
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
-   const uint8_t init1[] = {
+   const uint8_t init[] = {
       5, EPD75_PWR, 0x17, 0x07, 0x3F, 0x3F,     // 4 not 5 as no red (second is 0x07 for slow VCOM slew)
       2, EPD75_VDCS, 0x26,      //
       2, EPD75_PFS, 0x30,       // Power off sequence
