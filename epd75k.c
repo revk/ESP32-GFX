@@ -206,11 +206,12 @@ gfx_driver_send (void)
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POFF->DSLP
+      return "AUTO+DSLP failed";
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POFF
-      gfx_busy_wait ("Post draw");
+      return "AUTO failed";
+   gfx_busy_wait ("Post draw");
 #endif
-   return "AUTO failed";
 #else
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
