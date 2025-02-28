@@ -79,14 +79,26 @@ gfx_driver_init (void)
    ESP_LOGD (TAG, "Init");
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
-   const uint8_t init[] = {
+   const uint8_t init1[] = {
       5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red
       2, EPD75_VDCS, 0x26,      //
       2, EPD75_PFS, 0x30,       // Power off sequence
       3, EPD75_CDI, 0xBB, 0x08, //
 #ifndef	FAST
       2, EPD75_PSR, 0x1F,       // KW LUT=OTP (slow update for first display)
-#else
+#endif
+      5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
+      2, EPD75_DSPI, 0x00,      //
+      5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
+      2, EPD75_TCON, 0x22,      //
+      2, EPD75_PLL, 0x06,       //
+      //2, EPD75_TSE, 0x00,     //
+      //2, EPD75_EVS, 0x02,     //
+      2, EPD75_AMV, 0x11, 0xFF, // VCOM cal and wait
+      0
+   };
+   const uint8_t init2[] = {
+#ifdef FAST
       61, EPD75_LUT_VCOM,       // VCOM LUT
       0x00, T1, T2, T3, T4, REPEAT,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -139,24 +151,19 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #endif
-      5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
-      2, EPD75_DSPI, 0x00,      //
-      5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
-      2, EPD75_TCON, 0x22,      //
-      2, EPD75_PLL, 0x06,       //
-      //2, EPD75_TSE, 0x00,     //
-      //2, EPD75_EVS, 0x02,     //
-      2, EPD75_AMV, 0x11, 0xFF, // VCOM cal and wait
       0
    };
-   if (gfx_command_bulk (init))
-      return "Init failed";
+   if (gfx_command_bulk (init1))
+      return "Init1 failed";
+   if (gfx_command_bulk (init2))
+      return "Init2 failed";
    return NULL;
 }
 
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
+   uint64_t a = esp_timer_get_time ();
 #ifdef	USE_DSLP
    if (gfx_settings.asleep)
    {
@@ -207,6 +214,8 @@ gfx_driver_send (void)
    else
       gfx_driver_sleep ();
 #endif
+   uint64_t b = esp_timer_get_time ();
+   ESP_LOGE (TAG, "Draw time %lldms", (b - a + 500) / 1000);
    return NULL;
 }
 
