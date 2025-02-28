@@ -190,7 +190,7 @@ static spi_device_handle_t gfx_spi;
 
 // Driver support
 static esp_err_t gfx_send_command (uint8_t cmd);
-static void gfx_wait(void);	// Manual wait if no busy set
+static void gfx_busy_wait(void);	// Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
@@ -517,7 +517,7 @@ static uint32_t b_mul = 0;      // actual f/b colour multiplier
 
 // Driver support
 
-static void gfx_wait(void)
+static void gfx_busy_wait(void)
 { // manual wait if BUSY not set
    if (!gfx_settings.busy)sleep(5);
 }

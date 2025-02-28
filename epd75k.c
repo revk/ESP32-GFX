@@ -151,7 +151,7 @@ gfx_driver_init (void)
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
-   gfx_wait ();
+   gfx_busy_wait ();
    uint64_t b = esp_timer_get_time ();
    ESP_LOGD (TAG, "Init time %lldms", (b - a + 500) / 1000);
    return NULL;
@@ -208,7 +208,7 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
 #endif
-   gfx_wait ();
+   gfx_busy_wait ();
    // Set OLD (N2OCP seems not to work)
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
