@@ -528,7 +528,7 @@ gfx_send_command (uint8_t cmd)
    ESP_LOGD (TAG, "Command %02X", cmd);
    if (gfx_settings.busy)
    {                            // Check busy
-      uint16_t try = 3000; // 3s
+      uint16_t try = 30000;
 #ifdef	GFX_BUSY_LOW
       while (--try && !gpio_get_level (gfx_settings.busy))
 #else
