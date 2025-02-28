@@ -90,7 +90,7 @@ gfx_driver_init (void)
       2, EPD75_TCON, 0x22,      //
       2, EPD75_PLL, 0x06,       //
       //2, EPD75_TSE, 0x00,     //
-      2, EPD75_EVS, 0x0B,     // was 0x02
+      //2, EPD75_EVS, 0x0B,     // was 0x02
 #ifndef	FAST
       2, EPD75_PSR, 0x1F,       // KW LUT=OTP (slow update for first display)
 #else
