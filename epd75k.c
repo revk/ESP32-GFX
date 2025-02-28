@@ -177,9 +177,9 @@ gfx_driver_send (void)
    {
       gfx_settings.asleep = 0;
       gpio_set_level (gfx_settings.rst, 0);
-      usleep (10000);
+      usleep (100000);
       gpio_set_level (gfx_settings.rst, 1);
-      usleep (10000);
+      usleep (100000);
       gfx_driver_init ();
    }
 #endif
