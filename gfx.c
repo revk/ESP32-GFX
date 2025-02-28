@@ -679,9 +679,9 @@ static __attribute__((unused))
       } else if (gfx_settings.busy)
       {                         // Check anyway
 #ifdef	GFX_BUSY_LOW
-         if (try-- && !gpio_get_level (gfx_settings.busy))
+         if (!gpio_get_level (gfx_settings.busy))
 #else
-         if (try-- && gpio_get_level (gfx_settings.busy))
+         if (gpio_get_level (gfx_settings.busy))
 #endif
             usleep (10000);
       }
