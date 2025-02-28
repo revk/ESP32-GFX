@@ -215,8 +215,6 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
    gfx_busy_wait ("Post draw");
-   if (gfx_command1 (EPD75_POF, 0x30))
-      return "POF failed";
 #endif
    // Set OLD (N2OCP seems not to work)
    if (gfx_send_command (EPD75_DTM1))
@@ -224,6 +222,8 @@ gfx_driver_send (void)
    if (gfx_send_gfx (0))
       return "Data send failed";
 #ifndef USE_AUTO
+   if (gfx_command1 (EPD75_POF, 0x30))
+      return "POF failed";
    if (gfx_settings.caffeine)
       gfx_settings.caffeine = 0;
    else
