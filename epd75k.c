@@ -147,6 +147,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #endif
       //2, EPD75_AMV, 0x11,       // VCOM
+      2, EPD75_AMV, 0x19,       // VCOM XON
       0
    };
    if (gfx_command_bulk (init))
