@@ -161,6 +161,18 @@ gfx_driver_init (void)
 }
 
 static const char *
+gfx_driver_sleep (void)
+{
+#ifdef	USE_DSLP
+   if (gfx_send_command (EPD75_DSLP))
+      return "DSLP failed";
+   else
+      gfx_settings.asleep = 1;
+#endif
+   return NULL;
+}
+
+static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
    uint64_t a = esp_timer_get_time ();
@@ -216,17 +228,5 @@ gfx_driver_send (void)
 #endif
    uint64_t b = esp_timer_get_time ();
    ESP_LOGE (TAG, "Draw time %lldms", (b - a + 500) / 1000);
-   return NULL;
-}
-
-static const char *
-gfx_driver_sleep (void)
-{
-#ifdef	USE_DSLP
-   if (gfx_send_command (EPD75_DSLP))
-      return "DSLP failed";
-   else
-      gfx_settings.asleep = 1;
-#endif
    return NULL;
 }
