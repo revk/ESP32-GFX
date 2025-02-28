@@ -95,11 +95,8 @@ gfx_driver_init (void)
       //2, EPD75_TSE, 0x00,     //
       //2, EPD75_EVS, 0x02,     //
       2, EPD75_AMV, 0x11,       // VCOM cal and wait
-      0
-   };
-   const uint8_t init2[] = {
 #ifdef FAST
-      61, EPD75_LUT_VCOM,       // VCOM LUT
+      61, EPD75_LUT_VCOM,       // LUT
       0x00, T1, T2, T3, T4, REPEAT,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -151,6 +148,9 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #endif
+      0
+   };
+   const uint8_t init2[] = {
       0
    };
    if (gfx_command_bulk (init1))
