@@ -159,7 +159,7 @@ gfx_driver_init (void)
       return "Init2 failed";
    gfx_settings.init = 1;
    uint64_t b = esp_timer_get_time ();
-   ESP_LOGE (TAG, "Init time %lldms", (b - a + 500) / 1000);
+   ESP_LOGD (TAG, "Init time %lldms", (b - a + 500) / 1000);
    return NULL;
 }
 
@@ -170,7 +170,7 @@ gfx_driver_sleep (void)
    if (gfx_send_command (EPD75_DSLP))
       return "DSLP failed";
    gfx_settings.asleep = 1;
-   gpio_set_level (gfx_settings.rst, 0);
+   //gpio_set_level (gfx_settings.rst, 0);
 #endif
    return NULL;
 }
