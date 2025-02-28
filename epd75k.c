@@ -76,7 +76,7 @@
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
-   ESP_LOGD (TAG, "Init");
+   uint64_t a = esp_timer_get_time ();
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t init1[] = {
@@ -155,8 +155,11 @@ gfx_driver_init (void)
    };
    if (gfx_command_bulk (init1))
       return "Init1 failed";
-   if (gfx_command_bulk (init2))
+   if (!gfx_settings.init && gfx_command_bulk (init2))
       return "Init2 failed";
+   gfx_settings.init = 1;
+   uint64_t b = esp_timer_get_time ();
+   ESP_LOGE (TAG, "Init time %lldms", (b - a + 500) / 1000);
    return NULL;
 }
 
