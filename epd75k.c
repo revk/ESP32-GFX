@@ -150,6 +150,7 @@ gfx_driver_init (void)
    };
    const uint8_t init2[] = {
       2, EPD75_AMV, 0x11,       // VCOM
+      0xFF,			// Cal needs a wait
       0
    };
    if (gfx_command_bulk (init1))
@@ -158,9 +159,7 @@ gfx_driver_init (void)
       return "Init2 failed";
    gfx_settings.init = 1;
    uint64_t b = esp_timer_get_time ();
-   gfx_busy_wait ("Init");
-   uint64_t c = esp_timer_get_time ();
-   ESP_LOGE (TAG, "Init time %lldms+%lldms", (b - a + 500) / 1000, (c - b + 500) / 1000);
+   ESP_LOGE (TAG, "Init time %lldms", (b - a + 500) / 1000);
    return NULL;
 }
 
