@@ -222,7 +222,7 @@ gfx_driver_send (void)
    if (gfx_send_gfx (0))
       return "Data send failed";
 #ifndef USE_AUTO
-   if (gfx_command1 (EPD75_POF, 0x30))
+   if (gfx_command1 (EPD75_POF, 0x00))
       return "POF failed";
    if (gfx_settings.caffeine)
       gfx_settings.caffeine = 0;
