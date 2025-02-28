@@ -42,7 +42,6 @@ typedef struct {
  uint8_t asleep:1;	// Device is asleep
  uint8_t caffeine:1;	// Keep awake a bit longer
  uint8_t pause:1;	// Pause needed before next operation
- uint8_t init:1;	// Init done
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);
