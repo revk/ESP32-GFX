@@ -161,7 +161,7 @@ gfx_driver_init (void)
    uint64_t b = esp_timer_get_time ();
    gfx_busy_wait ("Init");
    uint64_t c = esp_timer_get_time ();
-   ESP_LOGE (TAG, "Init time %lldms+%lldms", (b - a + 500) / 1000, (c - b + 500) 1000);
+   ESP_LOGE (TAG, "Init time %lldms+%lldms", (b - a + 500) / 1000, (c - b + 500) / 1000);
    return NULL;
 }
 
