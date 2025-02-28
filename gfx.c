@@ -525,10 +525,6 @@ gfx_busy_wait (const char *why)
       sleep (5);
       return;
    }
-   {
-      ESP_LOGE (TAG, "Not busy (%s)", why);
-      return;
-   }
    uint64_t a = esp_timer_get_time ();
    int try = 3000;              // 30s
 #ifdef	GFX_BUSY_LOW
