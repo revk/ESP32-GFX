@@ -80,7 +80,7 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t init1[] = {
-      5, EPD75_PWR, 0x17, 0x07, 0x3F, 0x3F,     // 4 not 5 as no red
+      5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red
       2, EPD75_VDCS, 0x26,      //
       2, EPD75_PFS, 0x30,       // Power off sequence
       3, EPD75_CDI, 0xBB, 0x08, //
@@ -215,6 +215,8 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
    gfx_busy_wait ("Post draw");
+   if (gfx_command1 (EPD75_POF, 0x30))
+      return "POF failed";
 #endif
    // Set OLD (N2OCP seems not to work)
    if (gfx_send_command (EPD75_DTM1))
@@ -222,8 +224,6 @@ gfx_driver_send (void)
    if (gfx_send_gfx (0))
       return "Data send failed";
 #ifndef USE_AUTO
-   if (gfx_command1 (EPD75_POF, 0x30))
-      return "POF failed";
    if (gfx_settings.caffeine)
       gfx_settings.caffeine = 0;
    else
