@@ -80,7 +80,7 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t init1[] = {
-      5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red
+      5, EPD75_PWR, 0x17, 0x07, 0x3F, 0x3F,     // 4 not 5 as no red
       2, EPD75_VDCS, 0x26,      //
       2, EPD75_PFS, 0x30,       // Power off sequence
       3, EPD75_CDI, 0xBB, 0x08, //
@@ -230,6 +230,6 @@ gfx_driver_send (void)
       gfx_driver_sleep ();
 #endif
    uint64_t b = esp_timer_get_time ();
-   ESP_LOGE (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");
+   ESP_LOGD (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");
    return NULL;
 }
