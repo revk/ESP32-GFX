@@ -84,9 +84,6 @@ gfx_driver_init (void)
       2, EPD75_VDCS, 0x26,      //
       2, EPD75_PFS, 0x30,       // Power off sequence
       3, EPD75_CDI, 0xBB, 0x08, //
-#ifndef	FAST
-      2, EPD75_PSR, 0x1F,       // KW LUT=OTP (slow update for first display)
-#endif
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
@@ -94,8 +91,9 @@ gfx_driver_init (void)
       2, EPD75_PLL, 0x06,       //
       //2, EPD75_TSE, 0x00,     //
       //2, EPD75_EVS, 0x02,     //
-      2, EPD75_AMV, 0x11,       // VCOM cal and wait
-#ifdef FAST
+#ifndef	FAST
+      2, EPD75_PSR, 0x1F,       // KW LUT=OTP (slow update for first display)
+#else
       61, EPD75_LUT_VCOM,       // LUT
       0x00, T1, T2, T3, T4, REPEAT,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -151,6 +149,7 @@ gfx_driver_init (void)
       0
    };
    const uint8_t init2[] = {
+      2, EPD75_AMV, 0x11,       // VCOM
       0
    };
    if (gfx_command_bulk (init1))
