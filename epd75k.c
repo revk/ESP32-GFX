@@ -150,7 +150,7 @@ gfx_driver_init (void)
    };
    const uint8_t init2[] = {
       2, EPD75_AMV, 0x11,       // VCOM
-      0xFF,			// Cal needs a wait
+      0xFF,                     // Cal needs a wait
       0
    };
    if (gfx_command_bulk (init1))
@@ -230,6 +230,6 @@ gfx_driver_send (void)
       gfx_driver_sleep ();
 #endif
    uint64_t b = esp_timer_get_time ();
-   ESP_LOGE (TAG, "Draw time %lldms", (b - a + 500) / 1000);
+   ESP_LOGE (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");
    return NULL;
 }
