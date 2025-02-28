@@ -90,7 +90,7 @@ gfx_driver_init (void)
       2, EPD75_TCON, 0x22,      //
       2, EPD75_PLL, 0x06,       //
       //2, EPD75_TSE, 0x00,     //
-      2, EPD75_EVS, 0x0B,     // was 0x02
+      2, EPD75_EVS, 0x0B,       // was 0x02
 #ifndef	FAST
       2, EPD75_PSR, 0x1F,       // KW LUT=OTP (slow update for first display)
 #else
@@ -151,6 +151,7 @@ gfx_driver_init (void)
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
+   gfx_wait ();
    uint64_t b = esp_timer_get_time ();
    ESP_LOGD (TAG, "Init time %lldms", (b - a + 500) / 1000);
    return NULL;
@@ -207,6 +208,7 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
 #endif
+   gfx_wait ();
    // Set OLD (N2OCP seems not to work)
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
