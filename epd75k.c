@@ -158,11 +158,15 @@ static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
 #ifdef	USE_DSLP
-   gpio_set_level (gfx_settings.rst, 0);
-   usleep (10000);
-   gpio_set_level (gfx_settings.rst, 1);
-   usleep (10000);
-   gfx_driver_init ();
+   if (gfx_settings.asleep)
+   {
+      gfx_settings.asleep = 0;
+      gpio_set_level (gfx_settings.rst, 0);
+      usleep (10000);
+      gpio_set_level (gfx_settings.rst, 1);
+      usleep (10000);
+      gfx_driver_init ();
+   }
 #endif
 #ifndef USE_AUTO
    if (gfx_send_command (EPD75_PON))
@@ -198,10 +202,10 @@ gfx_driver_send (void)
 #ifndef USE_AUTO
    if (gfx_command1 (EPD75_POF, 0x30))
       return "POF failed";
-#ifdef	USE_DSLP
-   if (gfx_send_command (EPD75_DSLP))
-      return "DSLP failed";
-#endif
+   if (gfx_settings.caffeine)
+      gfx_settings.caffeine = 0;
+   else
+      gfx_driver_sleep ();
 #endif
    return NULL;
 }
@@ -209,5 +213,11 @@ gfx_driver_send (void)
 static const char *
 gfx_driver_sleep (void)
 {
+#ifdef	USE_DSLP
+   if (gfx_send_command (EPD75_DSLP))
+      return "DSLP failed";
+   else
+      gfx_settings.asleep = 1;
+#endif
    return NULL;
 }
