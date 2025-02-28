@@ -169,8 +169,8 @@ gfx_driver_sleep (void)
 #ifdef	USE_DSLP
    if (gfx_send_command (EPD75_DSLP))
       return "DSLP failed";
-   else
-      gfx_settings.asleep = 1;
+   gfx_settings.asleep = 1;
+   gpio_set_level (gfx_settings.rst, 0);
 #endif
    return NULL;
 }
