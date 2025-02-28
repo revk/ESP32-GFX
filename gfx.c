@@ -189,7 +189,6 @@ static SemaphoreHandle_t gfx_mutex = NULL;
 static spi_device_handle_t gfx_spi;
 
 // Driver support
-static void gfx_busy_wait (const char *);
 static esp_err_t gfx_send_command (uint8_t cmd);
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
@@ -517,38 +516,13 @@ static uint32_t b_mul = 0;      // actual f/b colour multiplier
 
 // Driver support
 
-static void
-gfx_busy_wait (const char *why)
-{
-   if (!gfx_settings.busy)
-   {                            // No busy, so just wait
-      sleep (5);
-      return;
-   }
-   uint64_t a = esp_timer_get_time ();
-   int try = 3000;              // 30s
-#ifdef	GFX_BUSY_LOW
-   while (--try && !gpio_get_level (gfx_settings.busy))
-#else
-   while (--try && gpio_get_level (gfx_settings.busy))
-#endif
-      usleep (10000);
-   if (!try)
-   {
-      ESP_LOGE (TAG, "Busy stuck (%s)", why);
-      return;
-   }
-   uint64_t b = esp_timer_get_time ();
-   ESP_LOGD (TAG, "Busy waited (%s) %lldms", why, (b - a + 500) / 1000);
-}
-
 static esp_err_t
 gfx_send_command (uint8_t cmd)
 {
    ESP_LOGD (TAG, "Command %02X", cmd);
    if (gfx_settings.busy)
-   {                            // Check busy anyway - short time
-      uint8_t try = 10;
+   {                            // Check busy
+      uint16_t try = 3000; // 3s
 #ifdef	GFX_BUSY_LOW
       while (--try && !gpio_get_level (gfx_settings.busy))
 #else
@@ -676,11 +650,6 @@ static __attribute__((unused))
    while (*bulk)
    {
       uint8_t len = *bulk++;
-      if (len == 0xFF)
-      {
-         gfx_busy_wait ("bulk wait");
-         continue;
-      }
       if (len > sizeof (buf))
       {
          ESP_LOGE (TAG, "Bad bulk command len %d", len);

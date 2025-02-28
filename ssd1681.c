@@ -79,8 +79,7 @@ gfx_driver_send (void)
       usleep (1000);
       gpio_set_level (gfx_settings.rst, 1);
       usleep (1000);
-   } else
-      gfx_busy_wait ("Pre draw");
+   }
    if (gfx_command1 (SSD1681_SET_RAMXCOUNT, 0))
       return "Set X failed";
    if (gfx_command2 (SSD1681_SET_RAMYCOUNT, 0, 0))
@@ -116,14 +115,12 @@ gfx_driver_send (void)
          return "Display ctrl failed";
       if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
          return "Master activate failed";
-      gfx_busy_wait ("Draw");
       if (gfx_settings.mode2)
       {                         // Will revert
          if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
             return "Display ctrl failed";
          if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
             return "Master activate failed";
-         gfx_busy_wait ("Draw2");
       }
    }
    return NULL;

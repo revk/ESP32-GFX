@@ -46,7 +46,6 @@ gfx_driver_init (void)
    int H = gfx_settings.height;
    const uint8_t init[] = {
       1, EPD154_SW_RESET,       // soft reset
-      0xFF,                     // busy wait
       4, EPD154_DRIVER_CONTROL, (H - 1) & 0xFF, (H - 1) >> 8, 0,        //
       4, EPD154_BOOST_SOFTSTART, 0xD7, 0xD6, 0x9D,      // 
       2, EPD154_WRITE_VCOM, 0x7C,       // 
@@ -82,7 +81,6 @@ gfx_driver_send (void)
    gfx_command1 (EPD154_DISP_CTRL2, 0xF7);
    gfx_send_command (EPD154_MASTER_ACTIVATE);
    gfx_send_command (0xFF);
-   gfx_busy_wait ("send");
    return NULL;
 }
 

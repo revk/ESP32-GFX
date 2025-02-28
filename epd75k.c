@@ -147,7 +147,6 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #endif
       2, EPD75_AMV, 0x11,       // VCOM
-      0xFF,                     // Cal needs a wait
       0
    };
    if (gfx_command_bulk (init))
@@ -203,12 +202,10 @@ gfx_driver_send (void)
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POFF
       return "AUTO failed";
-   gfx_busy_wait ("Post draw");
 #endif
 #else
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
-   gfx_busy_wait ("Post draw");
 #endif
    // Set OLD (N2OCP seems not to work)
    if (gfx_send_command (EPD75_DTM1))

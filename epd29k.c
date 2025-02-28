@@ -45,7 +45,6 @@ gfx_driver_init (void)
    int H = gfx_settings.height;
    const uint8_t init[] = {
       1, EPD29_SW_RESET,        // soft reset
-      0xFF,                     // busy wait
       4, EPD29_DRIVER_CONTROL, (H - 1) & 0xFF, (H - 1) >> 8, 0, //
       4, EPD29_BOOST_SOFTSTART, 0xD7, 0xD6, 0x9D,       // 
       2, EPD29_WRITE_VCOM, 0xA8,        // 
@@ -81,7 +80,6 @@ gfx_driver_send (void)
    gfx_command1 (EPD29_DISP_CTRL2, 0xF7);
    gfx_send_command (EPD29_MASTER_ACTIVATE);
    gfx_send_command (0xFF);
-   gfx_busy_wait ("send");
    return NULL;
 }
 
