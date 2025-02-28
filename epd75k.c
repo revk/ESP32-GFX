@@ -68,9 +68,9 @@
 #define       FAST              // LUT from register
 
 #define	T1	30
-#define	T2	1
+#define	T2	5
 #define	T3	30
-#define	T4	1
+#define	T4	5
 #define	REPEAT	1
 
 static const char *
