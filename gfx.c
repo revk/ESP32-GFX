@@ -1327,7 +1327,7 @@ gfx_text_desc (const char *c)
    uint8_t n = 0;
    if (c)
       while (*c && n < 255)
-         if (strchr ("gijqpy", *c))
+         if (strchr ("gijqpy", *c++))
             n++;
    return n;
 }
