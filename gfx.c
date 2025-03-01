@@ -1113,7 +1113,7 @@ gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
 }
 
 void
-gfx_7seg_size (int8_t size, const char *t, gfx_pos_t & wp, gfx_pos_t & hp)
+gfx_7seg_size (int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
 {
    if (wp)
       *wp = 0;

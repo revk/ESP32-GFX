@@ -93,11 +93,11 @@ void gfx_fill(gfx_pos_t w,gfx_pos_t h,gfx_intensity_t); // draw a filled rectang
 void gfx_line(gfx_pos_t x1,gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_t); // Draw a line
 
 void gfx_text(int8_t size, const char *fmt,...); // text, use -ve size for descenders versions
-void gfx_text_size(int8_t size,const char *,gfx_pos_t &w,gfx_pos_t &h);
+void gfx_text_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 void gfx_blocky (int8_t size, const char *fmt, ...); // blocky text
-void gfx_blocky_size(int8_t size,const char *,gfx_pos_t &w,gfx_pos_t &h);
+void gfx_blocky_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 void gfx_7seg (int8_t size, const char *fmt, ...); // digits (allows : or , or space after a digit)
-void gfx_7seg_size(int8_t size,const char *,gfx_pos_t &w,gfx_pos_t &h);
+void gfx_7seg_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 
 void gfx_icon2(gfx_pos_t w,gfx_pos_t h,const void *data);	// Icon, 2 bit per pixel packed
 void gfx_icon16(gfx_pos_t w,gfx_pos_t h,const void *data);	// Icon, 16 bit per pixel packed
