@@ -194,10 +194,18 @@ static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -314,45 +322,47 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static char const sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
-static uint8_t const sevensegmap[] = {
-   0x00,                        // space
-   0x3F,                        // 0
-   0x06,                        // 1
-   0x5B,                        // 2
-   0x4F,                        // 3
-   0x66,                        // 4
-   0x6D,                        // 5
-   0x7D,                        // 6
-   0x07,                        // 7
-   0x7F,                        // 8
-   0x6F,                        // 9
-   0x40,                        // -
-   0x08,                        // _
-   0x22,                        // "
-   0x02,                        // '
-   0x04,                        // ,
-   0x39,                        // [
-   0x0F,                        // ]
-   0x77,                        // A
-   0x7C,                        // B (b)
-   0x39,                        // C
-   0x5E,                        // D (d)
-   0x79,                        // E
-   0x71,                        // F
-   0x3D,                        // G
-   0x76,                        // H
-   0x30,                        // I
-   0x1E,                        // J
-   0x38,                        // L
-   0x37,                        // N
-   0x3F,                        // O
-   0x73,                        // P
-   0x50,                        // R (r)
-   0x6D,                        // S
-   0x3E,                        // U
-   0x5B,                        // Z
-};
+     static char const
+        sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
+     static uint8_t const
+        sevensegmap[] = {
+        0x00,                   // space
+        0x3F,                   // 0
+        0x06,                   // 1
+        0x5B,                   // 2
+        0x4F,                   // 3
+        0x66,                   // 4
+        0x6D,                   // 5
+        0x7D,                   // 6
+        0x07,                   // 7
+        0x7F,                   // 8
+        0x6F,                   // 9
+        0x40,                   // -
+        0x08,                   // _
+        0x22,                   // "
+        0x02,                   // '
+        0x04,                   // ,
+        0x39,                   // [
+        0x0F,                   // ]
+        0x77,                   // A
+        0x7C,                   // B (b)
+        0x39,                   // C
+        0x5E,                   // D (d)
+        0x79,                   // E
+        0x71,                   // F
+        0x3D,                   // G
+        0x76,                   // H
+        0x30,                   // I
+        0x1E,                   // J
+        0x38,                   // L
+        0x37,                   // N
+        0x3F,                   // O
+        0x73,                   // P
+        0x50,                   // R (r)
+        0x6D,                   // S
+        0x3E,                   // U
+        0x5B,                   // Z
+     };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1252,7 +1262,6 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    if (!gfx || !fonts[size])
       return;
 
-
    gfx_pos_t x,
      y,
      w,
@@ -1339,7 +1348,7 @@ gfx_text (int8_t size, const char *fmt, ...)
    va_list ap;
    char *temp;
    va_start (ap, fmt);
-   vaprintf (temp, fmt, ap);
+   vasprintf (temp, fmt, ap);
    va_end (ap);
    if (temp)
       gfx_text_draw (size, z, 0, temp);
@@ -1349,30 +1358,6 @@ gfx_text (int8_t size, const char *fmt, ...)
 void
 gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
-   if (w)
-      *w = 0;
-   if (h)
-      *h = 0;
-   if (size < 1)
-      size = 1;
-   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
-      size = sizeof (sevenseg) / sizeof (*sevenseg);
-}
-
-
-void
-gfx_7seg (int8_t size, const char *fmt, ...)
-{                               // Plot 7 segment digits
-   if (!gfx)
-      return;
-   if (size < 1)
-      size = 1;
-   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
-      size = sizeof (sevenseg) / sizeof (*sevenseg);
-   if (!gfx || size < 1 || !sevenseg[size - 1])
-      return;
-   va_list ap;
-   char temp[gfx_width () / 4 + 2];
    int z = 7;                   // effective height
    if (size < 0)
    {                            // indicates descenders allowed
@@ -1382,7 +1367,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       z = 5;
    if (size > sizeof (fonts) / sizeof (*fonts) - 1)
       size = sizeof (fonts) / sizeof (*fonts) - 1;
-   gfx_texty_draw_size (size, z, t, w, h);
+   gfx_text_draw_size (size, z, t, w, h);
 }
 
 void
@@ -1400,7 +1385,7 @@ gfx_blocky (int8_t size, const char *fmt, ...)
    va_list ap;
    char *temp;
    va_start (ap, fmt);
-   vaprintf (temp, fmt, ap);
+   vasprintf (temp, fmt, ap);
    va_end (ap);
    if (temp)
       gfx_text_draw (size, z, 1, temp);
@@ -1410,30 +1395,6 @@ gfx_blocky (int8_t size, const char *fmt, ...)
 void
 gfx_blocky_size (int8_t size, const char *t, gfx_pos_t & w, gfx_pos_t & h)
 {
-   if (w)
-      *w = 0;
-   if (h)
-      *h = 0;
-   if (size < 1)
-      size = 1;
-   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
-      size = sizeof (sevenseg) / sizeof (*sevenseg);
-}
-
-
-void
-gfx_7seg (int8_t size, const char *fmt, ...)
-{                               // Plot 7 segment digits
-   if (!gfx)
-      return;
-   if (size < 1)
-      size = 1;
-   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
-      size = sizeof (sevenseg) / sizeof (*sevenseg);
-   if (!gfx || size < 1 || !sevenseg[size - 1])
-      return;
-   va_list ap;
-   char temp[gfx_width () / 4 + 2];
    int z = 7;                   // effective height
    if (size < 0)
    {                            // indicates descenders allowed
