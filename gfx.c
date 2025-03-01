@@ -1152,7 +1152,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    //char temp[gfx_width () / 4 + 2];
    char *temp;
    va_start (ap, fmt);
-   vssnprintf (&temp, sizeof (temp), fmt, ap);
+   vasnprintf (&temp, sizeof (temp), fmt, ap);
    va_end (ap);
 
    int fontw = 7 * size;        // pixel width of characters in font file
