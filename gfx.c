@@ -1149,11 +1149,12 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    if (!gfx || size < 1 || !sevenseg[size - 1])
       return;
    va_list ap;
-   //char temp[gfx_width () / 4 + 2];
    char *temp;
    va_start (ap, fmt);
    vasprintf (&temp, fmt, ap);
    va_end (ap);
+   if (!temp)
+      return;
 
    int fontw = 7 * size;        // pixel width of characters in font file
    inline const uint8_t *fontdata (uint8_t s)
@@ -1188,7 +1189,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
          gfx_mask_pack (x, y, 0, fontdata (s), (map & (1 << s)) ? 255 : 0);
       x += (segs > 7 ? fontw : 6 * size);
    }
-   free(temp);
+   free (temp);
 }
 
 static int
@@ -1238,7 +1239,7 @@ gfx_text_draw_size (int8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gf
       w -= (size ? : 1);        // Margin right hand pixel needs removing from width
    if (!w)
       return;                   // nothing to print
-   h = (y + 1) * ((z + 1) * (size ? : 1)) - (size ? : 1);  // Margin bottom needs removing
+   h = (y + 1) * ((z + 1) * (size ? : 1)) - (size ? : 1);       // Margin bottom needs removing
    if (wp)
       *wp = w;
    if (hp)
@@ -1336,15 +1337,17 @@ gfx_text (int8_t size, const char *fmt, ...)
    if (size > sizeof (fonts) / sizeof (*fonts) - 1)
       size = sizeof (fonts) / sizeof (*fonts) - 1;
    va_list ap;
-   char temp[gfx_width () / 4 + 2];
+   char *temp;
    va_start (ap, fmt);
-   vsnprintf (temp, sizeof (temp), fmt, ap);
+   vaprintf (temp, fmt, ap);
    va_end (ap);
-   gfx_text_draw (size, z, 0, temp);
+   if (temp)
+      gfx_text_draw (size, z, 0, temp);
+   free (temp);
 }
 
 void
-gfx_text_size (int8_t size, const char *t, gfx_pos_t & w, gfx_pos_t & h)
+gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
    if (w)
       *w = 0;
@@ -1395,11 +1398,13 @@ gfx_blocky (int8_t size, const char *fmt, ...)
    } else if (!size)
       z = 5;
    va_list ap;
-   char temp[gfx_width () / 4 + 2];
+   char *temp;
    va_start (ap, fmt);
-   vsnprintf (temp, sizeof (temp), fmt, ap);
+   vaprintf (temp, fmt, ap);
    va_end (ap);
-   gfx_text_draw (size, z, 1, temp);
+   if (temp)
+      gfx_text_draw (size, z, 1, temp);
+   free (temp);
 }
 
 void
