@@ -1113,6 +1113,31 @@ gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
 }
 
 void
+gfx_7seg_size (int8_t size, const char *t, gfx_pos_t & wp, gfx_pos_t & hp)
+{
+   if (wp)
+      *wp = 0;
+   if (hp)
+      *hp = 0;
+   if (size < 1)
+      size = 1;
+   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
+      size = sizeof (sevenseg) / sizeof (*sevenseg);
+   gfx_pos_t w = 0;
+   for (char *p = temp; *p; p++)
+      if (strchr (sevensegchar, *p))
+      {
+         w += 6 * size;
+         if (p[1] == ':' || p[1] == '.')
+            w += size;
+      }
+   if (wp)
+      *wp = w;
+   if (hp)
+      *hp = 9 * size;
+}
+
+void
 gfx_7seg (int8_t size, const char *fmt, ...)
 {                               // Plot 7 segment digits
    if (!gfx)
@@ -1135,17 +1160,12 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       return sevenseg[size - 1][s];
    }
 
-   int w = 0;
-   for (char *p = temp; *p; p++)
-      if (strchr (sevensegchar, *p))
-      {
-         w += 6 * size;
-         if (p[1] == ':' || p[1] == '.')
-            w += size;
-      }
    gfx_pos_t x,
-     y;
-   gfx_draw (w, 9 * size, size, size, &x, &y);  // starting point
+     y,
+     w,
+     h;
+   gfx_7seg_size (size, temp, &w, &h);
+   gfx_draw (w, h, size, size, &x, &y); // starting point
    x += size / 2;               // Better alignment in box
    for (char *p = temp; *p; p++)
    {
@@ -1169,35 +1189,30 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    }
 }
 
-void
-gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
-{                               // Size negative for descenders
-   if (!gfx || !fonts[size])
-      return;
-
-   int fontw = (size ? 6 * size : 4);   // pixel width of characters in font file
-   int fonth = (z + 1) * (size ? : 1);
-   int w = 0;                   // width of overall text
-   int h = 0;
-   int cwidth (char c)
-   {                            // character width as printed - some characters are done narrow, and <' ' is fixed size move
-      if (c & 0x80)
-         return 0;
-      if (size)
-      {
-         if (c <= 8)
-            return c * size;    // Chars 1-8 are spacers
-         if (c < ' ')
-            return 0;
-         if (c == ':' || c == '.')
-            return size * 2;
-      }
-      return fontw;
-   }
-   const uint8_t *fontdata (char c)
+static int
+cwidth (int8_t size, char c)
+{                               // character width as printed - some characters are done narrow, and <' ' is fixed size move
+   if (c & 0x80)
+      return 0;
+   if (size)
    {
-      return fonts[size][c - ' '];
+      if (c <= 8)
+         return c * size;       // Chars 1-8 are spacers
+      if (c < ' ')
+         return 0;
+      if (c == ':' || c == '.')
+         return size * 2;
    }
+   return (size ? 6 * size : 4);
+}
+
+static void
+gfx_text_draw_size (int8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gfx_pos_t * hp)
+{
+   if (wp)
+      *wp = 0;
+   if (hp)
+      *hp = 0;
    gfx_pos_t x = 0,
       y = 0;
    for (const char *p = text; *p; p++)
@@ -1211,7 +1226,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
             y++;
          continue;
       }
-      x += cwidth (*p);
+      x += cwidth (size, *p);
    }
    if (x > w)
       w = x;
@@ -1220,6 +1235,32 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    if (!w)
       return;                   // nothing to print
    h = (y + 1) * fonth - (size ? : 1);  // Margin bottom needs removing
+   if (wp)
+      *wp = w;
+   if (hp)
+      *hp = h;
+}
+
+void
+gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
+{                               // Size negative for descenders
+   if (!gfx || !fonts[size])
+      return;
+
+   int fontw = (size ? 6 * size : 4);   // pixel width of characters in font file
+   int fonth = (z + 1) * (size ? : 1);
+
+   gfx_post_t x,
+     y,
+     w,
+     h;
+   gfx_text_draw_size (size, x, text);
+
+   const uint8_t *fontdata (char c)
+   {
+      return fonts[size][c - ' '];
+   }
+
    gfx_pos_t ox = 0,
       oy = 0;
    gfx_draw (w, h, 1, 1, &ox, &oy);     // starting point
@@ -1241,12 +1282,12 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       if (!x && y + fonth > h)
          fonth = h - y;         // Last line
       int c = *p;
-      int charw = cwidth (c);
+      int charw = cwidth (size, c);
       if (charw)
       {
          if (c <= 8)
             c = ' ';
-         if (!cwidth (p[1]))
+         if (!cwidth (size, p[1]))
             charw -= (size ? : 1);      // Crop right edge border
          int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
          if (blocky)
@@ -1299,6 +1340,45 @@ gfx_text (int8_t size, const char *fmt, ...)
 }
 
 void
+gfx_text_size (int8_t size, const char *t, gfx_pos_t & w, gfx_pos_t & h)
+{
+   if (w)
+      *w = 0;
+   if (h)
+      *h = 0;
+   if (size < 1)
+      size = 1;
+   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
+      size = sizeof (sevenseg) / sizeof (*sevenseg);
+}
+
+
+void
+gfx_7seg (int8_t size, const char *fmt, ...)
+{                               // Plot 7 segment digits
+   if (!gfx)
+      return;
+   if (size < 1)
+      size = 1;
+   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
+      size = sizeof (sevenseg) / sizeof (*sevenseg);
+   if (!gfx || size < 1 || !sevenseg[size - 1])
+      return;
+   va_list ap;
+   char temp[gfx_width () / 4 + 2];
+   int z = 7;                   // effective height
+   if (size < 0)
+   {                            // indicates descenders allowed
+      size = -size;
+      z = 9;
+   } else if (!size)
+      z = 5;
+   if (size > sizeof (fonts) / sizeof (*fonts) - 1)
+      size = sizeof (fonts) / sizeof (*fonts) - 1;
+   gfx_texty_draw_size (size, z, t, w, h);
+}
+
+void
 gfx_blocky (int8_t size, const char *fmt, ...)
 {                               // Size negative for descenders, blocky text
    if (!gfx)
@@ -1316,6 +1396,43 @@ gfx_blocky (int8_t size, const char *fmt, ...)
    vsnprintf (temp, sizeof (temp), fmt, ap);
    va_end (ap);
    gfx_text_draw (size, z, 1, temp);
+}
+
+void
+gfx_blocky_size (int8_t size, const char *t, gfx_pos_t & w, gfx_pos_t & h)
+{
+   if (w)
+      *w = 0;
+   if (h)
+      *h = 0;
+   if (size < 1)
+      size = 1;
+   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
+      size = sizeof (sevenseg) / sizeof (*sevenseg);
+}
+
+
+void
+gfx_7seg (int8_t size, const char *fmt, ...)
+{                               // Plot 7 segment digits
+   if (!gfx)
+      return;
+   if (size < 1)
+      size = 1;
+   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
+      size = sizeof (sevenseg) / sizeof (*sevenseg);
+   if (!gfx || size < 1 || !sevenseg[size - 1])
+      return;
+   va_list ap;
+   char temp[gfx_width () / 4 + 2];
+   int z = 7;                   // effective height
+   if (size < 0)
+   {                            // indicates descenders allowed
+      size = -size;
+      z = 9;
+   } else if (!size)
+      z = 5;
+   gfx_texty_draw_size (size, z, t, w, h);
 }
 
 static void
