@@ -1124,7 +1124,7 @@ gfx_7seg_size (int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
    if (size > sizeof (sevenseg) / sizeof (*sevenseg))
       size = sizeof (sevenseg) / sizeof (*sevenseg);
    gfx_pos_t w = 0;
-   for (char *p = temp; *p; p++)
+   for (char *p = t; *p; p++)
       if (strchr (sevensegchar, *p))
       {
          w += 6 * size;
