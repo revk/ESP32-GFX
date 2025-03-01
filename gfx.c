@@ -1250,7 +1250,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    int fontw = (size ? 6 * size : 4);   // pixel width of characters in font file
    int fonth = (z + 1) * (size ? : 1);
 
-   gfx_post_t x,
+   gfx_pos_t x,
      y,
      w,
      h;
