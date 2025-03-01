@@ -1152,7 +1152,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    //char temp[gfx_width () / 4 + 2];
    char *temp;
    va_start (ap, fmt);
-   vasnprintf (&temp, sizeof (temp), fmt, ap);
+   vasprintf (&temp, fmt, ap);
    va_end (ap);
 
    int fontw = 7 * size;        // pixel width of characters in font file
@@ -1251,14 +1251,14 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    if (!gfx || !fonts[size])
       return;
 
-   int fontw = (size ? 6 * size : 4);   // pixel width of characters in font file
-   int fonth = (z + 1) * (size ? : 1);
 
    gfx_pos_t x,
      y,
      w,
      h;
    gfx_text_draw_size (size, x, text, &w, &h);
+
+   int fonth = (z + 1) * (size ? : 1);
 
    const uint8_t *fontdata (char c)
    {
