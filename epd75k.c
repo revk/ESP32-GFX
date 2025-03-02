@@ -95,7 +95,9 @@ gfx_driver_init (void)
       2, EPD75_VDCS, 0x26,      //
       2, EPD75_TSE, 0x80,       // Temp
       //3, EPD75_CDI, 0xBB, 0x08, //
-      //2, EPD75_PFS, 0x30,       // Power off sequence
+#ifdef	USE_AUTO
+      2, EPD75_PFS, 0x30,       // Power off sequence
+#endif
       //2, EPD75_TSE, 0x00,     //
       //2, EPD75_EVS, 0x02,     // 
 #ifdef	FAST
@@ -189,10 +191,6 @@ gfx_driver_send (void)
       gfx_driver_init ();
    }
 #endif
-#ifndef USE_AUTO
-   if (gfx_send_command (EPD75_PON))
-      return "PON failed";
-#endif
 #ifdef	FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
 #endif
@@ -201,10 +199,12 @@ gfx_driver_send (void)
                  8 |
 #endif
                  (gfx_settings.norefresh ? 0xB1 : (gfx_settings.border ^ gfx_settings.invert) ? 0x13 : 0x23), 0x07);
+
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
+
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POFF->DSLP
@@ -213,12 +213,17 @@ gfx_driver_send (void)
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POFF
       return "AUTO failed";
 #endif
-   gfx_busy_wait ();
-   usleep (500000);             // Wait after POF
-#else
+#else // Not auto
+   if (gfx_send_command (EPD75_PON))
+      return "PON failed";
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
+   if (gfx_command1 (EPD75_POF, 0x30))
+      return "POF failed";
 #endif
+   gfx_busy_wait ();
+   usleep (500000);             // Wait after POF
+
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
@@ -226,10 +231,6 @@ gfx_driver_send (void)
       return "Data send failed";
 #endif
 #ifndef USE_AUTO
-   if (gfx_command1 (EPD75_POF, 0x30))
-      return "POF failed";
-   gfx_busy_wait ();
-   usleep (500000);
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
    uint64_t b = esp_timer_get_time ();
