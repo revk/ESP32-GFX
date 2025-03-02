@@ -208,6 +208,7 @@ gfx_driver_send (void)
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POFF
       return "AUTO failed";
+   usleep(500000);
 #endif
 #else
    if (gfx_send_command (EPD75_DRF))
@@ -222,6 +223,7 @@ gfx_driver_send (void)
 #ifndef USE_AUTO
    if (gfx_command1 (EPD75_POF, 0x30))
       return "POF failed";
+   usleep(500000);
    gfx_driver_sleep ();
 #endif
    uint64_t b = esp_timer_get_time ();
