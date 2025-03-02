@@ -71,9 +71,9 @@
 #define	T2	1
 #define	T3	30
 #define	T4	1
-#define	T5	10
+#define	T5	20
 #define	T6	1
-#define	T7	10
+#define	T7	20
 #define	T8	1
 #define	REPEAT	3
 
