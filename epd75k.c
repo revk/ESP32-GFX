@@ -68,14 +68,14 @@
 #define       FAST              // LUT from register
 
 #define	T1	30
-#define	T2	1
+#define	T2	5
 #define	T3	30
-#define	T4	1
+#define	T4	5
 #define	T5	30
 #define	T6	1
 #define	T7	30
 #define	T8	1
-#define	REPEAT	1
+#define	REPEAT	3
 
 static const char *
 gfx_driver_init (void)
