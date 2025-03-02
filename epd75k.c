@@ -222,10 +222,7 @@ gfx_driver_send (void)
 #ifndef USE_AUTO
    if (gfx_command1 (EPD75_POF, 0x30))
       return "POF failed";
-   if (gfx_settings.caffeine)
-      gfx_settings.caffeine = 0;
-   else
-      gfx_driver_sleep ();
+   gfx_driver_sleep ();
 #endif
    uint64_t b = esp_timer_get_time ();
    ESP_LOGD (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");

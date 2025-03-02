@@ -40,7 +40,6 @@ typedef struct {
  uint8_t norefresh:1;	// Next update does not need full refresh, can be set in init to avoid normal startup process (e.g. from deep sleep)
  uint8_t update:1;	// Controls update, cleared when updated
  uint8_t asleep:1;	// Device is asleep
- uint8_t caffeine:1;	// Keep awake a bit longer
  uint8_t pause:1;	// Pause needed before next operation
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
@@ -55,7 +54,6 @@ void gfx_wait(void);	// Wait for updates to be done
 void gfx_load(const void *data); // Block load whole image (does not allow for logical invert)
 int gfx_ok(void);	// GFX is enabled
 void gfx_sleep(void);	// Put device to sleep
-void gfx_caffeine(void);	// Keep awake a bit longer
 void gfx_flip(uint8_t flip);	// Change flip
 void gfx_border(uint8_t border);	// Change border
 

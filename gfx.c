@@ -1689,12 +1689,6 @@ gfx_ok (void)
 }
 
 void
-gfx_caffeine (void)
-{
-   gfx_settings.caffeine = 1;
-}
-
-void
 gfx_sleep (void)
 {
    if (!gfx)
