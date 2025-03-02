@@ -64,6 +64,7 @@
 #include <driver/rtc_io.h>
 
 #define USE_AUTO                // Auto PON/POFF sequence
+#define	USE_N2OCP
 //#define USE_DSLP                // Deep sleep
 #define       FAST              // LUT from register
 
@@ -92,7 +93,8 @@ gfx_driver_init (void)
       2, EPD75_DSPI, 0x00,      //
       2, EPD75_TCON, 0x22,      //
       2, EPD75_VDCS, 0x26,      //
-      3, EPD75_CDI, 0xBB, 0x08, //
+      2,EPD75_TSE,0x80,	// Temp
+      //3, EPD75_CDI, 0xBB, 0x08, //
       //2, EPD75_PFS, 0x30,       // Power off sequence
       //2, EPD75_TSE, 0x00,     //
       //2, EPD75_EVS, 0x02,     // 
@@ -191,11 +193,14 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_PON))
       return "PON failed";
 #endif
-   gfx_send_command (EPD75_TSC);
 #ifdef	FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
 #endif
-   gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0xB1 : (gfx_settings.border ^ gfx_settings.invert) ? 0x13 : 0x23, 0x07);   // N2OCP seems not to work
+   gfx_command2 (EPD75_CDI,
+#ifdef	USE_N2OCP
+		   8|
+#endif
+		   (gfx_settings.norefresh ? 0xB1 : (gfx_settings.border ^ gfx_settings.invert) ? 0x13 : 0x23) , 0x07);
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx (0))
@@ -213,11 +218,12 @@ gfx_driver_send (void)
       return "DRF failed";
 #endif
    gfx_busy_wait ();
-   // Set OLD (N2OCP seems not to work)
+#ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
+#endif
 #ifndef USE_AUTO
    if (gfx_command1 (EPD75_POF, 0x30))
       return "POF failed";
