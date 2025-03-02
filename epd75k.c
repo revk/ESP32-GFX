@@ -213,12 +213,12 @@ gfx_driver_send (void)
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POFF
       return "AUTO failed";
 #endif
+   gfx_busy_wait ();
+   usleep (500000);             // Wait after POF
 #else
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
 #endif
-   gfx_busy_wait ();
-   usleep (500000);
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
