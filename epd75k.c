@@ -64,7 +64,7 @@
 #include <driver/rtc_io.h>
 
 #define USE_AUTO                // Auto PON/POFF sequence
-//#define       USE_N2OCP
+#define       USE_N2OCP
 //#define USE_DSLP                // Deep sleep
 #define       FAST              // LUT from register
 
@@ -228,8 +228,9 @@ gfx_driver_send (void)
 #ifndef USE_AUTO
    if (gfx_command1 (EPD75_POF, 0x30))
       return "POF failed";
+   gfx_busy_wait ();
    usleep (500000);
-   gfx_driver_sleep ();
+   gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
    uint64_t b = esp_timer_get_time ();
    ESP_LOGD (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");
