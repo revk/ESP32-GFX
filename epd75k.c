@@ -93,7 +93,7 @@ gfx_driver_init (void)
       2, EPD75_DSPI, 0x00,      //
       2, EPD75_TCON, 0x22,      //
       2, EPD75_VDCS, 0x26,      //
-      2,EPD75_TSE,0x80,	// Temp
+      2, EPD75_TSE, 0x80,       // Temp
       //3, EPD75_CDI, 0xBB, 0x08, //
       //2, EPD75_PFS, 0x30,       // Power off sequence
       //2, EPD75_TSE, 0x00,     //
@@ -198,9 +198,9 @@ gfx_driver_send (void)
 #endif
    gfx_command2 (EPD75_CDI,
 #ifdef	USE_N2OCP
-		   8|
+                 8 |
 #endif
-		   (gfx_settings.norefresh ? 0xB1 : (gfx_settings.border ^ gfx_settings.invert) ? 0x13 : 0x23) , 0x07);
+                 (gfx_settings.norefresh ? 0xB1 : (gfx_settings.border ^ gfx_settings.invert) ? 0x13 : 0x23), 0x07);
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx (0))
@@ -227,7 +227,7 @@ gfx_driver_send (void)
 #ifndef USE_AUTO
    if (gfx_command1 (EPD75_POF, 0x30))
       return "POF failed";
-   usleep(500000);
+   usleep (500000);
    gfx_driver_sleep ();
 #endif
    uint64_t b = esp_timer_get_time ();
