@@ -221,7 +221,6 @@ gfx_driver_send (void)
       return "POF failed";
 #endif
    gfx_busy_wait ();
-   //gfx_command1 (EPD75_PSR,0x3D); // Booster off explicity?
 
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
