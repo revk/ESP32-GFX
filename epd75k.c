@@ -205,8 +205,6 @@ gfx_driver_send (void)
    if (gfx_send_gfx (0))
       return "Data send failed";
 
-   if (gfx_send_command (EPD75_PMES))
-      return "PMES failed";
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
@@ -224,7 +222,6 @@ gfx_driver_send (void)
       return "POF failed";
 #endif
    gfx_busy_wait ();
-   usleep (500000);             // Wait after POF
 
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
