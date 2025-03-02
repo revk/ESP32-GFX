@@ -86,7 +86,8 @@ gfx_driver_init (void)
    int H = gfx_settings.height;
    const uint8_t init[] = {
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
-      5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
+      //5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
+      5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,     // 4 not 5 as no red (second byte slow slew)
       //2, EPD75_PSR, 0x3F,       //
       2, EPD75_PLL, 0x06,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
@@ -216,7 +217,7 @@ gfx_driver_send (void)
       return "PON failed";
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
-   if (gfx_command1 (EPD75_POF, 0x30))
+   if (gfx_command1 (EPD75_POF, 0x30))  // V2 has arg, V3 does not?
       return "POF failed";
 #endif
    gfx_busy_wait ();
