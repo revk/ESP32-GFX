@@ -218,6 +218,7 @@ gfx_driver_send (void)
       return "DRF failed";
 #endif
    gfx_busy_wait ();
+   usleep (500000);
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
