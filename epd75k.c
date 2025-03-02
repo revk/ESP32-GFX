@@ -153,7 +153,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #endif
       //2, EPD75_AMV, 0x11,       // VCOM
-      2, EPD75_AMV, 0x19,       // VCOM XON
+      //2, EPD75_AMV, 0x19,       // VCOM XON
       0
    };
    if (gfx_command_bulk (init))
@@ -221,7 +221,7 @@ gfx_driver_send (void)
       return "POF failed";
 #endif
    gfx_busy_wait ();
-   gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
+   //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
 
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
