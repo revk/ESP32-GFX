@@ -63,10 +63,10 @@
 
 #include <driver/rtc_io.h>
 
-#define USE_AUTO                // Auto PON/DRF/POF sequence
-//#define       USE_N2OCP
-//#define USE_DSLP                // Deep sleep
-#define       FAST              // LUT from register
+#define		USE_AUTO        // Auto PON/DRF/POF sequence
+//#define       USE_N2OCP       // Auto copy buffer (seems not to work)
+//#define       USE_DSLP        // Deep sleep (slow start to every display)
+#define		USE_FAST        // LUT from register
 
 #define	T1	30
 #define	T2	1
@@ -100,7 +100,7 @@ gfx_driver_init (void)
 #endif
       //2, EPD75_TSE, 0x00,     //
       //2, EPD75_EVS, 0x02,     // 
-#ifdef	FAST
+#ifdef	USE_FAST
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x00, T1, T2, T3, T4, 1,
       0x00, T5, T6, T7, T8, REPEAT,
@@ -191,7 +191,7 @@ gfx_driver_send (void)
       gfx_driver_init ();
    }
 #endif
-#ifdef	FAST
+#ifdef	USE_FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
 #endif
    gfx_command2 (EPD75_CDI,
