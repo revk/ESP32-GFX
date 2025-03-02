@@ -64,7 +64,7 @@
 #include <driver/rtc_io.h>
 
 #define USE_AUTO                // Auto PON/POFF sequence
-#define       USE_N2OCP
+//#define       USE_N2OCP
 //#define USE_DSLP                // Deep sleep
 #define       FAST              // LUT from register
 
