@@ -86,7 +86,6 @@ gfx_driver_init (void)
    const uint8_t init[] = {
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
       5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
-      1, EPD75_PON,		//
       2, EPD75_PSR, 0x3F,       //
       2, EPD75_PLL, 0x06,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
