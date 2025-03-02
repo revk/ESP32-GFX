@@ -96,7 +96,7 @@ gfx_driver_init (void)
       2, EPD75_TSE, 0x80,       // Temp
       //3, EPD75_CDI, 0xBB, 0x08, //
 #ifdef	USE_AUTO
-      2, EPD75_PFS, 0x00,       // Power off sequence
+      2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
       //2, EPD75_TSE, 0x00,     //
       //2, EPD75_EVS, 0x02,     // 
@@ -205,6 +205,8 @@ gfx_driver_send (void)
    if (gfx_send_gfx (0))
       return "Data send failed";
 
+   if (gfx_send_command (EPD75_PMES))
+      return "PMES failed";
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
