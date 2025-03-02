@@ -72,11 +72,11 @@
 #define	T2	1
 #define	T3	30
 #define	T4	1
-#define	T5	20
+#define	T5	10
 #define	T6	1
-#define	T7	20
+#define	T7	10
 #define	T8	1
-#define	REPEAT	3
+#define	REPEAT	5
 
 static const char *
 gfx_driver_init (void)
