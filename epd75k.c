@@ -85,7 +85,7 @@ gfx_driver_init (void)
    int H = gfx_settings.height;
    const uint8_t init[] = {
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
-      5, EPD75_PWR, 0x07, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
+      5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
       1, EPD75_PON,		//
       2, EPD75_PSR, 0x3F,       //
       2, EPD75_PLL, 0x06,       //
