@@ -89,7 +89,8 @@ gfx_driver_init (void)
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
       //5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
       5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,     // 4 not 5 as no red (second byte slow slew)
-      2, EPD75_PLL, 0x06,       //
+      //2, EPD75_PLL, 0x06,       //
+      2, EPD75_PLL, 0x0F,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
       2, EPD75_TCON, 0x22,      //
