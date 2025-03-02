@@ -1548,9 +1548,9 @@ gfx_init_opts (gfx_init_t o)
       gpio_set_direction (gfx_settings.rst, GPIO_MODE_OUTPUT);
       if (!gfx_settings.sleep)
       {
-         usleep (10000);
+         usleep (100000);
          gpio_set_level (gfx_settings.rst, 0);
-         usleep (10000);
+         usleep (100000);
          gpio_set_level (gfx_settings.rst, 1);
          usleep (100000);
       }
