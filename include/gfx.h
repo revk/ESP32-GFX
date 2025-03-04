@@ -85,7 +85,7 @@ char gfx_b(void);	// Current background colour
 // Raw
 uint16_t gfx_raw_w(void);	// Raw frame buffer width
 uint16_t gfx_raw_h(void);	// Raw frame buffer height
-uint8_t gfx_raw_b(void);	// Raw frame buffer
+uint8_t *gfx_raw_b(void);	// Raw frame buffer
 
 // Drawing
 void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp); // Work out drawing position for object
