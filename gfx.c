@@ -568,7 +568,8 @@ gfx_send_command (uint8_t cmd)
       .tx_data = {cmd},
       .flags = SPI_TRANS_USE_TXDATA,
    };
-   esp_err_t e = spi_device_polling_transmit (gfx_spi, &t);
+   //esp_err_t e = spi_device_polling_transmit (gfx_spi, &t);
+   esp_err_t e = spi_device_transmit (gfx_spi, &t);
    return e;
 }
 
