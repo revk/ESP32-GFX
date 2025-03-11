@@ -143,7 +143,6 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-#if 0
       43, EPD75_LUT_VCOM2,
       0x00, T1, T2, T3, T4, 1,
       0x00, T5, T6, T7, T8, REPEAT,
@@ -152,7 +151,6 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-#endif
 #endif
       2, EPD75_AMV, 0x11,       // VCOM
       //2, EPD75_AMV, 0x19,       // VCOM XON
@@ -224,7 +222,10 @@ gfx_driver_send (void)
 #endif
    gfx_busy_wait ();
    //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
-
+#ifndef	USE_DSLP
+   // Extras POF?
+   if (gfx_command1 (EPD75_POF, 0x30))  // V2 has arg, V3 does not?
+      return "POF failed";
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
@@ -233,6 +234,7 @@ gfx_driver_send (void)
 #endif
 #ifndef USE_AUTO
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
+#endif
 #endif
    uint64_t b = esp_timer_get_time ();
    ESP_LOGD (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");
