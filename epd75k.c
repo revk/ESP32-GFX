@@ -98,7 +98,7 @@ gfx_driver_init (void)
 #ifdef	USE_AUTO
       2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
-      //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
+      2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
 #ifdef	USE_FAST
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x00, T1, T2, T3, T4, 1,
