@@ -65,7 +65,7 @@
 
 #define		USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define       USE_DSLP        // Deep sleep (slow start to every display)
+//#define       USE_DSLP        // Deep sleep (slow start to every display)
 #define		USE_FAST        // LUT from register
 
 #define	T1	30
@@ -197,10 +197,10 @@ gfx_driver_send (void)
 #ifdef	USE_N2OCP
                  8 |
 #endif
-		 (gfx_settings.norefresh?0x80:0x00)| // Border if refresh
-		  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20)|	// border colour
-		  0x01, // new+old logic refresh
-		 0x07);
+                 (gfx_settings.norefresh ? 0x80 : 0x00) |       // Border if refresh
+                 ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20) |  // border colour
+                 0x01,          // new+old logic refresh
+                 0x07);
 
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
@@ -211,6 +211,7 @@ gfx_driver_send (void)
 #ifdef	USE_DSLP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
       return "AUTO+DSLP failed";
+   gfx_settings.asleep = 1;
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POF
       return "AUTO failed";
@@ -226,7 +227,7 @@ gfx_driver_send (void)
    gfx_busy_wait ();
 #ifndef	USE_DSLP
    //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
-   //gfx_command1(EPD75_POF,0x30);		// Extra POF?
+   //gfx_command1(EPD75_POF,0x30);              // Extra POF?
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
