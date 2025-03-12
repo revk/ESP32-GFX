@@ -203,7 +203,7 @@ gfx_driver_send (void)
                  (gfx_settings.norefresh ? 0x80 : 0x00) |       // Border if refresh
                  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20) |  // border colour
 #ifdef	USE_DSLP
-		 0x03,		// Not new/old
+                 0x03,          // Not new/old
 #else
                  0x01,          // new+old logic refresh
 #endif
@@ -230,8 +230,10 @@ gfx_driver_send (void)
       return "DRF failed";
    if (gfx_command1 (EPD75_POF, 0x30))  // V2 has arg, V3 does not?
       return "POF failed";
+   gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
    gfx_busy_wait ();
+   usleep (100000);             // Testing a sleep here... TODO
 #ifndef	USE_DSLP
    //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
    //gfx_command1(EPD75_POF,0x30);              // Extra POF?
@@ -240,9 +242,6 @@ gfx_driver_send (void)
       return "DTM1 failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
-#endif
-#ifndef USE_AUTO
-   gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
 #endif
    uint64_t b = esp_timer_get_time ();
