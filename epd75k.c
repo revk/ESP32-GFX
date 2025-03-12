@@ -88,7 +88,7 @@ gfx_driver_init (void)
       2, EPD75_PSR, 0x00,       // Reset
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
       //5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
-      5, EPD75_PWR, 0x07, 0x17, 0x3A, 0x3A,     // 4 not 5 as no red (second byte slow slew)
+      5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,     // 4 not 5 as no red (second byte slow slew)
       2, EPD75_PLL, 0x06,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
@@ -198,7 +198,7 @@ gfx_driver_send (void)
                  8 |
 #endif
 		 (gfx_settings.norefresh?0x80:0x00)| // Border if refresh
-		  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x00)|	// border colour
+		  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20)|	// border colour
 		  0x01, // new+old logic refresh
 		 0x07);
 
@@ -226,6 +226,7 @@ gfx_driver_send (void)
    gfx_busy_wait ();
 #ifndef	USE_DSLP
    //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
+   //gfx_command1(EPD75_POF,0x30);		// Extra POF?
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
