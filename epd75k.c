@@ -197,7 +197,9 @@ gfx_driver_send (void)
 #ifdef	USE_N2OCP
                  8 |
 #endif
-                 (gfx_settings.norefresh ? 0xB3 : (gfx_settings.border ^ gfx_settings.invert) ? 0x13 : 0x03), 0x07);
+		  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x00)|	//
+		  0x03, //
+		 0x07);
 
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
