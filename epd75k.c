@@ -88,7 +88,7 @@ gfx_driver_init (void)
       2, EPD75_PSR, 0x00,       // Reset
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
       //5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
-      5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,     // 4 not 5 as no red (second byte slow slew)
+      5, EPD75_PWR, 0x07, 0x17, 0x3A, 0x3A,     // 4 not 5 as no red (second byte slow slew)
       2, EPD75_PLL, 0x06,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
@@ -191,14 +191,15 @@ gfx_driver_send (void)
    }
 #endif
 #ifdef	USE_FAST
-   gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
+   gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
 #endif
    gfx_command2 (EPD75_CDI,
 #ifdef	USE_N2OCP
                  8 |
 #endif
-		  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x00)|	//
-		  0x01, //
+		 (gfx_settings.norefresh?0x80:0x00)| // Border if refresh
+		  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x00)|	// border colour
+		  0x01, // new+old logic refresh
 		 0x07);
 
    if (gfx_send_command (EPD75_DTM2))
