@@ -221,11 +221,8 @@ gfx_driver_send (void)
       return "POF failed";
 #endif
    gfx_busy_wait ();
-   //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
 #ifndef	USE_DSLP
-   // Extras POF?
-   if (gfx_command1 (EPD75_POF, 0x30))  // V2 has arg, V3 does not?
-      return "POF failed";
+   //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
