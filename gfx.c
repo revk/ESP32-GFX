@@ -534,7 +534,7 @@ gfx_busy_wait (void)
       sleep (5);
    else
    {
-      uint16_t try = 30000;
+      uint16_t try = 3000;
 #ifdef	GFX_BUSY_LOW
       while (--try && !gpio_get_level (gfx_settings.busy))
 #else
