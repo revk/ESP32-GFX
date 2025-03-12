@@ -199,7 +199,11 @@ gfx_driver_send (void)
 #endif
                  (gfx_settings.norefresh ? 0x80 : 0x00) |       // Border if refresh
                  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20) |  // border colour
+#ifdef	USE_DSLP
+		 0x03,		// Not new/old
+#else
                  0x01,          // new+old logic refresh
+#endif
                  0x07);
 
    if (gfx_send_command (EPD75_DTM2))
