@@ -226,7 +226,7 @@ gfx_driver_send (void)
    gfx_busy_wait ();
 #ifndef	USE_DSLP
    //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
-   //gfx_command1(EPD75_POF,0x30);		// Extra POF?
+   gfx_command1(EPD75_POF,0x30);		// Extra POF?
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
