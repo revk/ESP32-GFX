@@ -469,20 +469,19 @@ static uint8_t const *const *fonts[] = {
 #define	black	0
 #define WHITE   (RED+GREEN+BLUE)
 
+#define	BLACK	0
+
 #elif GFX_BPP == 1              // Mono
 
-#define	BLACK	0
 #define WHITE   1
 
 #elif GFX_BPP == 2              // Black/red/white
 
-#define	BLACK	0
 #define WHITE   1
 #define	RED	2
 
 #elif GFX_BPP <= 8              // Greyscale or mono
 
-#define	BLACK	0
 #define WHITE   255
 #define GFX_INTENSITY_BPP  GFX_BPP
 
