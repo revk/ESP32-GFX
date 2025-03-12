@@ -198,7 +198,7 @@ gfx_driver_send (void)
                  8 |
 #endif
 		  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x00)|	//
-		  0x03, //
+		  0x01, //
 		 0x07);
 
    if (gfx_send_command (EPD75_DTM2))
