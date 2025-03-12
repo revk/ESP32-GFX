@@ -1809,7 +1809,7 @@ gfx_raw_h (void)
    return gfx_settings.height;
 }
 
-uint8_t *
+gfx_cell_t *
 gfx_raw_b (void)
 {                               // Raw frame buffer
    return gfx;

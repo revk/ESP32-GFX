@@ -75,7 +75,7 @@ void gfx_background(char);	// Set background - colour is a character
 // State get
 uint16_t	gfx_width(void);	// Display width
 uint16_t	gfx_height(void);	// Display height
-uint8_t	gfx_bpp(void);	// Display bpp
+uint8_t	gfx_bpp(void);	// Display app
 gfx_pos_t gfx_x(void);	// Current x
 gfx_pos_t gfx_y(void); // Current y
 gfx_align_t gfx_a(void); // Current alignment
@@ -85,7 +85,7 @@ char gfx_b(void);	// Current background colour
 // Raw
 uint16_t gfx_raw_w(void);	// Raw frame buffer width
 uint16_t gfx_raw_h(void);	// Raw frame buffer height
-uint8_t *gfx_raw_b(void);	// Raw frame buffer
+gfx_cell_t *gfx_raw_b(void);	// Raw frame buffer
 
 // Drawing
 void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp); // Work out drawing position for object
