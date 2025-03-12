@@ -65,7 +65,7 @@
 
 #define		USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-//#define       USE_DSLP        // Deep sleep (slow start to every display)
+#define       USE_DSLP        // Deep sleep (slow start to every display)
 #define		USE_FAST        // LUT from register
 
 #define	T1	30
@@ -101,7 +101,8 @@ gfx_driver_init (void)
 #ifdef	USE_AUTO
       2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
-      2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
+      //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
+      2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
 #ifdef	USE_FAST
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x00, T1, T2, T3, T4, 1,
@@ -222,6 +223,7 @@ gfx_driver_send (void)
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POF
       return "AUTO failed";
+   gfx_busy_wait ();
 #endif
 #else // Not auto
    if (gfx_send_command (EPD75_PON))
@@ -230,10 +232,9 @@ gfx_driver_send (void)
       return "DRF failed";
    if (gfx_command1 (EPD75_POF, 0x30))  // V2 has arg, V3 does not?
       return "POF failed";
+   gfx_busy_wait ();
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
-   gfx_busy_wait ();
-   usleep (100000);             // Testing a sleep here... TODO
 #ifndef	USE_DSLP
    //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
    //gfx_command1(EPD75_POF,0x30);              // Extra POF?
