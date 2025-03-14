@@ -86,7 +86,7 @@ gfx_driver_init (void)
    int H = gfx_settings.height;
    const uint8_t init[] = {
       2, EPD75_PSR, 0x00,       // Reset
-#if 0	// My attempt
+#if 0                           // My attempt
 #ifndef	USE_FAST
       2, EPD75_PSR, 0x1F,       // Normal LUT
 #endif
@@ -105,12 +105,14 @@ gfx_driver_init (void)
       2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
 #else // Based on esphome
       5, EPD75_PWR, 0x07, 0x07, 0x3F, 0x3F,     //
-      //1, EPD75_PON,             //
-      //2, EPD75_PSR, 0x0F,       //
+      1, EPD75_PON,             //
+      2, EPD75_PSR, 0x0F,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
       3, EPD75_CDI, 0x11, 0x07, //
       2, EPD75_TCON, 0x22,      //
+      2, EPD75_VDCS, 0x08,      //
+      2, EPD75_PLL, 0x06,       //
       5, EPD75_GSST, 0x00, 0x00, 0x00, 0x00,    // ???
 #endif
 
