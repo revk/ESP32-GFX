@@ -105,7 +105,7 @@ gfx_driver_init (void)
       2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
 #else // Based on esphome
       5, EPD75_PWR, 0x07, 0x07, 0x3F, 0x3F,     //
-      1, EPD75_PON,             //
+      //1, EPD75_PON,             //
       2, EPD75_PSR, 0x0F,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
@@ -169,7 +169,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #endif
-      2, EPD75_AMV, 0x11,       // VCOM
+      //2, EPD75_AMV, 0x11,       // VCOM
       //2, EPD75_AMV, 0x19,       // VCOM XON
       0
    };
