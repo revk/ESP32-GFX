@@ -105,15 +105,15 @@ gfx_driver_init (void)
 #endif
       //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
       2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
-#else	// Based on esphome
-      5,EPD75_PWR,0x07,0x07,0x3F,0x3F, //
-      1,EPD75_PON, //
-      2,EPD75_PSR,0x0F, //
+#else // Based on esphome
+      5, EPD75_PWR, 0x07, 0x07, 0x3F, 0x3F,     //
+      1, EPD75_PON,             //
+      2, EPD75_PSR, 0x0F,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
-      2,EPD75_DSPI,0x00, //
-      2,EPD75_CDI,0x11,0x07, //
-      1,EPD75_TCON,0x22, //
-      5,EPD75_GSST,0x00,0x00,0x00,0x00, // ???
+      2, EPD75_DSPI, 0x00,      //
+      3, EPD75_CDI, 0x11, 0x07, //
+      1, EPD75_TCON, 0x22,      //
+      5, EPD75_GSST, 0x00, 0x00, 0x00, 0x00,    // ???
 #endif
 
 #ifdef	USE_FAST
