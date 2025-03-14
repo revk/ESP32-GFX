@@ -452,6 +452,8 @@ static uint8_t const *const *fonts[] = {
 #endif
 };
 
+#define	BLACK	0
+
 #if GFX_BPP == 16               // 16 bit RGB
 #define GFX_INTENSITY_BPP  4    // We work on each colour being 4 bits intensity based on one of a set of colours
 #define R       (1<<11)
@@ -468,8 +470,6 @@ static uint8_t const *const *fonts[] = {
 
 #define	black	0
 #define WHITE   (RED+GREEN+BLUE)
-
-#define	BLACK	0
 
 #elif GFX_BPP == 1              // Mono
 
