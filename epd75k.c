@@ -78,7 +78,7 @@
 #define	T8	1
 #define	REPEAT	5
 
-//#define	AJK
+#define	AJKINIT
 
 static const char *
 gfx_driver_init (void)
@@ -88,7 +88,7 @@ gfx_driver_init (void)
    int H = gfx_settings.height;
    const uint8_t init[] = {
       2, EPD75_PSR, 0x00,       // Reset
-#ifdef	AJK	// My attempt
+#ifdef	AJKINIT	// My attempt
 #ifndef	USE_FAST
       2, EPD75_PSR, 0x1F,       // Normal LUT
 #endif
