@@ -1413,6 +1413,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                   end = font_vector_offset[u + 95];
                   break;
                }
+		 ESP_LOGE(TAG,"Unicode %u %u %u",c,start,end);
          }
 #endif
          uint8_t half = 0;
