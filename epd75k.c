@@ -80,7 +80,7 @@
 #define	REPEAT	5
 
 #define	AJKINIT
-//#define       AJKLUT
+#define       AJKLUT
 
 static const char *
 gfx_driver_init (void)
