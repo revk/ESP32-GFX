@@ -58,7 +58,7 @@ menu "GFX"
 
 	config GFX_UNICODE
 	bool "Include additional unicode characters"
-	depends on GFX_UNICODE
+	depends on GFX_VECTOT
 	default y 
 	help
 		Additional unicode characters (experimental)
