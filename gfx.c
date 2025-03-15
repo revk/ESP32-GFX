@@ -1368,7 +1368,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    x = y = 0;
    int s0 = size / 2,
       s1 = (size + 1) / 2,
-      s2 = s0 * s0 ? : 1;
+      s2 = s0 * s1 ? : 1;
    ox += s0;
    oy += s0;
    const char *p = text;
