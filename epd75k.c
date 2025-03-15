@@ -66,7 +66,7 @@
 
 #define		USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define       USE_DSLP        // Deep sleep (slow start to every display)
+#define       USE_DSLP          // Deep sleep (slow start to every display)
 #define		USE_FAST        // LUT from register
 
 #define	T1	30
@@ -241,7 +241,7 @@ gfx_driver_send (void)
    static uint8_t *old = NULL;
    if (!old)
    {
-      old = malloc(SIZE);
+      old = malloc (SIZE);
       if (old)
          memset (old, 0, SIZE);
    }
@@ -270,7 +270,7 @@ gfx_driver_send (void)
 #ifdef	USE_DSLP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
       return "AUTO+DSLP failed";
-   gfx_busy_wait ();
+   sleep (gfx_settings.norefresh ? 5 : 2);
    gfx_settings.asleep = 1;
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POF
