@@ -1400,9 +1400,9 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                }
          }
 #endif
+         uint8_t half = 0;
          while (start < end)
          {
-            uint8_t half = 0;
             inline uint8_t nibble (void)
             {
                if (!half)
