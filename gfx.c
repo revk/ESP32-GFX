@@ -1354,7 +1354,6 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 {
    if (!gfx)
       return;
-   ESP_LOGE(TAG,"Vector");
 
    gfx_pos_t x,
      y,
@@ -1566,6 +1565,7 @@ gfx_text_desc (const char *c)
 void
 gfx_vector (int8_t size, const char *fmt, ...)
 {                               // Vector draw
+	ESP_LOG(TAG,"Vector text %s",fmt);
    if (!gfx)
       return;
    int z = 7;                   // effective height
