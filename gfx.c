@@ -1396,15 +1396,13 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 #ifdef	CONFIG_GFX_UNICODE
          else if (c >= 128)
          {
-            for (int u = 0; u < sizeof (font_vector_unicode) / sizeof (font_vector_unicode); u++)
+            for (int u = 0; u < sizeof (font_vector_unicode) / sizeof (*font_vector_unicode); u++)
                if (font_vector_unicode[u] == c)
                {
-                  ESP_LOGE (TAG, "Found %u", c);
                   start = font_vector_offset[u + 96];
                   end = font_vector_offset[u + 97];
                   break;
                }
-            ESP_LOGE (TAG, "Unicode %u %u %u", c, start, end);
          }
 #endif
          uint8_t half = 0;
