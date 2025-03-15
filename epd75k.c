@@ -65,7 +65,6 @@
 
 #define		USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define       CONFIG_GFX_USE_DEEP_SLEEP          // Deep sleep (slow start to every display)
 #define		USE_FAST        // LUT from register
 
 #define	T1	30
