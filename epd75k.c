@@ -65,7 +65,7 @@
 
 #define		USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define       USE_DSLP          // Deep sleep (slow start to every display)
+#define       CONFIG_GFX_USE_DEEP_SLEEP          // Deep sleep (slow start to every display)
 #define		USE_FAST        // LUT from register
 
 #define	T1	30
@@ -217,7 +217,7 @@ gfx_driver_init (void)
 #endif
 #ifdef	AJKINIT
       //2, EPD75_AMV, 0x11,       // VCOM
-#ifndef	USE_DSLP
+#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
       2, EPD75_AMV, 0x19,       // VCOM XON
 #endif
 #endif
@@ -234,7 +234,7 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_sleep (void)
 {
-#ifdef	USE_DSLP
+#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
    if (gfx_send_command (EPD75_DSLP))
       return "DSLP failed";
    gfx_settings.asleep = 1;
@@ -246,7 +246,7 @@ static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
    uint64_t a = esp_timer_get_time ();
-#ifdef	USE_DSLP
+#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
    if (gfx_settings.asleep)
    {
       gfx_settings.asleep = 0;
@@ -269,7 +269,7 @@ gfx_driver_send (void)
                  0x01,          // new+old logic refresh
                  0x07);
 
-#ifdef	USE_DSLP
+#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
 #define SIZE (GFX_DEFAULT_WIDTH/8*GFX_DEFAULT_HEIGHT)
    static uint8_t *old = NULL;
    if (!old)
@@ -301,7 +301,7 @@ gfx_driver_send (void)
 #endif
 
 #ifdef	USE_AUTO
-#ifdef	USE_DSLP
+#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
       return "AUTO+DSLP failed";
    sleep (gfx_settings.norefresh ? 1 : 10);
@@ -321,7 +321,7 @@ gfx_driver_send (void)
    gfx_busy_wait ();
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
-#ifndef	USE_DSLP
+#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
    //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
    //gfx_command1(EPD75_POF,0x30);              // Extra POF?
 #ifndef	USE_N2OCP
