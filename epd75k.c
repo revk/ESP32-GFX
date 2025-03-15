@@ -90,7 +90,7 @@ gfx_driver_init (void)
    int H = gfx_settings.height;
    const uint8_t init[] = {
       2, EPD75_PSR, 0x00,       // Reset
-#ifdef	AJKINIT	// My attempt
+#ifdef	AJKINIT                 // My attempt
 #ifndef	USE_FAST
       2, EPD75_PSR, 0x1F,       // Normal LUT
 #endif
@@ -173,7 +173,7 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-#else	// esphome LUT
+#else // esphome LUT
       31, EPD75_LUT_PART,
       0x10, 0x18, 0x18, 0x08, 0x18, 0x18,
       0x08, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -242,6 +242,9 @@ gfx_driver_send (void)
       return "DTM2 failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
+
+   if (gfx_settings.norefresh)
+      gfx_command1 (EPD75_TSSET, 0x5A); // Seems odd, but esphome does this
 
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
