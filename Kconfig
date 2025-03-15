@@ -58,14 +58,14 @@ menu "GFX"
 
 	config GFX_UNICODE
 	bool "Include additional unicode characters"
-	depends on GFX_VECTOT
+	depends on GFX_VECTOR
 	default y 
 	help
 		Additional Unicode characters (experimental)
 
 	config GFX_VECTOR_ONLY
 	bool "Vector not pre-made fonts"
-	depends on GFX_VECTOT
+	depends on GFX_VECTOR
 	default n 
 	help
 		Use vector fonts only
