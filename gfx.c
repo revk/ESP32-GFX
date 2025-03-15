@@ -1472,7 +1472,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 }
 #endif
 
-#ifndef	GFX_VECTOR_ONLY
+#ifndef	CONFIG_GFX_VECTOR_ONLY
 void
 gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 {                               // Size negative for descenders
@@ -1565,7 +1565,7 @@ gfx_text_desc (const char *c)
 void
 gfx_vector (int8_t size, const char *fmt, ...)
 {                               // Vector draw
-   if (!gfx)
+   f (!gfx)
       return;
    int z = 7;                   // effective height
    if (size < 0)
@@ -1600,7 +1600,7 @@ gfx_vector_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 }
 #endif
 
-#ifndef	GFX_VECTOR_ONLY
+#ifndef	CONFIG_GFX_VECTOR_ONLY
 void
 gfx_text (int8_t size, const char *fmt, ...)
 {                               // Size negative for descenders
@@ -1626,7 +1626,7 @@ gfx_text (int8_t size, const char *fmt, ...)
 }
 #endif
 
-#ifndef	GFX_VECTOR_ONLY
+#ifndef	CONFIG_GFX_VECTOR_ONLY
 void
 gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
@@ -1919,7 +1919,7 @@ gfx_message (const char *m)
    if (!gfx)
       return;
    gfx_lock ();
-   gfx_pos (gfx_width () / 2, 0, GFX_T | GFX_C | GFX_V);
+   gfx_pos (gfx_width () / 2, 0, GFX_T | GFX_C |GFX_V);
    int8_t size = (gfx_width () > 256 ? 6 : 2);
    while (*m)
    {
