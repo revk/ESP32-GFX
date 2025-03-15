@@ -1384,7 +1384,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
             c = ' ';
          if (!cwidth (size, *p))
             charw -= (size ? : 1);      // Crop right edge border - messy for UTF8 but should be OK
-         int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
+         int dx = ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
          // Find character
          uint16_t start = 0,
             end = 0;
@@ -1431,7 +1431,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                         return 0;
                      }
                      if (check (DX, DY))
-                        gfx_line (DX + ox + x + size * (x1 + dx), DY + oy + y + size * y1, DX + ox + x + size * (x2 + dx),
+                        gfx_line (DX + ox + x + size * (x1 - dx), DY + oy + y + size * y1, DX + ox + x + size * (x2 - dx),
                                   DY + oy + y + size * y2, 255);
                   }
             }
