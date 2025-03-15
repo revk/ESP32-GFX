@@ -87,7 +87,7 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t init[] = {
-      2, EPD75_PSR, 0x00,       // Reset
+      //2, EPD75_PSR, 0x00,       // Reset
 #ifdef	AJKINIT                 // My attempt
 #ifndef	USE_FAST
       2, EPD75_PSR, 0x1F,       // Normal LUT
@@ -250,9 +250,9 @@ gfx_driver_send (void)
    {
       gfx_settings.asleep = 0;
       gpio_set_level (gfx_settings.rst, 0);
-      usleep (100000);
+      usleep (10000);
       gpio_set_level (gfx_settings.rst, 1);
-      usleep (100000);
+      usleep (10000);
       gfx_driver_init ();
    }
 #endif
@@ -293,7 +293,7 @@ gfx_driver_send (void)
    if (gfx_send_gfx (0))
       return "Data send failed";
 
-#if 1                           // esphome stuff
+#if 0                           // esphome stuff
    gfx_send_command (EPD75_PTOUT);      // Should not be needed unless we do partial updates
    if (gfx_settings.norefresh)
       gfx_command1 (EPD75_TSSET, 0x5A); // Seems odd, but esphome does this
