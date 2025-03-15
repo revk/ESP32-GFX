@@ -240,8 +240,7 @@ gfx_driver_send (void)
 
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
-        if(gfx_send_data (gfx_raw_b(), GFX_PAGE))
-   //if (gfx_send_gfx (0))
+   if (gfx_send_gfx (0))
       return "Data send failed";
 
    gfx_command(EPD75_PTOUT);	// Should not be needed unless we do partial updates
