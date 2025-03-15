@@ -1453,6 +1453,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 }
 #endif
 
+#ifndef	GFX_VECTOR_ONLY
 void
 gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 {                               // Size negative for descenders
@@ -1528,6 +1529,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       }
    }
 }
+#endif
 
 uint8_t
 gfx_text_desc (const char *c)
@@ -1579,6 +1581,7 @@ gfx_vector_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 }
 #endif
 
+#ifndef	GFX_VECTOR_ONLY
 void
 gfx_text (int8_t size, const char *fmt, ...)
 {                               // Size negative for descenders
@@ -1602,7 +1605,9 @@ gfx_text (int8_t size, const char *fmt, ...)
       gfx_text_draw (size, z, 0, temp);
    free (temp);
 }
+#endif
 
+#ifndef	GFX_VECTOR_ONLY
 void
 gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
@@ -1617,6 +1622,7 @@ gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
       size = sizeof (fonts) / sizeof (*fonts) - 1;
    gfx_text_draw_size (size, z, t, w, h);
 }
+#endif
 
 void
 gfx_blocky (int8_t size, const char *fmt, ...)
