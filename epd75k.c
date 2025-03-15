@@ -33,7 +33,6 @@
 #define	EPD75_LUT_VCOM2	0x25
 #define	EPD75_KWOPT	0x2B
 #define	EPD75_PLL	0x30
-#define	EPD75_LUT_PART	0x32
 #define	EPD75_TSC	0x40
 #define	EPD75_TSE	0x41
 #define	EPD75_TSW	0x42
