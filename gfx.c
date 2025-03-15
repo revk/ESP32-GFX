@@ -1427,7 +1427,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                      inline int check (int x, int y)
                      {
                         int d = x * x + y * y;
-                        if (d < s2 && (size < 3 || d > s3))
+                        if (d < s2)//&& (size < 3 || d > s3))
                            return 1;
                         return 0;
                      }
