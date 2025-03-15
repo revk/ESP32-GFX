@@ -140,7 +140,42 @@ gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 }
 
 void
+gfx_vector (int8_t size, const char *fmt, ...)
+{                               // Dummy - no driver
+}
+
+void
+gfx_vector_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
+{                               // Dummy - no driver
+}
+
+void
 gfx_text (int8_t size, const char *fmt, ...)
+{                               // Dummy - no driver
+}
+
+void
+gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
+{                               // Dummy - no driver
+}
+
+void
+gfx_blocky (int8_t size, const char *fmt, ...)
+{                               // Dummy - no driver
+}
+
+void
+gfx_blocky_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
+{                               // Dummy - no driver
+}
+
+void
+gfx_7seg (int8_t size, const char *fmt, ...)
+{                               // Dummy - no driver
+}
+
+void
+gfx_7seg_size (int8_t size, const char *, gfx_pos_t * w, gfx_pos_t * h)
 {                               // Dummy - no driver
 }
 
@@ -265,6 +300,14 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #include "pack7seg18.h"
 #include "pack7seg19.h"
 #include "pack7seg20.h"
+#endif
+#endif
+
+#ifdef	CONFIG_GFX_VECTOR
+#ifdef	CONFIG_GFX_UNICODE
+#include "vector.h"
+#else
+#include "vector96.h"
 #endif
 #endif
 
@@ -1360,6 +1403,20 @@ gfx_text_desc (const char *c)
          if (strchr ("gijqpy_", *c++))
             n++;
    return n;
+}
+
+void
+gfx_vector (int8_t size, const char *fmt, ...)
+{                               // Vector draw
+#ifdef	CONFIG_GFX_VECTOR
+#endif
+}
+
+void
+gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
+{
+#ifdef	CONFIG_GFX_VECTOR
+#endif
 }
 
 void
