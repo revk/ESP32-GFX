@@ -6,6 +6,8 @@ if(! -e include) then
 	echo run in main dir
 	exit 1
 endif
+/projects/tools/bin/5x9 --style=vector96 > "$d/include/vector96.h"
+/projects/tools/bin/5x9 --style=vector > "$d/include/vector.h"
 if(! -e /tmp/5x9JTDBold) then
 	/projects/tools/bin/5x9 --em=1000 --style=JTD --dir=/tmp/5x9JTDBold --bold
 	cd /tmp/5x9JTDBold

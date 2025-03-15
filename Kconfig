@@ -50,6 +50,19 @@ menu "GFX"
 	help
 		7 segment digit fonts (all sizes)
 
+	config GFX_VECTOR
+	bool "Include 5x9 vector font"
+	default y 
+	help
+		Vector font (experimental)
+
+	config GFX_UNICODE
+	bool "Include additional unicode characters"
+	depends on GFX_UNICODE
+	default y 
+	help
+		Additional unicode characters (experimental)
+
 	config GFX_FONT0
 	bool "Include 3x5 font"
 	default y 
