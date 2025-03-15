@@ -1366,10 +1366,10 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       oy = 0;
    gfx_draw (w, h, 1, 1, &ox, &oy);     // starting point
    x = y = 0;
-   int s2 = size * size,
+   int s2 = size * size / 4,
       s0 = size / 2,
       s1 = (size + 1) / 2,
-      s3 = (size - 2) * (size - 2);
+      s3 = (size - 2) * (size - 2) / 2;
    ox += s0;
    oy += s0;
    const char *p = text;
@@ -1427,7 +1427,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                      inline int check (int x, int y)
                      {
                         int d = x * x + y * y;
-                        if (d < s2)//&& (size < 3 || d > s3))
+                        if (d < s2 && (size < 3 || d > s3))
                            return 1;
                         return 0;
                      }
@@ -1917,7 +1917,7 @@ gfx_message (const char *m)
    if (!gfx)
       return;
    gfx_lock ();
-   gfx_pos (gfx_width () / 2, 0, GFX_T | GFX_C |GFX_V);
+   gfx_pos (gfx_width () / 2, 0, GFX_T | GFX_C | GFX_V);
    int8_t size = (gfx_width () > 256 ? 6 : 2);
    while (*m)
    {
