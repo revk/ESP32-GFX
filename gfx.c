@@ -1565,7 +1565,7 @@ gfx_text_desc (const char *c)
 void
 gfx_vector (int8_t size, const char *fmt, ...)
 {                               // Vector draw
-   f (!gfx)
+   if (!gfx)
       return;
    int z = 7;                   // effective height
    if (size < 0)
