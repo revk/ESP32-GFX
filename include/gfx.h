@@ -100,7 +100,7 @@ void gfx_vector(int8_t size, const char *fmt,...); // vector, use -ve size for d
 void gfx_vector_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 #endif
 
-#ifdef GFX_VECTOR_ONLY
+#ifdef CONFIG_GFX_VECTOR_ONLY
 #define	gfx_text	gfx_vector
 #define	gfx_text_size	gfx_vector_size
 #else
