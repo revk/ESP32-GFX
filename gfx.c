@@ -1400,7 +1400,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                if (font_vector_unicode[u] == c)
                {
                   start = font_vector_offset[u + 96];
-                  end = font_vector_offset[u + 95];
+                  end = font_vector_offset[u + 97];
                   break;
                }
             ESP_LOGE (TAG, "Unicode %u %u %u", c, start, end);
