@@ -66,7 +66,7 @@
 
 #define		USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-//#define       USE_DSLP        // Deep sleep (slow start to every display)
+#define       USE_DSLP        // Deep sleep (slow start to every display)
 #define		USE_FAST        // LUT from register
 
 #define	T1	30
@@ -184,7 +184,9 @@ gfx_driver_init (void)
 #endif
 #ifdef	AJKINIT
       //2, EPD75_AMV, 0x11,       // VCOM
+#ifndef	USE_DSLP
       2, EPD75_AMV, 0x19,       // VCOM XON
+#endif
 #endif
       0
    };
@@ -231,19 +233,35 @@ gfx_driver_send (void)
 #endif
                  (gfx_settings.norefresh ? 0x80 : 0x00) |       // Border if refresh
                  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20) |  // border colour
-#ifdef	USE_DSLP
-                 0x03,          // Not new/old
-#else
                  0x01,          // new+old logic refresh
-#endif
                  0x07);
+
+#ifdef	USE_DSLP
+#define SIZE (GFX_DEFAULT_WIDTH/8*GFX_DEFAULT_HEIGHT)
+   static uint8_t *old = NULL;
+   if (!old)
+   {
+      old = mallocspi (SIZE);
+      if (old)
+         memset (old, 0, SIZE);
+   }
+   if (old)
+   {
+      if (gfx_send_command (EPD75_DTM1))
+         return "DTM1 failed";
+      if (gfx_send_data (old, SIZE))
+         return "Data failed";
+      memcpy (old, gfx_raw_b (), SIZE);
+   }
+#undef SIZE
+#endif
 
    if (gfx_send_command (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
 
-   gfx_send_command(EPD75_PTOUT);	// Should not be needed unless we do partial updates
+   gfx_send_command (EPD75_PTOUT);      // Should not be needed unless we do partial updates
 
    if (gfx_settings.norefresh)
       gfx_command1 (EPD75_TSSET, 0x5A); // Seems odd, but esphome does this
