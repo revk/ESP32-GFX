@@ -1415,7 +1415,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
             }
             void line (uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
             {
-               gfx_line (ox + size * (x1 - dx), oy + size * y1, ox + size * (x2 - dx), oy + size * y2, 255);
+               gfx_line (x + size * (x1 - dx), y + size * y1, x + size * (x2 - dx), y + size * y2, 255);
             }
             uint8_t l = nibble ();
             if (start == end)
