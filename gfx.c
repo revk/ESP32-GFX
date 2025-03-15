@@ -1431,7 +1431,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                         return 0;
                      }
                      if (check (DX, DY))
-                        gfx_line (DX + ox + x + size * (x1 - dx), DY + oy + y + size * y1, DX + ox + x + size * (x2 - dx),
+                        gfx_line (DX + ox + x + size * (x1 + dx), DY + oy + y + size * y1, DX + ox + x + size * (x2 + dx),
                                   DY + oy + y + size * y2, 255);
                   }
             }
