@@ -1413,7 +1413,7 @@ gfx_vector (int8_t size, const char *fmt, ...)
 }
 
 void
-gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
+gfx_vector_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
 #ifdef	CONFIG_GFX_VECTOR
 #endif
