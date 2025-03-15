@@ -241,7 +241,7 @@ gfx_driver_send (void)
    static uint8_t *old = NULL;
    if (!old)
    {
-      old = mallocspi (SIZE);
+      old = malloc(SIZE);
       if (old)
          memset (old, 0, SIZE);
    }
