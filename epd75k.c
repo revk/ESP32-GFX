@@ -271,7 +271,7 @@ gfx_driver_send (void)
 #ifdef	USE_DSLP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
       return "AUTO+DSLP failed";
-   sleep (gfx_settings.norefresh ? 5 : 3);
+   sleep (gfx_settings.norefresh ? 5 : 1);
    gfx_settings.asleep = 1;
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POF
