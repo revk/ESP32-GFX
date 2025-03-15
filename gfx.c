@@ -1430,8 +1430,8 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
             }
             void line (uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
             {
-               for (int dy = -s0; dy < s1; sy++)
-                  for (int dx = -s0; dx < s1; sx++)
+               for (int dy = -s0; dy < s1; dy++)
+                  for (int dx = -s0; dx < s1; dx++)
                   {
                      gfx_line (dx + ox + x + size * (x1 - dx), dy + oy + y + size * y1, dx + ox + x + size * (x2 - dx),
                                dy + oy + y + size * y2, 255);
