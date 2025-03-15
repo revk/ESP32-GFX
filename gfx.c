@@ -1430,11 +1430,11 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
             }
             void line (uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
             {
-               for (int dy = -s0; dy < s1; dy++)
-                  for (int dx = -s0; dx < s1; dx++)
+               for (int Dy = -s0; DY < s1; DY++)
+                  for (int DX = -s0; DX < s1; DX++)
                   {
-                     gfx_line (dx + ox + x + size * (x1 - dx), dy + oy + y + size * y1, dx + ox + x + size * (x2 - dx),
-                               dy + oy + y + size * y2, 255);
+                     gfx_line (DX + ox + x + size * (x1 - dx), DY + oy + y + size * y1, DX + ox + x + size * (x2 - dx),
+                               DY + oy + y + size * y2, 255);
                   }
             }
             uint8_t l = nibble ();
