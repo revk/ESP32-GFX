@@ -1624,6 +1624,7 @@ gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 }
 #endif
 
+#ifdef	CONFIG_GFX_FONT1
 void
 gfx_blocky (int8_t size, const char *fmt, ...)
 {                               // Size negative for descenders, blocky text
@@ -1645,7 +1646,9 @@ gfx_blocky (int8_t size, const char *fmt, ...)
       gfx_text_draw (size, z, 1, temp);
    free (temp);
 }
+#endif
 
+#ifdef	CONFIG_GFX_FONT1
 void
 gfx_blocky_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
@@ -1658,6 +1661,7 @@ gfx_blocky_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
       z = 5;
    gfx_text_draw_size (size, z, t, w, h);
 }
+#endif
 
 static void
 gfx_update (void)
