@@ -247,18 +247,10 @@ static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -383,47 +375,45 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static char const
-        sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
-     static uint8_t const
-        sevensegmap[] = {
-        0x00,                   // space
-        0x3F,                   // 0
-        0x06,                   // 1
-        0x5B,                   // 2
-        0x4F,                   // 3
-        0x66,                   // 4
-        0x6D,                   // 5
-        0x7D,                   // 6
-        0x07,                   // 7
-        0x7F,                   // 8
-        0x6F,                   // 9
-        0x40,                   // -
-        0x08,                   // _
-        0x22,                   // "
-        0x02,                   // '
-        0x04,                   // ,
-        0x39,                   // [
-        0x0F,                   // ]
-        0x77,                   // A
-        0x7C,                   // B (b)
-        0x39,                   // C
-        0x5E,                   // D (d)
-        0x79,                   // E
-        0x71,                   // F
-        0x3D,                   // G
-        0x76,                   // H
-        0x30,                   // I
-        0x1E,                   // J
-        0x38,                   // L
-        0x37,                   // N
-        0x3F,                   // O
-        0x73,                   // P
-        0x50,                   // R (r)
-        0x6D,                   // S
-        0x3E,                   // U
-        0x5B,                   // Z
-     };
+static char const sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
+static uint8_t const sevensegmap[] = {
+   0x00,                        // space
+   0x3F,                        // 0
+   0x06,                        // 1
+   0x5B,                        // 2
+   0x4F,                        // 3
+   0x66,                        // 4
+   0x6D,                        // 5
+   0x7D,                        // 6
+   0x07,                        // 7
+   0x7F,                        // 8
+   0x6F,                        // 9
+   0x40,                        // -
+   0x08,                        // _
+   0x22,                        // "
+   0x02,                        // '
+   0x04,                        // ,
+   0x39,                        // [
+   0x0F,                        // ]
+   0x77,                        // A
+   0x7C,                        // B (b)
+   0x39,                        // C
+   0x5E,                        // D (d)
+   0x79,                        // E
+   0x71,                        // F
+   0x3D,                        // G
+   0x76,                        // H
+   0x30,                        // I
+   0x1E,                        // J
+   0x38,                        // L
+   0x37,                        // N
+   0x3F,                        // O
+   0x73,                        // P
+   0x50,                        // R (r)
+   0x6D,                        // S
+   0x3E,                        // U
+   0x5B,                        // Z
+};
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1358,6 +1348,111 @@ gfx_text_draw_size (int8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gf
       *hp = h;
 }
 
+#ifdef	CONFIG_GFX_VECTOR
+void
+gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
+{
+   if (!gfx || !fonts[size])
+      return;
+
+   gfx_pos_t x,
+     y,
+     w,
+     h;
+   gfx_text_draw_size (size, z, text, &w, &h);
+
+   int fonth = (z + 1) * (size ? : 1);
+   gfx_pos_t ox = 0,
+      oy = 0;
+   gfx_draw (w, h, 1, 1, &ox, &oy);     // starting point
+   x = y = 0;
+   const char *p = text;
+   int c;
+   while ((c = utf8 (&p)) > 0)
+   {
+      if (!x && y + fonth > h)
+         fonth = h - y;         // Last line
+      int charw = cwidth (size, c);
+      if (charw)
+      {
+         if (c <= 8)
+            c = ' ';
+         if (!cwidth (size, *p))
+            charw -= (size ? : 1);      // Crop right edge border - messy for UTF8 but should be OK
+         int dx = size * ((c == ':' || c == '.') ? 2 : 0);      // : and . are offset as make narrower
+         // Find character
+         uint16_t start = 0,
+            end = 0;
+         if (c >= 32 && c < 128)
+         {
+            start = font_vector_offset[c - 32];
+            end = font_vector_offset[c - 31];
+         }
+#ifdef	CONFIG_GFX_UNICODE
+         else if (c >= 128)
+         {
+            for (int u = 0; u < sizeof (font_vector_unicode) / sizeof (font_vector_unicode); u++)
+               if (font_vector_unicode[u] == c)
+               {
+                  start = font_vector_offset[u - 96];
+                  end = font_vector_offset[c - 95];
+                  break;
+               }
+         }
+#endif
+         while (start < end)
+         {
+            uint8_t half = 0;
+            inline uint8_t nibble (void)
+            {
+               if (!half)
+               {
+                  half = 1;
+                  return font_vector_data[start] >> 4;
+               }
+               half = 0;
+               return font_vector_data[start++] & 0xF;
+            }
+            void line (uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
+            {
+               gfx_line (x1, y1, x2, y2, 255);
+            }
+            uint8_t l = nibble ();
+            if (start == end)
+               break;           // Trailing nibble;
+            uint8_t x1 = nibble ();
+            uint8_t y1 = nibble ();
+            if (!l)
+               line (x1, y1, x1, y2);   // Dot
+            else if (l < 12)
+            {                   // Lines
+               while (l--)
+               {
+                  uint8_t x2 = nibble ();
+                  uint8_t y2 = nibble ();
+                  line (x, y, x2, y2);
+                  x1 = x2;
+                  y1 = y2;
+               }
+            } else
+            {                   // Special
+               uint8_t n = nibble ();
+               if (l == 12)
+                  line (x1, y1, x1 + n, y1);
+               else if (l == 12)
+                  line (x1, y1, x1, y1 + n);
+               else if (l == 12)
+                  line (x1, y1, x1 - n, y1 + n);
+               else
+                  line (x1, y1, x1 + n, y1 + n);
+            }
+         }
+         x += charw;
+      }
+   }
+}
+#endif
+
 void
 gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 {                               // Size negative for descenders
@@ -1449,6 +1544,23 @@ gfx_text_desc (const char *c)
 void
 gfx_vector (int8_t size, const char *fmt, ...)
 {                               // Vector draw
+   if (!gfx)
+      return;
+   int z = 7;                   // effective height
+   if (size < 0)
+   {                            // indicates descenders allowed
+      size = -size;
+      z = 9;
+   } else if (!size)
+      z = 5;
+   va_list ap;
+   char *temp;
+   va_start (ap, fmt);
+   vasprintf (&temp, fmt, ap);
+   va_end (ap);
+   if (temp)
+      gfx_vector_draw (size, z, 0, temp);
+   free (temp);
 }
 #endif
 
