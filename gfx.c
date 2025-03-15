@@ -1472,7 +1472,6 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 }
 #endif
 
-#ifndef	CONFIG_GFX_VECTOR_ONLY
 void
 gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 {                               // Size negative for descenders
@@ -1548,7 +1547,6 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       }
    }
 }
-#endif
 
 uint8_t
 gfx_text_desc (const char *c)
