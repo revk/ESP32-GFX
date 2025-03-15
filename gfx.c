@@ -1408,7 +1408,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          else if (c >= 128)
          {
             for (int u = 0; u < sizeof (font_vector_unicode) / sizeof (font_vector_unicode); u++)
-               if (font_vector_unicode[u - 128] == c)
+               if (font_vector_unicode[u] == c)
                {
                   start = font_vector_offset[u - 96];
                   end = font_vector_offset[u - 95];
