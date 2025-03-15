@@ -1352,6 +1352,7 @@ gfx_text_draw_size (int8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gf
 void
 gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 {
+	ESP_LOGE(TAG,"GFX vector %s",fmt);
    if (!gfx)
       return;
 
