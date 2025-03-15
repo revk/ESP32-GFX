@@ -61,7 +61,14 @@ menu "GFX"
 	depends on GFX_VECTOT
 	default y 
 	help
-		Additional unicode characters (experimental)
+		Additional Unicode characters (experimental)
+
+	config GFX_VECTOR_ONLY
+	bool "Vector not pre-made fonts"
+	depends on GFX_VECTOT
+	default n 
+	help
+		Use vector fonts only
 
 	config GFX_FONT0
 	bool "Include 3x5 font"
@@ -71,57 +78,66 @@ menu "GFX"
 
 	config GFX_FONT1
 	bool "Include 5x9 font"
+	depends on !GFX_VECTOR_ONLY
 	default y 
 	help
-		Small 5x9 font
+		Small 5x9 pre-rendered font
 
 	config GFX_FONT2
 	bool "Include 10x18 font"
+	depends on !GFX_VECTOR_ONLY
 	default y 
 	help
-		Medium 10x18 font
+		Medium 10x18 pre-rendered font
 
 	config GFX_FONT3
 	bool "Include 15x27 font"
+	depends on !GFX_VECTOR_ONLY
 	default y 
 	help
-		Larger 15x27 font
+		Larger 15x27 pre-rendered font
 
 	config GFX_FONT4
 	bool "Include 20x36 font"
+	depends on !GFX_VECTOR_ONLY
 	default y 
 	help
-		Large 20x36 font
+		Large 20x36 pre-rendered font
 
 	config GFX_FONT5
 	bool "Include 25x45 font"
+	depends on !GFX_VECTOR_ONLY
 	default y 
 	help
-		Extra large 25x45 font
+		Extra large 25x45 pre-rendered font
 	
 	config GFX_FONT6
 	bool "Include 30x54 font"
+	depends on !GFX_VECTOR_ONLY
 	default y 
 	help
-		Extra large 30x54 font
+		Extra large 30x54 pre-rendered font
 	
 	config GFX_FONT7
 	bool "Include 35x63 font"
+	depends on !GFX_VECTOR_ONLY
 	default n
 	help
-		Extra large 35x63 font
+		Extra large 35x63 pre-rendered font
 	
 	config GFX_FONT8
+	depends on !GFX_VECTOR_ONLY
 	bool "Include 40x72 font"
 	default n
 	help
-		Extra large 40x72 font
+		Extra large 40x72 pre-rendered font
 	
 	config GFX_FONT9
 	bool "Include 45x81 font"
+	depends on !GFX_VECTOR_ONLY
 	default n
 	help
-		Extra large 45x81 font
+		Extra large 45x81 pre-rendered font
 	
 	config GFX_BIGDIGIT
 	bool "Include large 7 segment digits"
