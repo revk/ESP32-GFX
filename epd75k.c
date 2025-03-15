@@ -297,7 +297,7 @@ gfx_driver_send (void)
 
 #if 1                           // esphome stuff
    gfx_send_command (EPD75_PTOUT);      // Should not be needed unless we do partial updates
-   if (!gfx_settings.norefresh)
+   if (gfx_settings.norefresh)
       gfx_command1 (EPD75_TSSET, 0x5A); // Seems odd, but esphome does this
 #endif
 
