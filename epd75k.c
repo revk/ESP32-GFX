@@ -261,16 +261,17 @@ gfx_driver_send (void)
    if (gfx_send_gfx (0))
       return "Data send failed";
 
+#if 0                           // esphome stuff
    gfx_send_command (EPD75_PTOUT);      // Should not be needed unless we do partial updates
-
    if (gfx_settings.norefresh)
       gfx_command1 (EPD75_TSSET, 0x5A); // Seems odd, but esphome does this
+#endif
 
 #ifdef	USE_AUTO
 #ifdef	USE_DSLP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
       return "AUTO+DSLP failed";
-   sleep (gfx_settings.norefresh ? 5 : 2);
+   sleep (gfx_settings.norefresh ? 5 : 3);
    gfx_settings.asleep = 1;
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POF
