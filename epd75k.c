@@ -78,7 +78,9 @@
 #define	REPEAT	5
 
 #define	AJKINIT
-#define       AJKLUT
+#define	AJKLUT
+
+extern uint32_t uptime(void);
 
 static const char *
 gfx_driver_init (void)
@@ -246,15 +248,16 @@ gfx_driver_send (void)
 {                               // Send buffer and update display
    uint64_t a = esp_timer_get_time ();
 #ifdef	CONFIG_GFX_USE_DEEP_SLEEP
-   static uint32_t waiting=0;
+   static uint32_t waiting = 0;
    if (gfx_settings.asleep)
    {
-	   if(waiting)
-	   {
-		   uint32_t up=uptime();
-		   if(waiting>up)sleep(waiting-up);
-		   waiting=0;
-	   }
+      if (waiting)
+      {
+         uint32_t up = uptime ();
+         if (waiting > up)
+            sleep (waiting - up);
+         waiting = 0;
+      }
       gfx_settings.asleep = 0;
       gpio_set_level (gfx_settings.rst, 0);
       usleep (10000);
@@ -310,14 +313,15 @@ gfx_driver_send (void)
 #ifdef	CONFIG_GFX_USE_DEEP_SLEEP
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
       return "AUTO+DSLP failed";
-   if(gfx_settings.norefresh)
+   if (gfx_settings.norefresh)
    {
-	   sleep(2);
+      sleep (2);
       gpio_set_level (gfx_settings.rst, 0);
       usleep (10000);
       gpio_set_level (gfx_settings.rst, 1);
       usleep (10000);
-   } else waiting=uptime()+10;
+   } else
+      waiting = uptime () + 10;
    gfx_settings.asleep = 1;
 #else
    if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POF
