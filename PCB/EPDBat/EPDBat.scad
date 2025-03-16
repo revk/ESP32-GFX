@@ -1,6 +1,6 @@
 // Generated case design for EPDBat/EPDBat.kicad_pcb
 // By https://github.com/revk/PCBCase
-// Generated 2025-01-12 15:03:04
+// Generated 2025-02-18 10:32:24
 // title:	Waveshare EPD adapter
 // rev:	1
 // company:	Adrian Kennard, Andrews & Arnold Ltd
@@ -71,7 +71,7 @@ translate([23.281251,17.250001,1.200000])m9(part,hole,block,casetop); // U1 (bac
 translate([3.100001,27.300001,1.200000])m0(part,hole,block,casetop); // RevK:C_0402 C_0402_1005Metric (back)
 }
 
-parts_top=14;
+parts_top=13;
 // Parts to go on PCB (bottom)
 module parts_bottom(part=false,hole=false,block=false){
 }
