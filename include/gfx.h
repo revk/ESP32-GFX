@@ -107,10 +107,8 @@ void gfx_vector_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 void gfx_text(int8_t size, const char *fmt,...); // text, use -ve size for descenders versions
 void gfx_text_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 #endif
-#ifdef	CONFIG_GFX_FONT1
 void gfx_blocky (int8_t size, const char *fmt, ...); // blocky text
 void gfx_blocky_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
-#endif
 void gfx_7seg (int8_t size, const char *fmt, ...); // digits (allows : or , or space after a digit)
 void gfx_7seg_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 
