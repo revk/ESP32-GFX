@@ -1435,7 +1435,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                y1 = oy + y + size * y1;
                x2 = ox + x + size * (x2 - dx);
                y2 = oy + y + size * y2;
-               for (int DY = -s1; DY = s1; DY += 2)
+               for (int DY = -s1; DY <= s1; DY += 2)
                   for (int DX = -s1; DX <= s1; DX += 2)
                   {
                      inline int check (int x, int y)
