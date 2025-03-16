@@ -1370,7 +1370,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    if (size == 3)
       s2 = 7;
    if (flags & GFX_TEXT_LIGHT)
-      s2 /= 4;
+      s2 /= 2;
    const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
