@@ -1429,7 +1429,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
                half = 0;
                return font_vector_data[start++] & 0xF;
             }
-            void line (uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2)
+            void line (int x1, int y1, int x2, int y2)
             {
                x1 = ox + x + size * (x1 - dx);
                y1 = oy + y + size * y1;
