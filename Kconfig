@@ -72,6 +72,7 @@ menu "GFX"
 
 	config GFX_FONT0
 	bool "Include 3x5 font"
+	depends on !GFX_VECTOR_ONLY
 	default y 
 	help
 		Tiny 3x5 font pre-rendered font, limited characters

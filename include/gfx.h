@@ -100,15 +100,13 @@ void gfx_vector(int8_t size, const char *fmt,...); // vector, use -ve size for d
 void gfx_vector_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 #endif
 
-#ifdef CONFIG_GFX_VECTOR_ONLY
-#define	gfx_text	gfx_vector
-#define	gfx_text_size	gfx_vector_size
-#else
-void gfx_text(int8_t size, const char *fmt,...); // text, use -ve size for descenders versions
-void gfx_text_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
-#endif
-void gfx_blocky (int8_t size, const char *fmt, ...); // blocky text
-void gfx_blocky_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
+// gfx_text flags
+#define	GFX_TEXT_DESCENDERS	(1<<0)	// Allow descenders
+#define	GFX_TEXT_BLOCKY		(1<<1)	// Blocky text
+#define	GFX_TEXT_VECTOR		(1<<2)	// Vector test (default if vector only set)
+#define	GFX_TEXT_LIGHT		(1<<3)	// Thin (vector) test
+void gfx_text(uint8_t flags,uint8_t size, const char *fmt,...); // text, use -ve size for descenders versions
+void gfx_text_size(uint8_t flags,uint8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 void gfx_7seg (int8_t size, const char *fmt, ...); // digits (allows : or , or space after a digit)
 void gfx_7seg_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 

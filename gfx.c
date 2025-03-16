@@ -140,34 +140,15 @@ gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_intensity_t i)
 }
 
 void
-gfx_vector (int8_t size, const char *fmt, ...)
+gfx_text (uint8_t flags, uint8_t size, const char *fmt, ...)
 {                               // Dummy - no driver
 }
 
 void
-gfx_vector_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
+gfx_text_size (uint8_t flags, uint8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {                               // Dummy - no driver
 }
 
-void
-gfx_text (int8_t size, const char *fmt, ...)
-{                               // Dummy - no driver
-}
-
-void
-gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
-{                               // Dummy - no driver
-}
-
-void
-gfx_blocky (int8_t size, const char *fmt, ...)
-{                               // Dummy - no driver
-}
-
-void
-gfx_blocky_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
-{                               // Dummy - no driver
-}
 
 void
 gfx_7seg (int8_t size, const char *fmt, ...)
@@ -1352,10 +1333,13 @@ gfx_text_draw_size (int8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gf
 
 #ifdef	CONFIG_GFX_VECTOR
 void
-gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
+gfx_vector_draw (uint8_t flags, int8_t size, uint8_t blocky, const char *text)
 {
    if (!gfx)
       return;
+   uint8_t z = 7;
+   if (flags & GFX_TEXT_DESCENDERS)
+      z = 9;
 
    gfx_pos_t x,
      y,
@@ -1375,6 +1359,8 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
    int s2 = size * size;
    if (size == 3)
       s2 = 7;
+   if (flags & GFX_TEXT_LIGHT)
+      s2 /= 4;
    const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
@@ -1508,11 +1494,15 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 }
 #endif
 
+#ifndef	CONFIG_GFX_VECTOR
 void
 gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
 {                               // Size negative for descenders
    if (!gfx || !fonts[size])
       return;
+   uint8_t z = 7;
+   if (flags & GFX_TEXT_DESCENDERS)
+      z = 9;
 
    gfx_pos_t x,
      y,
@@ -1586,6 +1576,7 @@ gfx_text_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
       }
    }
 }
+#endif
 
 uint8_t
 gfx_text_desc (const char *c)
@@ -1598,128 +1589,53 @@ gfx_text_desc (const char *c)
    return n;
 }
 
-#ifdef	CONFIG_GFX_VECTOR
 void
-gfx_vector (int8_t size, const char *fmt, ...)
-{                               // Vector draw
-   if (!gfx)
-      return;
-   int z = 7;                   // effective height
-   if (size < 0)
-   {                            // indicates descenders allowed
-      size = -size;
-      z = 9;
-   } else if (!size)
-      z = 5;
-   va_list ap;
-   char *temp;
-   va_start (ap, fmt);
-   vasprintf (&temp, fmt, ap);
-   va_end (ap);
-   if (temp)
-      gfx_vector_draw (size, z, 0, temp);
-   free (temp);
-}
-#endif
-
-#ifdef	CONFIG_GFX_VECTOR
-void
-gfx_vector_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
-{
-   int z = 7;                   // effective height
-   if (size < 0)
-   {                            // indicates descenders allowed
-      size = -size;
-      z = 9;
-   } else if (!size)
-      z = 5;
-   gfx_text_draw_size (size, z, t, w, h);
-}
-#endif
-
-#ifndef	CONFIG_GFX_VECTOR_ONLY
-void
-gfx_text (int8_t size, const char *fmt, ...)
+gfx_text (uint8_t flags, uint8_t size, const char *fmt, ...)
 {                               // Size negative for descenders
    if (!gfx)
       return;
-   int z = 7;                   // effective height
-   if (size < 0)
-   {                            // indicates descenders allowed
-      size = -size;
-      z = 9;
-   } else if (!size)
-      z = 5;
-   if (size > sizeof (fonts) / sizeof (*fonts) - 1)
-      size = sizeof (fonts) / sizeof (*fonts) - 1;
-   va_list ap;
-   char *temp;
-   va_start (ap, fmt);
-   vasprintf (&temp, fmt, ap);
-   va_end (ap);
-   if (temp)
-      gfx_text_draw (size, z, 0, temp);
-   free (temp);
-}
-#endif
-
-#ifndef	CONFIG_GFX_VECTOR_ONLY
-void
-gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
-{
-   int z = 7;                   // effective height
-   if (size < 0)
-   {                            // indicates descenders allowed
-      size = -size;
-      z = 9;
-   } else if (!size)
-      z = 5;
-   if (size > sizeof (fonts) / sizeof (*fonts) - 1)
-      size = sizeof (fonts) / sizeof (*fonts) - 1;
-   gfx_text_draw_size (size, z, t, w, h);
-}
-#endif
-
-void
-gfx_blocky (int8_t size, const char *fmt, ...)
-{                               // Size negative for descenders, blocky text
-   if (!gfx)
-      return;
-   int z = 7;                   // effective height
-   if (size < 0)
-   {                            // indicates descenders allowed
-      size = -size;
-      z = 9;
-   } else if (!size)
-      z = 5;
-   va_list ap;
-   char *temp;
-   va_start (ap, fmt);
-   vasprintf (&temp, fmt, ap);
-   va_end (ap);
-   if (temp)
 #ifdef	CONFIG_GFX_VECTOR_ONLY
-      gfx_vector_draw (size, z, 1, temp);
-#else
-      gfx_text_draw (size, z, 1, temp);
+   flags |= GFX_TEXT_VECTOR;
 #endif
+#ifndef	CONFIG_GFX_VECTOR
+   flags &= ~GFX_TEXT_VECTOR;
+#endif
+   if (!(flags & GFX_TEXT_VECTOR) && size > sizeof (fonts) / sizeof (*fonts) - 1)
+      size = sizeof (fonts) / sizeof (*fonts) - 1;
+   va_list ap;
+   char *temp;
+   va_start (ap, fmt);
+   vasprintf (&temp, fmt, ap);
+   va_end (ap);
+   if (temp)
+   {
+#ifdef	CONFIG_GFX_VECTOR_ONLY
+      gfx_vector_draw (flags, size, 0, temp);
+#else
+#ifdef	CONFIG_GFX_VECTOR
+      if (flags & GFX_TEXT_VECTOR)
+         gfx_vector_draw (flags, size, 0, temp);
+      else
+#endif
+         gfx_text_draw (flags, size, 0, temp);
+#endif
+   }
    free (temp);
 }
 
-#ifdef	CONFIG_GFX_FONT1
 void
-gfx_blocky_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
+gfx_text_size (uint8_t flags, uint8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
-   int z = 7;                   // effective height
-   if (size < 0)
-   {                            // indicates descenders allowed
-      size = -size;
-      z = 9;
-   } else if (!size)
-      z = 5;
-   gfx_text_draw_size (size, z, t, w, h);
-}
+#ifdef	CONFIG_GFX_VECTOR_ONLY
+   flags |= GFX_TEXT_VECTOR;
 #endif
+#ifndef	CONFIG_GFX_VECTOR
+   flags &= ~GFX_TEXT_VECTOR;
+#endif
+   if (!(flags & GFX_TEXT_VECTOR) && size > sizeof (fonts) / sizeof (*fonts) - 1)
+      size = sizeof (fonts) / sizeof (*fonts) - 1;
+   gfx_text_draw_size (flags, size, t, w, h);
+}
 
 static void
 gfx_update (void)
@@ -1960,17 +1876,21 @@ gfx_message (const char *m)
    gfx_lock ();
    gfx_pos (gfx_width () / 2, 0, GFX_T | GFX_C | GFX_V);
    int8_t size = (gfx_width () > 256 ? 6 : 2);
+   uint8_t flags = 0;
    while (*m)
    {
       if (*m == '[')
       {
          int8_t isf = 1;
          int8_t lc = 1;
+         flags = 0;
          for (; *m && *m != ']'; m++)
             if (*m == '-')
-               lc = -lc;
+               flags |= GFX_TEXT_DESCENDERS;
+            else if (*m == 'L')
+               flags |= GFX_TEXT_LIGHT;
             else if (isdigit ((unsigned char) *m))
-               size = lc * (*m - '0');  /* size */
+               size = (*m - '0');       /* size */
             else if (isalpha ((unsigned char) *m))
             {                   /* colour */
                if ((isf++) & 1)
@@ -1986,11 +1906,11 @@ gfx_message (const char *m)
       const char *e = m;
       while (*e && *e != '/' && *e != '[')
          e++;
-      gfx_text (size, "%.*s", (int) (e - m), m);
+      gfx_text (flags, size, "%.*s", (int) (e - m), m);
       m = e;
       if (*m == '/')
       {
-         gfx_pos (gfx_x (), gfx_y () + (size < 0 ? -size : size) - 1, gfx_a ());
+         gfx_pos (gfx_x (), gfx_y () + size - 1, gfx_a ());
          m++;
       }
    }
