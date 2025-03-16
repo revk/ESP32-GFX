@@ -228,18 +228,10 @@ static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -364,47 +356,45 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static char const
-        sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
-     static uint8_t const
-        sevensegmap[] = {
-        0x00,                   // space
-        0x3F,                   // 0
-        0x06,                   // 1
-        0x5B,                   // 2
-        0x4F,                   // 3
-        0x66,                   // 4
-        0x6D,                   // 5
-        0x7D,                   // 6
-        0x07,                   // 7
-        0x7F,                   // 8
-        0x6F,                   // 9
-        0x40,                   // -
-        0x08,                   // _
-        0x22,                   // "
-        0x02,                   // '
-        0x04,                   // ,
-        0x39,                   // [
-        0x0F,                   // ]
-        0x77,                   // A
-        0x7C,                   // B (b)
-        0x39,                   // C
-        0x5E,                   // D (d)
-        0x79,                   // E
-        0x71,                   // F
-        0x3D,                   // G
-        0x76,                   // H
-        0x30,                   // I
-        0x1E,                   // J
-        0x38,                   // L
-        0x37,                   // N
-        0x3F,                   // O
-        0x73,                   // P
-        0x50,                   // R (r)
-        0x6D,                   // S
-        0x3E,                   // U
-        0x5B,                   // Z
-     };
+static char const sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
+static uint8_t const sevensegmap[] = {
+   0x00,                        // space
+   0x3F,                        // 0
+   0x06,                        // 1
+   0x5B,                        // 2
+   0x4F,                        // 3
+   0x66,                        // 4
+   0x6D,                        // 5
+   0x7D,                        // 6
+   0x07,                        // 7
+   0x7F,                        // 8
+   0x6F,                        // 9
+   0x40,                        // -
+   0x08,                        // _
+   0x22,                        // "
+   0x02,                        // '
+   0x04,                        // ,
+   0x39,                        // [
+   0x0F,                        // ]
+   0x77,                        // A
+   0x7C,                        // B (b)
+   0x39,                        // C
+   0x5E,                        // D (d)
+   0x79,                        // E
+   0x71,                        // F
+   0x3D,                        // G
+   0x76,                        // H
+   0x30,                        // I
+   0x1E,                        // J
+   0x38,                        // L
+   0x37,                        // N
+   0x3F,                        // O
+   0x73,                        // P
+   0x50,                        // R (r)
+   0x6D,                        // S
+   0x3E,                        // U
+   0x5B,                        // Z
+};
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1366,11 +1356,12 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
          for (y = -1; y <= h; y++)
             gfx_pixel (ox + x, oy + y, 0);      // background
    x = y = 0;
-   int s2 = size * size;
-   if (size == 3)
+   int s1 = size;
+   if ((flags & GFX_TEXT_LIGHT) && size > 1)
+      s1--;
+   int s2 = s1 * s1;
+   if (s1 == 3)
       s2 = 7;
-   if ((flags & GFX_TEXT_LIGHT) && size > 2)
-      s2 = s2 / 4 + 1;
    const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
@@ -1422,15 +1413,12 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
             {
                if (flags & GFX_TEXT_BLOCKY)
                {
-                  uint8_t s = size;
-                  if ((flags & GFX_TEXT_LIGHT) && s > 1)
-                     s--;
                   while (1)
                   {
                      int X = ox + x + size * (x1 - dx);
                      int Y = oy + y + size * y1;
-                     for (int DY = 0; DY < s; DY++)
-                        for (int DX = 0; DX < s; DX++)
+                     for (int DY = 0; DY < s1; DY++)
+                        for (int DX = 0; DX < s1; DX++)
                            gfx_pixel (X + DX, Y + DY, 255);
                      if (x1 == x2 && y1 == y2)
                         break;
@@ -1449,24 +1437,21 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
                y1 = oy + y + size * y1;
                x2 = ox + x + size * (x2 - dx);
                y2 = oy + y + size * y2;
-               if ((flags & GFX_TEXT_LIGHT) && size == 2)
-                  gfx_line (x1, y1, x2, y2, 255);
-               else
-                  for (int DY = 0; DY < size; DY++)
-                     for (int DX = 0; DX < size; DX++)
+               for (int DY = 0; DY < s1; DY++)
+                  for (int DX = 0; DX < s1; DX++)
+                  {
+                     inline int check (int x, int y)
                      {
-                        inline int check (int x, int y)
-                        {
-                           x = x * 2 - size + 1;
-                           y = y * 2 - size + 1;
-                           int d = x * x + y * y;
-                           if (d <= s2)
-                              return 1;
-                           return 0;
-                        }
-                        if (check (DX, DY))
-                           gfx_line (DX + x1, DY + y1, DX + x2, DY + y2, 255);
+                        x = x * 2 - s1 + 1;
+                        y = y * 2 - s1 + 1;
+                        int d = x * x + y * y;
+                        if (d <= s2)
+                           return 1;
+                        return 0;
                      }
+                     if (check (DX, DY))
+                        gfx_line (DX + x1, DY + y1, DX + x2, DY + y2, 255);
+                  }
             }
             uint8_t l = nibble ();
             if (start == end)
