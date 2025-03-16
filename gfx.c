@@ -1371,8 +1371,27 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
       s2 = 7;
    if ((flags & GFX_TEXT_LIGHT) && size > 2)
       s2 /= 4;
-   ESP_LOGE(TAG,"size=%d s2=%d [%s]",size,s2,text);
-   const char *p = text;
+   ESP_LOGE (TAG, "size=%d s2=%d [%s]", size, s2, text);
+   if (size == 6)
+   {
+      for (int DY = 0; DY < size; DY++)
+         for (int DX = 0; DX < size; DX++)
+         {
+            inline int check (int x, int y)
+            {
+               x = x * 2 - size + 1;
+               y = y * 2 - size + 1;
+               int d = x * x + y * y;
+               if (d <= s2)
+                  return 1;
+               return 0;
+            }
+            ESP_LOGE (TAG, "%d/%d %d", DX, DY, check (DX, DY));
+         }
+   }
+   uint8_t l = nibble ();
+   if (start == end)
+      const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
    {
