@@ -1362,6 +1362,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
      w,
      h;
    gfx_text_draw_size (size, z, text, &w, &h);
+   ESP_LOGE(TAG,"Size=%d z=%d w=%d h=%d [%s]",size,z,w,h,text);
 
    int fonth = (z + 1) * (size ? : 1);
    gfx_pos_t ox = 0,
@@ -1986,7 +1987,6 @@ gfx_message (const char *m)
       const char *e = m;
       while (*e && *e != '/' && *e != '[')
          e++;
-      ESP_LOGE(TAG,"Size %d [%.*s]",size,(int) (e - m), m);
       gfx_text (size, "%.*s", (int) (e - m), m);
       m = e;
       if (*m == '/')
