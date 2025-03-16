@@ -91,6 +91,7 @@ gfx_driver_init (void)
    const uint8_t init[] = {
       //2, EPD75_PSR, 0x00,       // Reset
 #ifdef	AJKINIT                 // My attempt
+      2, EPD75_PSR, 0x00,	// Reset
 #ifndef	USE_FAST
       2, EPD75_PSR, 0x1F,       // Normal LUT
 #endif
