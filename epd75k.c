@@ -314,8 +314,8 @@ gfx_driver_send (void)
    if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
       return "AUTO+DSLP failed";
    if (gfx_settings.norefresh)
-   {
-      sleep (2);
+   { // Reset to try and avoid fading
+      sleep (3);
       gpio_set_level (gfx_settings.rst, 0);
       usleep (10000);
       gpio_set_level (gfx_settings.rst, 1);
