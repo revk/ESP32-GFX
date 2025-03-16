@@ -1377,6 +1377,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
                   return 1;
                return 0;
             }
+	    check(DX,DY);
          }
    }
    const char *p = text;
