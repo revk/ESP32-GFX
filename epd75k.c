@@ -114,7 +114,7 @@ gfx_driver_init (void)
       2, EPD75_PSR, 0x0F,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
-      3, EPD75_CDI, 0x11, 0x07, //
+      3, EPD75_CDI, 0x10, 0x07, //
       2, EPD75_TCON, 0x22,      //
       2, EPD75_VDCS, 0x08,      //
       2, EPD75_PLL, 0x06,       //
