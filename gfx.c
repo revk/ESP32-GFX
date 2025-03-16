@@ -1650,7 +1650,7 @@ gfx_text_size (uint8_t flags, uint8_t size, const char *t, gfx_pos_t * w, gfx_po
    uint8_t z = 7;
    if (flags & GFX_TEXT_DESCENDERS)
       z = 9;
-   gfx_text_draw_size (size, x, t, w, h);
+   gfx_text_draw_size (size, z, t, w, h);
 }
 
 static void
