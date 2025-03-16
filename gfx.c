@@ -1372,7 +1372,7 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
          for (y = -1; y <= h; y++)
             gfx_pixel (ox + x, oy + y, 0);      // background
    x = y = 0;
-   int s2 = size * size * 8 / 10;
+   int s2 = size * size * 9 / 10;
    if (size == 3)
       s2 = 7;
    const char *p = text;
