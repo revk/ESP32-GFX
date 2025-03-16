@@ -77,7 +77,7 @@
 #define	T8	1
 #define	REPEAT	5
 
-#define	AJKINIT
+//#define	AJKINIT
 #define	AJKLUT
 
 extern uint32_t uptime (void);
@@ -137,7 +137,7 @@ gfx_driver_init (void)
       43, EPD75_LUT_WW,
       0x02, T1, T2, T3, T4, 1,
       0x02, T5, T6, T7, T8, REPEAT,
-      0x00, T5, T6, T7, 0, 1,
+      0x02, T5, T6, T7, 0, 1,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
