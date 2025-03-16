@@ -1371,6 +1371,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
       s2 = 7;
    if ((flags & GFX_TEXT_LIGHT) && size > 2)
       s2 /= 4;
+   ESP_LOGE(TAG,"size=%d s1=%d s2=%d [%s]",size,s1,s2,text);
    const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
