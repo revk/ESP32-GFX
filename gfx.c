@@ -1372,11 +1372,11 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
                x = x * 2 - size + 1;
                y = y * 2 - size + 1;
                int d = x * x + y * y;
+            ESP_LOGE (TAG, "%d/%d %d %d", x,y,d,d<=s2?"Y":"N");
                if (d <= s2)
                   return 1;
                return 0;
             }
-            ESP_LOGE (TAG, "%d/%d %d", DX, DY, check (DX, DY));
          }
    }
    const char *p = text;
