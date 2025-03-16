@@ -1887,9 +1887,9 @@ gfx_message (const char *m)
          int8_t isf = 1;
          flags = 0;
          for (; *m && *m != ']'; m++)
-            if (*m == '-')
+            if (*m == '_')
                flags |= GFX_TEXT_DESCENDERS;
-            else if (*m == 'L')
+            else if (*m == '|')
                flags |= GFX_TEXT_LIGHT;
             else if (isdigit ((unsigned char) *m))
                size = (*m - '0');       /* size */
