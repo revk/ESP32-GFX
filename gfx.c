@@ -1500,7 +1500,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
 
 #ifndef	CONFIG_GFX_VECTOR
 void
-gfx_text_draw (uint8_t size, uint8_t size, const char *text)
+gfx_text_draw (uint8_t flags, uint8_t size, const char *text)
 {                               // Size negative for descenders
    if (!gfx || !fonts[size])
       return;
@@ -1639,6 +1639,7 @@ gfx_text_size (uint8_t flags, uint8_t size, const char *t, gfx_pos_t * w, gfx_po
    if (!(flags & GFX_TEXT_VECTOR) && size > sizeof (fonts) / sizeof (*fonts) - 1)
       size = sizeof (fonts) / sizeof (*fonts) - 1;
    gfx_text_draw_size (flags, size, t, w, h);
+   ESP_LOGE(TAG,"text size flags %X size %d [%s]",flags,size,t);
 }
 
 static void
