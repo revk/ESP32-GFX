@@ -268,18 +268,10 @@ gfx_driver_send (void)
    }
 #endif
 
-#if 0
 #ifdef	USE_FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
 #endif
-#else
-   gfx_command1 (EPD75_PSR,  0x1F);      //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip
-   if(gfx_settings.norefresh)
-   {
-      gfx_command1 (EPD75_CCSET, 0x02); // Seems odd, but esphome does this
-      gfx_command1 (EPD75_TSSET, 0x5A); // Seems odd, but esphome does this
-   }
-#endif
+
    gfx_command2 (EPD75_CDI,
 #ifdef	USE_N2OCP
                  8 |
