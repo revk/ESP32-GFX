@@ -1362,12 +1362,12 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
      w,
      h;
    gfx_text_draw_size (size, z, text, &w, &h);
-   ESP_LOGE(TAG,"Size=%d z=%d w=%d h=%d [%s]",size,z,w,h,text);
 
    int fonth = (z + 1) * (size ? : 1);
    gfx_pos_t ox = 0,
       oy = 0;
    gfx_draw (w, h, 1, 1, &ox, &oy);     // starting point
+   ESP_LOGE(TAG,"Size=%d z=%d w=%d h=%d ox=%d oy=%d [%s]",size,z,w,h,ox,oy,text);
    if (f != b)
       for (x = -1; x <= w; x++)
          for (y = -1; y <= h; y++)
