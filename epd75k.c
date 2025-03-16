@@ -89,7 +89,7 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t init[] = {
-      2, EPD75_PSR, 0x00,       // Reset
+      //2, EPD75_PSR, 0x00,       // Reset
 #ifdef	AJKINIT                 // My attempt
       //2, EPD75_PSR, 0x00,	// Reset
 #ifndef	USE_FAST
