@@ -1428,6 +1428,11 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
             }
             void line (int x1, int y1, int x2, int y2)
             {
+		    if(blocky)
+		    {
+
+			    return;
+		    }
                x1 = ox + x + size * (x1 - dx);
                y1 = oy + y + size * y1;
                x2 = ox + x + size * (x2 - dx);
@@ -1659,7 +1664,6 @@ gfx_text_size (int8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 }
 #endif
 
-#ifdef	CONFIG_GFX_FONT1
 void
 gfx_blocky (int8_t size, const char *fmt, ...)
 {                               // Size negative for descenders, blocky text
@@ -1678,10 +1682,13 @@ gfx_blocky (int8_t size, const char *fmt, ...)
    vasprintf (&temp, fmt, ap);
    va_end (ap);
    if (temp)
+#ifndef	CONFIG_GFX_VECTOR_ONLY
+      gfx_vector_draw (size, z, 1, temp);
+#else
       gfx_text_draw (size, z, 1, temp);
+#endif
    free (temp);
 }
-#endif
 
 #ifdef	CONFIG_GFX_FONT1
 void

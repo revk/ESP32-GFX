@@ -78,9 +78,10 @@ menu "GFX"
 
 	config GFX_FONT1
 	bool "Include 5x9 font"
+	depends on !GFX_VECTOR_ONLY
 	default y 
 	help
-		Small 5x9 pre-rendered font - needed for blocky text
+		Small 5x9 pre-rendered font
 
 	config GFX_FONT2
 	bool "Include 10x18 font"
