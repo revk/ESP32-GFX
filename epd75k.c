@@ -315,7 +315,7 @@ gfx_driver_send (void)
       return "AUTO+DSLP failed";
    if (gfx_settings.norefresh)
    { // Reset to try and avoid fading
-      sleep (3);
+      sleep (4);
       gpio_set_level (gfx_settings.rst, 0);
       usleep (10000);
       gpio_set_level (gfx_settings.rst, 1);
