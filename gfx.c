@@ -1430,7 +1430,19 @@ gfx_vector_draw (int8_t size, uint8_t z, uint8_t blocky, const char *text)
             {
 		    if(blocky)
 		    {
-
+			    while(1)
+			    {
+				    int X=ox + x + size * (x1 - dx);
+				    int Y=oy + y + size * y1; 
+               for (int DY = 0; DY < size; DY++)
+                  for (int DX = 0; DX < size; DX++)
+			  gfx_pixel(X+DX,Y+DY,255);
+	       if(x1==x2&&y1==y2)break;
+	       if(x2>x1)x1++;
+	       else if(x2<x1)x1--;
+	       if(y2>y1)y1++;
+	       else if(y2<y1)y1--;
+			    }
 			    return;
 		    }
                x1 = ox + x + size * (x1 - dx);

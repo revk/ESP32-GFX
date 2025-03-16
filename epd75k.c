@@ -80,7 +80,7 @@
 #define	AJKINIT
 #define	AJKLUT
 
-extern uint32_t uptime(void);
+extern uint32_t uptime (void);
 
 static const char *
 gfx_driver_init (void)
