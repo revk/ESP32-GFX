@@ -77,7 +77,7 @@
 #define	T8	1
 #define	REPEAT	5
 
-//#define	AJKINIT
+#define	AJKINIT
 #define	AJKLUT
 
 extern uint32_t uptime (void);
@@ -267,8 +267,18 @@ gfx_driver_send (void)
       gfx_driver_init ();
    }
 #endif
+
+#if 0
 #ifdef	USE_FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
+#endif
+#else
+   gfx_command1 (EPD75_PSR,  0x1F);      //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip
+   if(gfx_settings.norefresh)
+   {
+      gfx_command1 (EPD75_CCSET, 0x02); // Seems odd, but esphome does this
+      gfx_command1 (EPD75_TSSET, 0x5A); // Seems odd, but esphome does this
+   }
 #endif
    gfx_command2 (EPD75_CDI,
 #ifdef	USE_N2OCP
@@ -304,11 +314,6 @@ gfx_driver_send (void)
    if (gfx_send_gfx (0))
       return "Data send failed";
 
-#if 0                           // esphome stuff
-   gfx_send_command (EPD75_PTOUT);      // Should not be needed unless we do partial updates
-   if (gfx_settings.norefresh)
-      gfx_command1 (EPD75_TSSET, 0x5A); // Seems odd, but esphome does this
-#endif
 
 #ifdef	USE_AUTO
 #ifdef	CONFIG_GFX_USE_DEEP_SLEEP
