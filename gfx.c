@@ -1293,7 +1293,7 @@ utf8 (const char **pp)
 }
 
 static void
-gfx_text_draw_size (int8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gfx_pos_t * hp)
+gfx_text_draw_size (uint8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gfx_pos_t * hp)
 {
    if (wp)
       *wp = 0;
@@ -1329,6 +1329,7 @@ gfx_text_draw_size (int8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gf
       *wp = w;
    if (hp)
       *hp = h;
+   ESP_LOGE(TAG,"[%s] size=%d z=%d w=%d h=%d",text,z,w,h);
 }
 
 #ifdef	CONFIG_GFX_VECTOR
