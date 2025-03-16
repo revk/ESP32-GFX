@@ -1885,7 +1885,6 @@ gfx_message (const char *m)
       if (*m == '[')
       {
          int8_t isf = 1;
-         int8_t lc = 1;
          flags = 0;
          for (; *m && *m != ']'; m++)
             if (*m == '-')
