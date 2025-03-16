@@ -1689,7 +1689,7 @@ gfx_blocky (int8_t size, const char *fmt, ...)
    vasprintf (&temp, fmt, ap);
    va_end (ap);
    if (temp)
-#ifndef	CONFIG_GFX_VECTOR_ONLY
+#ifdef	CONFIG_GFX_VECTOR_ONLY
       gfx_vector_draw (size, z, 1, temp);
 #else
       gfx_text_draw (size, z, 1, temp);
