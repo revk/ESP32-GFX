@@ -1329,7 +1329,7 @@ gfx_text_draw_size (uint8_t size, uint8_t z, const char *text, gfx_pos_t * wp, g
       *wp = w;
    if (hp)
       *hp = h;
-   ESP_LOGE(TAG,"[%s] size=%d z=%d w=%d h=%d",text,z,w,h);
+   ESP_LOGE(TAG,"[%s] size=%d z=%d w=%d h=%d",text,size,z,w,h);
 }
 
 #ifdef	CONFIG_GFX_VECTOR
