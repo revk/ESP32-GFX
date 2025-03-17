@@ -99,10 +99,9 @@ gfx_driver_init (void)
       2, EPD75_VDCS, 0x26,      //
       //2, EPD75_CCSET, 0x02,   // esphome did this
       //2, EPD75_TSSET, 0x5A,   // Fixed temp?
-      2, EPD75_TSE, 0x08,       // Temp sensor internal
-      //3, EPD75_TSC, 0x00, 0x00, // Temp cal
+      2, EPD75_TSE, 0x08,       // Temp sensor internal, offset
 #ifdef	USE_AUTO
-      2, EPD75_PFS, 0x30,       // Power off sequence
+      //2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
       //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
       2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
