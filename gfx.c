@@ -228,10 +228,18 @@ static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -356,45 +364,47 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static char const sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
-static uint8_t const sevensegmap[] = {
-   0x00,                        // space
-   0x3F,                        // 0
-   0x06,                        // 1
-   0x5B,                        // 2
-   0x4F,                        // 3
-   0x66,                        // 4
-   0x6D,                        // 5
-   0x7D,                        // 6
-   0x07,                        // 7
-   0x7F,                        // 8
-   0x6F,                        // 9
-   0x40,                        // -
-   0x08,                        // _
-   0x22,                        // "
-   0x02,                        // '
-   0x04,                        // ,
-   0x39,                        // [
-   0x0F,                        // ]
-   0x77,                        // A
-   0x7C,                        // B (b)
-   0x39,                        // C
-   0x5E,                        // D (d)
-   0x79,                        // E
-   0x71,                        // F
-   0x3D,                        // G
-   0x76,                        // H
-   0x30,                        // I
-   0x1E,                        // J
-   0x38,                        // L
-   0x37,                        // N
-   0x3F,                        // O
-   0x73,                        // P
-   0x50,                        // R (r)
-   0x6D,                        // S
-   0x3E,                        // U
-   0x5B,                        // Z
-};
+     static char const
+        sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
+     static uint8_t const
+        sevensegmap[] = {
+        0x00,                   // space
+        0x3F,                   // 0
+        0x06,                   // 1
+        0x5B,                   // 2
+        0x4F,                   // 3
+        0x66,                   // 4
+        0x6D,                   // 5
+        0x7D,                   // 6
+        0x07,                   // 7
+        0x7F,                   // 8
+        0x6F,                   // 9
+        0x40,                   // -
+        0x08,                   // _
+        0x22,                   // "
+        0x02,                   // '
+        0x04,                   // ,
+        0x39,                   // [
+        0x0F,                   // ]
+        0x77,                   // A
+        0x7C,                   // B (b)
+        0x39,                   // C
+        0x5E,                   // D (d)
+        0x79,                   // E
+        0x71,                   // F
+        0x3D,                   // G
+        0x76,                   // H
+        0x30,                   // I
+        0x1E,                   // J
+        0x38,                   // L
+        0x37,                   // N
+        0x3F,                   // O
+        0x73,                   // P
+        0x50,                   // R (r)
+        0x6D,                   // S
+        0x3E,                   // U
+        0x5B,                   // Z
+     };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1399,16 +1409,6 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
          uint8_t half = 0;
          while (start < end)
          {
-            inline uint8_t nibble (void)
-            {
-               if (!half)
-               {
-                  half = 1;
-                  return font_vector_data[start] >> 4;
-               }
-               half = 0;
-               return font_vector_data[start++] & 0xF;
-            }
             void line (int x1, int y1, int x2, int y2)
             {
                if (flags & GFX_TEXT_BLOCKY)
@@ -1453,35 +1453,23 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
                         gfx_line (DX + x1, DY + y1, DX + x2, DY + y2, 255);
                   }
             }
-            uint8_t l = nibble ();
-            if (start == end)
-               break;           // Trailing nibble;
-            uint8_t x1 = nibble ();
-            uint8_t y1 = nibble ();
-            if (!l)
+            uint8_t v = font_vector_data[start++];
+            if (!v & 0x80)
+               ESP_LOGE (TAG, "Bad font %d", c);
+            uint8_t x1 = ((v & 0x70) >> 4);
+            uint8_t y1 = (v & 0xF);
+            if (start == end || (font_vector_data[start] & 0x80))
                line (x1, y1, x1, y1);   // Dot
-            else if (l < 12)
-            {                   // Lines
-               while (l--)
+            else
+               while (start < end && !((v = font_vector_data[start]) & 0x80))
                {
-                  uint8_t x2 = nibble ();
-                  uint8_t y2 = nibble ();
+                  uint8_t x2 = ((v & 0x70) >> 4);
+                  uint8_t y2 = (v & 0xF);
                   line (x1, y1, x2, y2);
                   x1 = x2;
                   y1 = y2;
+                  start++;
                }
-            } else
-            {                   // Special
-               uint8_t n = nibble ();
-               if (l == 12)
-                  line (x1, y1, x1 + n, y1);
-               else if (l == 13)
-                  line (x1, y1, x1, y1 + n);
-               else if (l == 14)
-                  line (x1, y1, x1 - n, y1 + n);
-               else
-                  line (x1, y1, x1 + n, y1 + n);
-            }
          }
          x += charw;
       }
