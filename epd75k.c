@@ -87,7 +87,6 @@ gfx_driver_init (void)
    int H = gfx_settings.height;
    const uint8_t init[] = {
       //2, EPD75_PSR, 0x00,       // Reset
-      //2, EPD75_PSR, 0x00,     // Reset
 #ifndef	USE_FAST
       2, EPD75_PSR, 0x1F,       // Normal LUT
 #endif
@@ -98,10 +97,9 @@ gfx_driver_init (void)
       2, EPD75_DSPI, 0x00,      //
       2, EPD75_TCON, 0x22,      //
       2, EPD75_VDCS, 0x26,      //
-      2, EPD75_CCSET, 0x02,
+      //2, EPD75_CCSET, 0x02,	// esphome did this
       //2, EPD75_TSSET, 0x5A,	// Fixed temp?
       //2, EPD75_TSE, 0x80,       // Temp sensor
-      2, EPD75_TSE, 0x00,       // Temp sensor off
 #ifdef	USE_AUTO
       2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
