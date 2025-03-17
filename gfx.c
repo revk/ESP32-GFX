@@ -228,18 +228,10 @@ static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -364,47 +356,45 @@ static __attribute__((unused))
 #endif
 #endif
 
-     static char const
-        sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
-     static uint8_t const
-        sevensegmap[] = {
-        0x00,                   // space
-        0x3F,                   // 0
-        0x06,                   // 1
-        0x5B,                   // 2
-        0x4F,                   // 3
-        0x66,                   // 4
-        0x6D,                   // 5
-        0x7D,                   // 6
-        0x07,                   // 7
-        0x7F,                   // 8
-        0x6F,                   // 9
-        0x40,                   // -
-        0x08,                   // _
-        0x22,                   // "
-        0x02,                   // '
-        0x04,                   // ,
-        0x39,                   // [
-        0x0F,                   // ]
-        0x77,                   // A
-        0x7C,                   // B (b)
-        0x39,                   // C
-        0x5E,                   // D (d)
-        0x79,                   // E
-        0x71,                   // F
-        0x3D,                   // G
-        0x76,                   // H
-        0x30,                   // I
-        0x1E,                   // J
-        0x38,                   // L
-        0x37,                   // N
-        0x3F,                   // O
-        0x73,                   // P
-        0x50,                   // R (r)
-        0x6D,                   // S
-        0x3E,                   // U
-        0x5B,                   // Z
-     };
+static char const sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
+static uint8_t const sevensegmap[] = {
+   0x00,                        // space
+   0x3F,                        // 0
+   0x06,                        // 1
+   0x5B,                        // 2
+   0x4F,                        // 3
+   0x66,                        // 4
+   0x6D,                        // 5
+   0x7D,                        // 6
+   0x07,                        // 7
+   0x7F,                        // 8
+   0x6F,                        // 9
+   0x40,                        // -
+   0x08,                        // _
+   0x22,                        // "
+   0x02,                        // '
+   0x04,                        // ,
+   0x39,                        // [
+   0x0F,                        // ]
+   0x77,                        // A
+   0x7C,                        // B (b)
+   0x39,                        // C
+   0x5E,                        // D (d)
+   0x79,                        // E
+   0x71,                        // F
+   0x3D,                        // G
+   0x76,                        // H
+   0x30,                        // I
+   0x1E,                        // J
+   0x38,                        // L
+   0x37,                        // N
+   0x3F,                        // O
+   0x73,                        // P
+   0x50,                        // R (r)
+   0x6D,                        // S
+   0x3E,                        // U
+   0x5B,                        // Z
+};
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1194,7 +1184,7 @@ gfx_7seg_size (int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
       if (strchr (sevensegchar, *p))
       {
          w += 6 * size;
-         if (p[1] == ':' || p[1] == '.' || c == '!')
+         if (p[1] == ':' || p[1] == '.')
             w += size;
       }
    if (wp)
@@ -1243,7 +1233,7 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       uint8_t segs = 7;
       uint16_t map = 0;
       map = sevensegmap[m - sevensegchar];
-      if (p[1] == ':' || p[1] == '.' || c == '!')
+      if (p[1] == ':' || p[1] == '.')
       {
          segs = 10;
          if (p[1] == ':')
@@ -1258,8 +1248,8 @@ gfx_7seg (int8_t size, const char *fmt, ...)
    free (temp);
 }
 
-static int
-cwidth (int8_t size, int c)
+static uint32_t
+cwidth (uint8_t flags, uint8_t size, int c)
 {                               // character width as printed - some characters are done narrow, and <' ' is fixed size move
    if (size)
    {
@@ -1267,7 +1257,7 @@ cwidth (int8_t size, int c)
          return c * size;       // Chars 1-8 are spacers
       if (c < ' ')
          return 0;
-      if (c == ':' || c == '.' || c == '!')
+      if (!(flags & GFX_TEXT_FIXED) && (c == ':' || c == '.' || c == '!' || c == '|' || c == 161))
          return size * 2;
    }
    return (size ? 6 * size : 4);
@@ -1303,7 +1293,7 @@ utf8 (const char **pp)
 }
 
 static void
-gfx_text_draw_size (uint8_t size, uint8_t z, const char *text, gfx_pos_t * wp, gfx_pos_t * hp)
+gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * wp, gfx_pos_t * hp)
 {
    if (wp)
       *wp = 0;
@@ -1313,6 +1303,9 @@ gfx_text_draw_size (uint8_t size, uint8_t z, const char *text, gfx_pos_t * wp, g
       y = 0,
       w = 0,
       h = 0;
+   uint8_t z = 7;
+   if (flags & GFX_TEXT_DESCENDERS)
+      z = 9;
    const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
@@ -1326,7 +1319,7 @@ gfx_text_draw_size (uint8_t size, uint8_t z, const char *text, gfx_pos_t * wp, g
             y++;
          continue;
       }
-      x += cwidth (size, c);
+      x += cwidth (flags, size, c);
    }
    if (x > w)
       w = x;
@@ -1355,7 +1348,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
      y,
      w,
      h;
-   gfx_text_draw_size (size, z, text, &w, &h);
+   gfx_text_draw_size (flags, size, text, &w, &h);
 
    int fonth = (z + 1) * (size ? : 1);
    gfx_pos_t ox = 0,
@@ -1378,14 +1371,14 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    {
       if (!x && y + fonth > h)
          fonth = h - y;         // Last line
-      int charw = cwidth (size, c);
+      int charw = cwidth (flags, size, c);
       if (charw)
       {
          if (c <= 8)
             c = ' ';
-         if (!cwidth (size, *p))
+         if (!cwidth (flags, size, *p))
             charw -= (size ? : 1);      // Crop right edge border - messy for UTF8 but should be OK
-         int dx = ((c == ':' || c == '.' || c == '!') ? 2 : 0); // : and . are offset as make narrower
+         int dx = (cwidth (flags, 1, c) == 2) ? 2 : 0;  // Narrow are offset
          // Find character
          uint16_t start = 0,
             end = 0;
@@ -1499,7 +1492,7 @@ gfx_text_draw (uint8_t flags, uint8_t size, const char *text)
      y,
      w,
      h;
-   gfx_text_draw_size (size, z, text, &w, &h);
+   gfx_text_draw_size (flags, size, text, &w, &h);
 
    int fonth = (z + 1) * (size ? : 1);
 
@@ -1533,14 +1526,14 @@ gfx_text_draw (uint8_t flags, uint8_t size, const char *text)
    {
       if (!x && y + fonth > h)
          fonth = h - y;         // Last line
-      int charw = cwidth (size, c);
+      int charw = cwidth (flags, size, c);
       if (charw)
       {
          if (c <= 8)
             c = ' ';
-         if (!cwidth (size, *p))
+         if (!cwidth (flags, size, *p))
             charw -= (size ? : 1);      // Crop right edge border - messy for UTF8 but should be OK
-         int dx = size * ((c == ':' || c == '.' || c == '!') ? 2 : 0);  // : and . are offset as make narrower
+         int dx = (cwidth (flags, 1, c) == 2) ? 2 : 0;  // Narrow are offset
          if (flags & GFX_TEXT_BLOCKY)
          {
 #if	GFX_BPP <= 2            // TODO should really do full colour
@@ -1625,10 +1618,7 @@ gfx_text_size (uint8_t flags, uint8_t size, const char *t, gfx_pos_t * w, gfx_po
 #endif
    if (!(flags & GFX_TEXT_VECTOR) && size > sizeof (fonts) / sizeof (*fonts) - 1)
       size = sizeof (fonts) / sizeof (*fonts) - 1;
-   uint8_t z = 7;
-   if (flags & GFX_TEXT_DESCENDERS)
-      z = 9;
-   gfx_text_draw_size (size, z, t, w, h);
+   gfx_text_draw_size (flags, size, t, w, h);
 }
 
 static void

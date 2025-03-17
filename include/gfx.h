@@ -105,6 +105,7 @@ void gfx_vector_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 #define	GFX_TEXT_BLOCKY		(1<<1)	// Blocky text
 #define	GFX_TEXT_VECTOR		(1<<2)	// Vector test (default if vector only set)
 #define	GFX_TEXT_LIGHT		(1<<3)	// Thin (vector) test
+#define	GFX_TEXT_FIXED		(1<<4)	// Don't do narrow special characters (full stop, colon, etc)
 void gfx_text(uint8_t flags,uint8_t size, const char *fmt,...); // text, use -ve size for descenders versions
 void gfx_text_size(uint8_t flags,uint8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 void gfx_7seg (int8_t size, const char *fmt, ...); // digits (allows : or , or space after a digit)
