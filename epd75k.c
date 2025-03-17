@@ -43,7 +43,7 @@
 #define	EPD75_EVS	0x52
 #define	EPD75_TCON	0x60
 #define	EPD75_TRES	0x61
-#defin-e	EPD75_GSST	0x65
+#define	EPD75_GSST	0x65
 #define	EPD75_REV	0x70
 #define	EPD75_FLG	0x71
 #define	EPD75_AMV	0x80
