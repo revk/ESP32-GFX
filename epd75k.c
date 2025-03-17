@@ -98,7 +98,7 @@ gfx_driver_init (void)
       2, EPD75_TCON, 0x22,      //
       2, EPD75_VDCS, 0x26,      //
       2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
-      2, EPD75_TSSET, 0x80,   // Fixed temp?
+      //2, EPD75_TSSET, 0x80,   // Fixed temp?
 #ifdef	USE_AUTO
       //2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
