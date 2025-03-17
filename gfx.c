@@ -1455,7 +1455,10 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
             }
             uint8_t v = font_vector_data[start++];
             if (!v & 0x80)
+	    {
                ESP_LOGE (TAG, "Bad font %d", c);
+	       break;
+	    }
             uint8_t x1 = ((v & 0x70) >> 4);
             uint8_t y1 = (v & 0xF);
             if (start == end || (font_vector_data[start] & 0x80))
