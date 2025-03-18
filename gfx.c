@@ -718,6 +718,7 @@ static __attribute__((unused))
          usleep (100000);
          continue;
       }
+#if 0
       uint8_t buf[64];          // TODO is this necessary?
       if (len > sizeof (buf))
       {
@@ -726,6 +727,9 @@ static __attribute__((unused))
       }
       memcpy (buf, bulk, len);
       esp_err_t e = gfx_command (*buf, buf + 1, len - 1);
+#else
+      esp_err_t e = gfx_command (*bulk, bulk + 1, len - 1);
+#endif
       if (e)
          return e;
       bulk += len;
