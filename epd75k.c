@@ -86,12 +86,14 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
    const uint8_t init[] = {
-      //2, EPD75_PSR, 0x00,       // Reset
+#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
+      2, EPD75_PSR, 0x00,       // Reset
+#endif
 #ifndef	USE_FAST
-      2, EPD75_PSR, 0x1F,       // Normal LUT
+      2, EPD75_PSR, 0x1E,       // Normal LUT
 #endif
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
-      5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,     // 4 not 5 as no red (second byte slow slew)
+      5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
       2, EPD75_PLL, 0x06,       //
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
@@ -157,9 +159,8 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 #endif
-      //2, EPD75_AMV, 0x11,       // VCOM
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-      2, EPD75_AMV, 0x19,       // VCOM XON
+      2, EPD75_AMV, 0x11,       // VCOM
 #endif
       0
    };
