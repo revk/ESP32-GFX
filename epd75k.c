@@ -96,6 +96,7 @@ fastlut (void)
    lut = 1;
 #endif
    ESP_LOGD (TAG, "Fast LUT");
+   // My LUT
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x00, T1, T2, T3, T4, 1,
@@ -162,6 +163,7 @@ slowlut (void)
    lut = 2;
 #endif
    ESP_LOGD (TAG, "Slow LUT");
+   // Waveshare example LUT
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x0, 0xF, 0xF, 0x0, 0x0, 0x1,
@@ -221,7 +223,7 @@ gfx_driver_init (void)
 
    const uint8_t init[] = {
 #if 1
-      // Waveshare example
+      // Waveshare example exactly
       6, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F, 0x11,       //
       2, EPD75_VDCS, 0x24,      //
       5, EPD75_BTST, 0x27, 0x27, 0x2F, 0x17,    //
@@ -242,6 +244,7 @@ gfx_driver_init (void)
       // We did PON, we need POFF else auto does not work
       2, EPD75_POF, 0x00,
 #else
+      // My settings
       5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,
       2, EPD75_VDCS, 0x26,      //
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,
