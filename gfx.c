@@ -636,10 +636,10 @@ gfx_send_gfx (uint8_t page)
 }
 
 static esp_err_t
-gfx_command (uint8_t c, const uint8_t * buf, uint8_t len)
+gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len)
 {
    ESP_LOGE (TAG, "Command %02X+%d", cmd, len);
-   esp_err_t e = gfx_send_command (c);
+   esp_err_t e = gfx_send_command (cmd);
    if (!e && len)
       e = gfx_send_data (buf, len);
    return e;
