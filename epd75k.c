@@ -65,7 +65,7 @@
 
 #define		USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define		BUFFER_OLD	// Buffer and send old
+#define		BUFFER_OLD      // Buffer and send old
 #define		SWITCH_LUT      // Change LUT as needed
 
 #define	T1	30
@@ -212,6 +212,9 @@ gfx_driver_init (void)
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
       2, EPD75_PSR, 0x00,       // Reset
 #endif
+#ifdef	SWITCH_LUT
+      2, EPD75_PSR, 0x3F,       // Use REG
+#endif
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
       5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
       2, EPD75_PLL, 0x06,       //
@@ -281,7 +284,6 @@ gfx_driver_send (void)
       fastlut ();
    else
       slowlut ();
-   gfx_command1 (EPD75_PSR, 0x3F);      //  KW, LUT=REG
 #else
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
 #endif
