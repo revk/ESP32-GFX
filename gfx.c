@@ -718,7 +718,7 @@ static __attribute__((unused))
          usleep (100000);
          continue;
       }
-      uint8_t buf[32];
+      uint8_t buf[64];
       if (len > sizeof (buf))
       {
          ESP_LOGE (TAG, "Bulk fail len %d", len);
