@@ -220,13 +220,12 @@ gfx_driver_init (void)
 #endif
 
    const uint8_t init[] = {
-#if 0
+#if 1
       6, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F, 0x11,       //
       2, EPD75_VDCS, 0x24,      //
       5, EPD75_BTST, 0x27, 0x27, 0x2F, 0x17,    //
       2, EPD75_PLL, 0x06,       //
-      1, EPD75_PON,
-      0xFF,
+      //1, EPD75_PON, 0xFF,
       2, EPD75_PSR, 0x3F,       // Use REG
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
