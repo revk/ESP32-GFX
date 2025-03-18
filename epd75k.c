@@ -87,12 +87,13 @@ static uint8_t lut = 0;
 static void
 fastlut (void)
 {
+   ESP_LOGE (TAG, "lut=%d", lut);
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
    if (lut == 1)
       return;
    lut = 1;
 #endif
-   ESP_LOGE(TAG,"Fast LUT");
+   ESP_LOGE (TAG, "Fast LUT");
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x00, T1, T2, T3, T4, 1,
@@ -152,12 +153,13 @@ fastlut (void)
 static void
 slowlut (void)
 {                               // slow (flashy) update (as per esphome code)
+   ESP_LOGE (TAG, "lut=%d", lut);
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
    if (lut == 2)
       return;
    lut = 2;
 #endif
-   ESP_LOGE(TAG,"Slow LUT");
+   ESP_LOGE (TAG, "Slow LUT");
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x0, 0xF, 0xF, 0x0, 0x0, 0x1,
@@ -351,12 +353,8 @@ gfx_driver_send (void)
       return "PON failed";
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
-   ESP_LOGE(TAG,"DRF done");
-   gfx_busy_wait ();
-   ESP_LOGE(TAG,"Busy done");
-   usleep (200000);
-   gfx_send_command(EPD75_POF);
-   ESP_LOGE(TAG,"POF done");
+   gfx_send_command (EPD75_POF);
+   ESP_LOGE (TAG, "POF done");
    //gfx_command1 (EPD75_POF, 0x30);  // V2 has arg, V3 does not?
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
