@@ -220,6 +220,7 @@ gfx_driver_init (void)
 #endif
 
    const uint8_t init[] = {
+#if 0
       6, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F, 0x11,       //
       2, EPD75_VDCS, 0x24,      //
       5, EPD75_BTST, 0x27, 0x27, 0x2F, 0x17,    //
@@ -232,6 +233,15 @@ gfx_driver_init (void)
       3, EPD75_CDI, 0x10,0x00, //
       2, EPD75_TCON, 0x22,      // 
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
+#else
+      5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,
+       2, EPD75_PLL, 0x06,       //
+      5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
+      2, EPD75_DSPI, 0x00,      //
+      2, EPD75_TCON, 0x22,      //
+      2, EPD75_VDCS, 0x26,      //
+      2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
+#endif
       //2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
 #ifdef	USE_AUTO
       //2, EPD75_PFS, 0x30,       // Power off sequence
