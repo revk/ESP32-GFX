@@ -64,7 +64,7 @@
 #include <driver/rtc_io.h>
 
 #define               USE_AUTO  // Auto PON/DRF/POF sequence
-//#define       USE_N2OCP       // Auto copy buffer (seems not to work)
+#define       USE_N2OCP       // Auto copy buffer (seems not to work)
 #define		BUFFER_OLD      // Buffer and send old
 #define		SWITCH_LUT      // Change LUT as needed
 
