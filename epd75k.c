@@ -351,8 +351,8 @@ gfx_driver_send (void)
       return "DRF failed";
    gfx_busy_wait ();
    usleep (200000);
-   if (gfx_command1 (EPD75_POF, 0x30))  // V2 has arg, V3 does not?
-      return "POF failed";
+   gfx_send_command(EPD75_POF);
+   //gfx_command1 (EPD75_POF, 0x30);  // V2 has arg, V3 does not?
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
