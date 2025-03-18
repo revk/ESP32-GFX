@@ -349,6 +349,8 @@ gfx_driver_send (void)
       return "PON failed";
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
+   gfx_busy_wait ();
+   usleep(100000);
    if (gfx_command1 (EPD75_POF, 0x30))  // V2 has arg, V3 does not?
       return "POF failed";
    gfx_busy_wait ();
