@@ -63,9 +63,9 @@
 
 #include <driver/rtc_io.h>
 
-#define               USE_AUTO        // Auto PON/DRF/POF sequence
+#define               USE_AUTO  // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-//#define		BUFFER_OLD      // Buffer and send old
+#define		BUFFER_OLD      // Buffer and send old
 #define		SWITCH_LUT      // Change LUT as needed
 
 #define	T1	30
@@ -308,24 +308,21 @@ gfx_driver_send (void)
       old = malloc (SIZE);
       if (old)
          memset (old, 0, SIZE);
+      else
+         ESP_LOGE (TAG, "Cannot malloc old");
    }
    if (old)
    {
-      if (gfx_send_command (EPD75_DTM1))
+      if (gfx_send_command (EPD75_DTM1) || gfx_send_data (old, SIZE))
          return "DTM1 failed";
-      if (gfx_send_data (old, SIZE))
-         return "Data failed";
       memcpy (old, gfx_raw_b (), SIZE);
    }
 #undef SIZE
 #endif
 #endif
 
-   if (gfx_send_command (EPD75_DTM2))
+   if (gfx_send_command (EPD75_DTM2) || gfx_send_gfx (0))
       return "DTM2 failed";
-   if (gfx_send_gfx (0))
-      return "Data send failed";
-
 
 #ifdef	USE_AUTO
 #ifdef	CONFIG_GFX_USE_DEEP_SLEEP
@@ -358,10 +355,8 @@ gfx_driver_send (void)
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
 #ifndef	BUFFER_OLD
 #ifndef	USE_N2OCP
-   if (gfx_send_command (EPD75_DTM1))
+   if (gfx_send_command (EPD75_DTM1) || gfx_send_gfx (0))
       return "DTM1 failed";
-   if (gfx_send_gfx (0))
-      return "Data send failed";
 #endif
 #endif
 #endif
