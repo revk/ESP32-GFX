@@ -216,7 +216,7 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-   gfx_command1 (EPD75_PSR);
+   gfx_command1 (EPD75_PSR, 0x00);      // Reset
 #endif
    gfx_send_command (EPD75_PON);
    usleep (100000);
