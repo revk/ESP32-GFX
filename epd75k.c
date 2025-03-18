@@ -92,6 +92,7 @@ fastlut (void)
       return;
    lut = 1;
 #endif
+   ESP_LOGE(TAG,"Fast LUT");
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x00, T1, T2, T3, T4, 1,
@@ -156,6 +157,7 @@ slowlut (void)
       return;
    lut = 2;
 #endif
+   ESP_LOGE(TAG,"Slow LUT");
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x0, 0xF, 0xF, 0x0, 0x0, 0x1,
