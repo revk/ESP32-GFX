@@ -349,9 +349,12 @@ gfx_driver_send (void)
       return "PON failed";
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
+   ESP_LOGE(TAG,"DRF done");
    gfx_busy_wait ();
+   ESP_LOGE(TAG,"Busy done");
    usleep (200000);
    gfx_send_command(EPD75_POF);
+   ESP_LOGE(TAG,"POF done");
    //gfx_command1 (EPD75_POF, 0x30);  // V2 has arg, V3 does not?
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
