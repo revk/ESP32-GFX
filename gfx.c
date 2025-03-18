@@ -591,7 +591,6 @@ gfx_send_command (uint8_t cmd)
       .tx_data = {cmd},
       .flags = SPI_TRANS_USE_TXDATA,
    };
-   //esp_err_t e = spi_device_polling_transmit (gfx_spi, &t);
    esp_err_t e = spi_device_transmit (gfx_spi, &t);
    return e;
 }
@@ -659,7 +658,7 @@ static __attribute__((unused))
       .tx_data = {a},
       .flags = SPI_TRANS_USE_TXDATA,
    };
-   return spi_device_polling_transmit (gfx_spi, &t);
+   return spi_device_transmit (gfx_spi, &t);
 }
 
 static __attribute__((unused))
@@ -674,7 +673,7 @@ static __attribute__((unused))
       .tx_data = {a, b},
       .flags = SPI_TRANS_USE_TXDATA,
    };
-   return spi_device_polling_transmit (gfx_spi, &t);
+   return spi_device_transmit (gfx_spi, &t);
 }
 
 static __attribute__((unused))
@@ -689,31 +688,24 @@ static __attribute__((unused))
       .tx_data = {a, b, c, d},
       .flags = SPI_TRANS_USE_TXDATA,
    };
-   return spi_device_polling_transmit (gfx_spi, &t);
+   return spi_device_transmit (gfx_spi, &t);
 }
 
 static __attribute__((unused))
      esp_err_t gfx_command_bulk (const uint8_t * bulk)
 {                               // Bulk command
-   // bulk is a sequence of blocks of the form :-
-   // Len, 0x00 is end, 0xFF is busy wait with no command or data
+   // Bulk is a sequence of blocks of the form :-
+   // Len (0 for end)
    // Command (included in len)
    // Data (len-1 bytes)
-   uint8_t buf[64];
 
    while (*bulk)
    {
       uint8_t len = *bulk++;
-      if (len > sizeof (buf))
-      {
-         ESP_LOGE (TAG, "Bad bulk command len %d", len);
-         break;
-      }
-      memcpy (buf, bulk, len);
-      bulk += len;
-      esp_err_t e = gfx_command (*buf, buf + 1, len - 1);
+      esp_err_t e = gfx_command (*bulk, bulk + 1, len - 1);
       if (e)
          return e;
+      bulk += len;
    }
    return 0;
 }
