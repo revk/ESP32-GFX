@@ -63,7 +63,7 @@
 
 #include <driver/rtc_io.h>
 
-//#define               USE_AUTO        // Auto PON/DRF/POF sequence
+#define               USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
 #define		BUFFER_OLD      // Buffer and send old
 #define		SWITCH_LUT      // Change LUT as needed
@@ -87,13 +87,12 @@ static uint8_t lut = 0;
 static void
 fastlut (void)
 {
-   ESP_LOGE (TAG, "lut=%d", lut);
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
    if (lut == 1)
       return;
    lut = 1;
 #endif
-   ESP_LOGE (TAG, "Fast LUT");
+   ESP_LOGD (TAG, "Fast LUT");
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x00, T1, T2, T3, T4, 1,
@@ -153,13 +152,12 @@ fastlut (void)
 static void
 slowlut (void)
 {                               // slow (flashy) update (as per esphome code)
-   ESP_LOGE (TAG, "lut=%d", lut);
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
    if (lut == 2)
       return;
    lut = 2;
 #endif
-   ESP_LOGE (TAG, "Slow LUT");
+   ESP_LOGD (TAG, "Slow LUT");
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x0, 0xF, 0xF, 0x0, 0x0, 0x1,
@@ -354,7 +352,6 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
    gfx_send_command (EPD75_POF);
-   ESP_LOGE (TAG, "POF done");
    //gfx_command1 (EPD75_POF, 0x30);  // V2 has arg, V3 does not?
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
