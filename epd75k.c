@@ -100,11 +100,13 @@ gfx_driver_init (void)
       2, EPD75_TCON, 0x22,      //
       2, EPD75_VDCS, 0x26,      //
       2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
-      //2, EPD75_TSE, 0x80,       // Temp sensor external
 #ifdef	USE_AUTO
       2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
-      2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
+#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
+      2, EPD75_AMV, 0x11,       // VCOM
+#endif
+      //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
       //2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
 #ifdef	USE_FAST
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
@@ -158,9 +160,6 @@ gfx_driver_init (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-#endif
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-      2, EPD75_AMV, 0x11,       // VCOM
 #endif
       0
    };
