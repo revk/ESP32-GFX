@@ -65,7 +65,7 @@
 
 #define		USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define		USE_FAST        // LUT from register
+#define		BUFFER_OLD	// Buffer and send old
 #define		SWITCH_LUT      // Change LUT as needed
 
 #define	T1	30
@@ -215,9 +215,6 @@ gfx_driver_init (void)
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
       2, EPD75_PSR, 0x00,       // Reset
 #endif
-#ifndef	USE_FAST
-      2, EPD75_PSR, 0x1E,       // Normal LUT
-#endif
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,    //
       5, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F,     // 4 not 5 as no red (second byte slow slew)
       2, EPD75_PLL, 0x06,       //
@@ -238,10 +235,8 @@ gfx_driver_init (void)
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
-#ifdef	USE_FAST
 #ifndef	SWITCH_LUT
    fastlut ();
-#endif
 #endif
    gfx_busy_wait ();
    uint64_t b = esp_timer_get_time ();
@@ -291,9 +286,7 @@ gfx_driver_send (void)
       slowlut ();
    gfx_command1 (EPD75_PSR, 0x3F);      //  KW, LUT=REG
 #else
-#ifdef	USE_FAST
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
-#endif
 #endif
 
    gfx_command2 (EPD75_CDI,
@@ -305,7 +298,8 @@ gfx_driver_send (void)
                  0x01,          // new+old logic refresh
                  0x07);
 
-#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
+#ifndef	USE_N2OCP
+#ifdef	BUFFER_OLD
 #define SIZE (GFX_DEFAULT_WIDTH/8*GFX_DEFAULT_HEIGHT)
    static uint8_t *old = NULL;
    if (!old)
@@ -323,6 +317,7 @@ gfx_driver_send (void)
       memcpy (old, gfx_raw_b (), SIZE);
    }
 #undef SIZE
+#endif
 #endif
 
    if (gfx_send_command (EPD75_DTM2))
@@ -361,13 +356,13 @@ gfx_driver_send (void)
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-   //gfx_command1 (EPD75_PSR, 0x3D);      // Explicit booster off?
-   //gfx_command1(EPD75_POF,0x30);              // Extra POF?
+#ifndef	BUFFER_OLD
 #ifndef	USE_N2OCP
    if (gfx_send_command (EPD75_DTM1))
       return "DTM1 failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
+#endif
 #endif
 #endif
    uint64_t b = esp_timer_get_time ();
