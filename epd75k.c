@@ -239,10 +239,14 @@ gfx_driver_init (void)
       // My bits
       2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-      2, EPD75_AMV, 0x11,       // VCOM
+      //2, EPD75_AMV, 0x11,       // VCOM
 #endif
+      //2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
       // We did PON, we need POFF else auto does not work
       2, EPD75_POF, 0x00,
+#ifdef	USE_AUTO
+      //2, EPD75_PFS, 0x30,       // Power off sequence
+#endif
 #else
       // My settings
       5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,
