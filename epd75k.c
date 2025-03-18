@@ -220,7 +220,8 @@ gfx_driver_init (void)
 #endif
 
    const uint8_t init[] = {
-#if 1 // Waveshare example
+#if 1
+      // Waveshare example
       6, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F, 0x11,       //
       2, EPD75_VDCS, 0x24,      //
       5, EPD75_BTST, 0x27, 0x27, 0x2F, 0x17,    //
@@ -233,7 +234,13 @@ gfx_driver_init (void)
       3, EPD75_CDI, 0x10, 0x00, //
       2, EPD75_TCON, 0x22,      // 
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
-      2, EPD75_POF,0x00,
+      // My bits
+      2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
+#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
+      2, EPD75_AMV, 0x11,       // VCOM
+#endif
+      // We did PON, we need POFF else auto does not work
+      2, EPD75_POF, 0x00,
 #else
       5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,
       2, EPD75_VDCS, 0x26,      //
@@ -256,7 +263,7 @@ gfx_driver_init (void)
 #endif
       //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
       //2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
-      2, EPD75_POF,0x00,
+      2, EPD75_POF, 0x00,
 #endif
       0
    };
