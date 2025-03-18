@@ -63,7 +63,7 @@
 
 #include <driver/rtc_io.h>
 
-//#define		USE_AUTO        // Auto PON/DRF/POF sequence
+//#define               USE_AUTO        // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
 #define		BUFFER_OLD      // Buffer and send old
 #define		SWITCH_LUT      // Change LUT as needed
@@ -350,10 +350,9 @@ gfx_driver_send (void)
    if (gfx_send_command (EPD75_DRF))
       return "DRF failed";
    gfx_busy_wait ();
-   usleep(100000);
+   usleep (200000);
    if (gfx_command1 (EPD75_POF, 0x30))  // V2 has arg, V3 does not?
       return "POF failed";
-   gfx_busy_wait ();
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
