@@ -84,7 +84,7 @@ gfx_driver_send (void)
       return "Set X failed";
    if (gfx_command2 (SSD1681_SET_RAMYCOUNT, 0, 0))
       return "Set Y failed";
-   if (gfx_send_command (SSD1681_WRITE_RAM1))
+   if (gfx_command0 (SSD1681_WRITE_RAM1))
       return "Data start failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
@@ -94,7 +94,7 @@ gfx_driver_send (void)
       ESP_LOGD (TAG, "Mode2");
       if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
          return "Display ctrl failed";
-      if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
+      if (gfx_command0 (SSD1681_MASTER_ACTIVATE))
          return "Master activate failed";
       if (gfx_settings.sleep)
       {
@@ -113,13 +113,13 @@ gfx_driver_send (void)
       ESP_LOGD (TAG, "Mode1");
       if (gfx_command1 (SSD1681_DISP_CTRL2, 0xF7))
          return "Display ctrl failed";
-      if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
+      if (gfx_command0 (SSD1681_MASTER_ACTIVATE))
          return "Master activate failed";
       if (gfx_settings.mode2)
       {                         // Will revert
          if (gfx_command1 (SSD1681_DISP_CTRL2, 0xFF))
             return "Display ctrl failed";
-         if (gfx_send_command (SSD1681_MASTER_ACTIVATE))
+         if (gfx_command0 (SSD1681_MASTER_ACTIVATE))
             return "Master activate failed";
       }
    }

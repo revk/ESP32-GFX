@@ -223,11 +223,11 @@ static SemaphoreHandle_t gfx_mutex = NULL;
 static spi_device_handle_t gfx_spi;
 
 // Driver support
-static esp_err_t gfx_send_command (uint8_t cmd);
 static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
-static esp_err_t gfx_command (uint8_t c, const uint8_t * buf, uint8_t len);
+static esp_err_t gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len);
+static __attribute__((unused)) esp_err_t gfx_command (uint8_t cmd);
 static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
 static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
 static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);

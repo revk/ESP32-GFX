@@ -13,10 +13,10 @@ gfx_driver_init (void)
    while (try--)
    {
       gfx_lock ();
-      e = gfx_send_command (0xAF);      // start
+      e = gfx_command0 (0xAF);      // start
       usleep (10000);
       // Many of these are setting as defaults, just to be sure
-      e += gfx_send_command (0xA5);     // white
+      e += gfx_command0 (0xA5);     // white
       e += gfx_command1 (0xA0, 0x26);   // colour mode
       e += gfx_command1 (0xFD, 0x12);   // unlock
       e += gfx_command1 (0xFD, 0xB1);   // unlock
@@ -38,9 +38,9 @@ gfx_driver_init (void)
       e += gfx_command1 (0xFD, 0xB0);   // lock
       gfx_command2 (0x15, 0, gfx_settings.width - 1);
       gfx_command2 (0x75, 0, gfx_settings.height - 1);
-      //gfx_send_command(0x5C);
+      //gfx_command0(0x5C);
       //gfx_send_data(gfx, GFX_SIZE);
-      gfx_send_command (0xA6);
+      gfx_command0 (0xA6);
       gfx_unlock ();
       if (!e)
          break;
@@ -56,7 +56,7 @@ gfx_driver_send (void)
 {                               // Send buffer and update display
    gfx_command2 (0x15, 0, gfx_settings.width - 1);
    gfx_command2 (0x75, 0, gfx_settings.height - 1);
-   gfx_send_command (0x5C);
+   gfx_command0 (0x5C);
    gfx_send_gfx (0);
    if (gfx_settings.update)
    {

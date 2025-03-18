@@ -75,11 +75,11 @@ gfx_driver_send (void)
    };
    if (gfx_command_bulk (init))
       return "Init failed";
-   gfx_send_command (EPD29_WRITE_RAM1);
+   gfx_command0 (EPD29_WRITE_RAM1);
    gfx_send_gfx (0);
    gfx_command1 (EPD29_DISP_CTRL2, 0xF7);
-   gfx_send_command (EPD29_MASTER_ACTIVATE);
-   gfx_send_command (0xFF);
+   gfx_command0 (EPD29_MASTER_ACTIVATE);
+   gfx_command0 (0xFF);
    return NULL;
 }
 

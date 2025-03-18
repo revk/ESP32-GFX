@@ -157,7 +157,7 @@ gfx_driver_send (void)
    gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW LUT=REG (fast update) or KW LUT=OTP (slow)
 #endif
    gfx_command2 (EPD75_CDI, gfx_settings.norefresh ? 0xB9 : (gfx_settings.border ^ gfx_settings.invert) ? 0x19 : 0x29, 0x07);
-   if (gfx_send_command (EPD75_DTM2))
+   if (gfx_command0 (EPD75_DTM2))
       return "DTM2 failed";
    if (gfx_send_gfx (0))
       return "Data send failed";
@@ -169,7 +169,7 @@ gfx_driver_send (void)
 #endif
       return "AUTO failed";
 #else
-   if (gfx_send_command (EPD75_DRF))
+   if (gfx_command0 (EPD75_DRF))
       return "DRF failed";
 #endif
    return NULL;
