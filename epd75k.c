@@ -257,7 +257,7 @@ static const char *
 gfx_driver_sleep (void)
 {
 #ifdef	CONFIG_GFX_USE_DEEP_SLEEP
-   if (gfx_send_command (EPD75_DSLP))
+   if (gfx_command0 (EPD75_DSLP))
       return "DSLP failed";
    gfx_settings.asleep = 1;
 #endif
@@ -320,7 +320,7 @@ gfx_driver_send (void)
    }
    if (old)
    {
-      if (gfx_send_command (EPD75_DTM1) || gfx_send_data (old, SIZE))
+      if (gfx_command0 (EPD75_DTM1) || gfx_send_data (old, SIZE))
          return "DTM1 failed";
       memcpy (old, gfx_raw_b (), SIZE);
    }
@@ -328,7 +328,7 @@ gfx_driver_send (void)
 #endif
 #endif
 
-   if (gfx_send_command (EPD75_DTM2) || gfx_send_gfx (0))
+   if (gfx_command0 (EPD75_DTM2) || gfx_send_gfx (0))
       return "DTM2 failed";
 
 #ifdef	USE_AUTO
@@ -351,18 +351,18 @@ gfx_driver_send (void)
    gfx_busy_wait ();
 #endif
 #else // Not auto
-   if (gfx_send_command (EPD75_PON))
+   if (gfx_command0 (EPD75_PON))
       return "PON failed";
-   if (gfx_send_command (EPD75_DRF))
+   if (gfx_command0 (EPD75_DRF))
       return "DRF failed";
-   gfx_send_command (EPD75_POF);
+   gfx_command0 (EPD75_POF);
    //gfx_command1 (EPD75_POF, 0x30);  // V2 has arg, V3 does not?
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
 #ifndef	BUFFER_OLD
 #ifndef	USE_N2OCP
-   if (gfx_send_command (EPD75_DTM1) || gfx_send_gfx (0))
+   if (gfx_command0 (EPD75_DTM1) || gfx_send_gfx (0))
       return "DTM1 failed";
 #endif
 #endif

@@ -649,7 +649,7 @@ static __attribute__((unused))
      esp_err_t gfx_command0 (uint8_t cmd)
 {
    ESP_LOGE (TAG, "Command %02X", cmd);
-   gfx_send_command (cmd);
+   return gfx_send_command (cmd);
 }
 
 static __attribute__((unused))
