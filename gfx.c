@@ -582,7 +582,7 @@ gfx_busy_wait (void)
 static esp_err_t
 gfx_send_command (uint8_t cmd)
 {
-   ESP_LOGD (TAG, "Command %02X", cmd);
+   ESP_LOGE (TAG, "Command %02X", cmd);
    if (gfx_settings.busy)
    {                            // Check busy
       uint16_t try = 30000;
@@ -623,7 +623,7 @@ gfx_send_data (const void *data, uint32_t len)
       uint32_t l = len;
       if (l > SPI_MAX)
          l = SPI_MAX;
-      ESP_LOGD (TAG, "Send %lu", l);
+      ESP_LOGE (TAG, "Send %lu", l);
       spi_transaction_t c = {
          .length = 8 * l,
          .tx_buffer = data,
