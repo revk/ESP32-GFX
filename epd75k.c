@@ -216,22 +216,21 @@ gfx_driver_init (void)
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-   gfx_command1 (EPD75_PSR, 0x00);      // Reset
+   //gfx_command1 (EPD75_PSR, 0x00);      // Reset
 #endif
-   gfx_send_command (EPD75_PON);
-   usleep (100000);
 
    const uint8_t init[] = {
-#ifdef	SWITCH_LUT
-      2, EPD75_PSR, 0x3F,       // Use REG
-#endif
-      5, EPD75_BTST, 0x27, 0x27, 0x2F, 0x17,    //
       6, EPD75_PWR, 0x17, 0x17, 0x3F, 0x3F, 0x11,       //
+      2, EPD75_VDCS, 0x24,      //
+      5, EPD75_BTST, 0x27, 0x27, 0x2F, 0x17,    //
       2, EPD75_PLL, 0x06,       //
+      1, EPD75_PON,
+      0xFF,
+      2, EPD75_PSR, 0x3F,       // Use REG
       5, EPD75_TRES, W / 256, W & 255, H / 256, H & 255,        //
       2, EPD75_DSPI, 0x00,      //
       2, EPD75_TCON, 0x22,      // 
-      2, EPD75_VDCS, 0x24,      //
+      5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
       //2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
 #ifdef	USE_AUTO
       //2, EPD75_PFS, 0x30,       // Power off sequence
@@ -241,7 +240,6 @@ gfx_driver_init (void)
 #endif
       //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
       //2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
-      5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
       0
    };
    if (gfx_command_bulk (init))
