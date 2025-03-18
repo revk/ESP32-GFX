@@ -222,9 +222,6 @@ gfx_driver_init (void)
    usleep (100000);
 
    const uint8_t init[] = {
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-      2, EPD75_PSR, 0x00,       // Reset
-#endif
 #ifdef	SWITCH_LUT
       2, EPD75_PSR, 0x3F,       // Use REG
 #endif
