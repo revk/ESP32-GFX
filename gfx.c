@@ -17,6 +17,7 @@
 
 static __attribute__((unused))
      const char TAG[] = "GFX";
+#define	DEBUG	ESP_LOGE
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -637,21 +638,20 @@ gfx_send_data (const void *data, uint32_t len)
       len -= l;
       data += l;
    }
-   ESP_LOGD (TAG, "Sent");
    return 0;
 }
 
 static esp_err_t
 gfx_send_gfx (uint8_t page)
 {
-   ESP_LOGD (TAG, "Data page %d: %d", page, GFX_PAGE);
+   DEBUG (TAG, "Data page %d: %d", page, GFX_PAGE);
    return gfx_send_data (gfx + page * GFX_PAGE, GFX_PAGE);
 }
 
 static esp_err_t
 gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len)
 {
-   ESP_LOGD (TAG, "Command %02X+%d", cmd, len);
+   DEBUG (TAG, "Command %02X+%d", cmd, len);
    esp_err_t e = gfx_send_command (cmd);
    if (!e && len)
       e = gfx_send_data (buf, len);
@@ -661,14 +661,14 @@ gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len)
 static __attribute__((unused))
      esp_err_t gfx_command0 (uint8_t cmd)
 {
-   ESP_LOGD (TAG, "Command %02X", cmd);
+   DEBUG (TAG, "Command %02X", cmd);
    return gfx_send_command (cmd);
 }
 
 static __attribute__((unused))
      esp_err_t gfx_command1 (uint8_t cmd, uint8_t a)
 {                               // Send a command with an arg
-   ESP_LOGD (TAG, "Command %02X %02X", cmd, a);
+   DEBUG (TAG, "Command %02X %02X", cmd, a);
    esp_err_t e = gfx_send_command (cmd);
    if (e)
       return e;
@@ -684,7 +684,7 @@ static __attribute__((unused))
 static __attribute__((unused))
      esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b)
 {                               // Send a command with args
-   ESP_LOGD (TAG, "Command %02X %02X %02X", cmd, a, b);
+   DEBUG (TAG, "Command %02X %02X %02X", cmd, a, b);
    esp_err_t e = gfx_send_command (cmd);
    if (e)
       return e;
@@ -700,7 +700,7 @@ static __attribute__((unused))
 static __attribute__((unused))
      esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 {                               // Send a command with args
-   ESP_LOGD (TAG, "Command %02X %02X %02X %02X %02X", cmd, a, b, c, d);
+   DEBUG (TAG, "Command %02X %02X %02X %02X %02X", cmd, a, b, c, d);
    esp_err_t e = gfx_send_command (cmd);
    if (e)
       return e;
