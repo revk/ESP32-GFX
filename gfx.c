@@ -17,7 +17,7 @@
 
 static __attribute__((unused))
      const char TAG[] = "GFX";
-#define	DEBUG	ESP_LOGE
+#define	DEBUG	ESP_LOGD
 
 #include <unistd.h>
 #include <arpa/inet.h>
