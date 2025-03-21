@@ -283,7 +283,7 @@ gfx_driver_init (void)
       return "Init1 failed";
    if (epdtse)
       gfx_command1 (EPD75_TSE, epdtse & 0xF);   // Temp compensation -8 to +7
-   gfx_command0 (EPD75K_POF);   // Needed as we did PON
+   gfx_command0 (EPD75_POF);   // Needed as we did PON
 #ifndef	SWITCH_LUT
    fastlut ();
 #endif
