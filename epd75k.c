@@ -250,7 +250,6 @@ gfx_driver_init (void)
 #ifdef	USE_AUTO
       //2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
-      1, EPD75_POF,
 #else
       // My settings
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
@@ -277,14 +276,14 @@ gfx_driver_init (void)
 #endif
       //2, EPD75_EVS, 0x08,       // 0x08 floating
       //2, EPD75_EVS, 0x02,       // 0x02 DC
-      1, EPD75_POF,
 #endif
       0
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
    if (epdtse)
-      gfx_command1 (EPD75_TSE, epdtse & 0xF);
+      gfx_command1 (EPD75_TSE, epdtse & 0xF);   // Temp compensation -8 to +7
+   gfx_command0 (EPD75K_POF);   // Needed as we did PON
 #ifndef	SWITCH_LUT
    fastlut ();
 #endif
