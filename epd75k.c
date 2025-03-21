@@ -13,6 +13,7 @@
 
 #ifndef	CONFIG_REVK_APPNAME
 const int8_t epdtse = 0x80;     // Default tse when no settings.def used
+const int8_t epdslow = 0;       // Default slow update LUT
 #endif
 
 #define	EPD75_PSR	0x00
@@ -69,7 +70,6 @@ const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 
 #define               USE_AUTO  // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define               SWITCH_LUT        // Change LUT as needed
 
 #ifdef	CONFIG_GFX_USE_DEEP_SLEEP
 #define		BUFFER_OLD      // Buffer and send old instead of sending after update
@@ -157,7 +157,6 @@ fastlut (void)
    gfx_command_bulk (lut);
 }
 
-#ifdef	SWITCH_LUT
 static void
 slowlut (void)
 {                               // slow (flashy) update 
@@ -213,7 +212,6 @@ slowlut (void)
    };
    gfx_command_bulk (lut);
 }
-#endif
 
 static const char *
 gfx_driver_init (void)
@@ -283,10 +281,9 @@ gfx_driver_init (void)
       return "Init1 failed";
    if (epdtse)
       gfx_command1 (EPD75_TSE, epdtse & 0xF);   // Temp compensation -8 to +7
-   gfx_command0 (EPD75_POF);   // Needed as we did PON
-#ifndef	SWITCH_LUT
-   fastlut ();
-#endif
+   gfx_command0 (EPD75_POF);    // Needed as we did PON
+   if (epdslow)
+      fastlut (); // We leave the LUT as the fast one rather than change each time
    gfx_busy_wait ();
    uint64_t b = esp_timer_get_time ();
    ESP_LOGD (TAG, "Init time %lldms", (b - a + 500) / 1000);
@@ -328,14 +325,15 @@ gfx_driver_send (void)
    }
 #endif
 
-#ifdef	SWITCH_LUT
-   if (gfx_settings.norefresh)
-      fastlut ();
+   if (epdslow)
+      gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);   //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
    else
-      slowlut ();
-#else
-   gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);      //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
-#endif
+   { // Always REG, switch LUT as needed
+      if (gfx_settings.norefresh)
+         fastlut ();
+      else
+         slowlut ();
+   }
 
    gfx_command2 (EPD75_CDI,
 #ifdef	USE_N2OCP
