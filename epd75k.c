@@ -72,14 +72,14 @@
 #endif
 
 #define	T1	30
-#define	T2	5
+#define	T2	10
 #define	T3	30
-#define	T4	5
+#define	T4	1
 #define	T5	10
-#define	T6	5
+#define	T6	1
 #define	T7	10
-#define	T8	5
-#define	REPEAT	3
+#define	T8	1
+#define	REPEAT	4
 
 extern uint32_t uptime (void);
 
