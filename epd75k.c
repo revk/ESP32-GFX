@@ -11,6 +11,10 @@
 #define GFX_BPP			1
 #define	GFX_BUSY_LOW
 
+#ifndef	CONFIG_REVK_APPNAME
+const int8_t epdtse = 0x80;     // Default tse when no settings.def used
+#endif
+
 #define	EPD75_PSR	0x00
 #define	EPD75_PWR	0x01
 #define	EPD75_POF	0x02
@@ -237,7 +241,7 @@ gfx_driver_init (void)
       2, EPD75_TCON, 0x22,      // 
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
       // My bits
-      //2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
+      //2, EPD75_TSE, 0x00,       // Temp sensor internal no offset
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
       //2, EPD75_AMV, 0x11,       // VCOM
 #endif
@@ -246,7 +250,7 @@ gfx_driver_init (void)
 #ifdef	USE_AUTO
       //2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
-      1, EPD75_POF, 
+      1, EPD75_POF,
 #else
       // My settings
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
@@ -264,8 +268,7 @@ gfx_driver_init (void)
       3, EPD75_CDI, 0x10, 0x00, //
       2, EPD75_TCON, 0x22,      //
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
-      //2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
-      2, EPD75_TSE, 0x00,       // Temp sensor internal
+      //2, EPD75_TSE, 0x00,       // Temp sensor internal no offset
 #ifdef	USE_AUTO
       2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
@@ -280,6 +283,8 @@ gfx_driver_init (void)
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
+   if (epdtse)
+      gfx_command1 (EPD75_TSE, epdtse & 0xF);
 #ifndef	SWITCH_LUT
    fastlut ();
 #endif

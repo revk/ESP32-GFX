@@ -13,10 +13,10 @@ gfx_driver_init (void)
    while (try--)
    {
       gfx_lock ();
-      e = gfx_command0 (0xAF);      // start
+      e = gfx_command0 (0xAF);  // start
       usleep (10000);
       // Many of these are setting as defaults, just to be sure
-      e += gfx_command0 (0xA5);     // white
+      e += gfx_command0 (0xA5); // white
       e += gfx_command1 (0xA0, 0x26);   // colour mode
       e += gfx_command1 (0xFD, 0x12);   // unlock
       e += gfx_command1 (0xFD, 0xB1);   // unlock
