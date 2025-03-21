@@ -65,7 +65,7 @@
 
 #define               USE_AUTO  // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define               SWITCH_LUT        // Change LUT as needed
+//#define               SWITCH_LUT        // Change LUT as needed
 
 #ifdef	CONFIG_GFX_USE_DEEP_SLEEP
 #define		BUFFER_OLD      // Buffer and send old instead of sending after update
