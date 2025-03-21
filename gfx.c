@@ -34,7 +34,7 @@ static __attribute__((unused))
 #include "freertos/task.h"
 #include "gfx.h"
 #ifdef	  CONFIG_REVK_APPNAME
-#include <settings.h>
+#include "main/settings.h"
 #endif
 
 #define	SPI_MAX	16384
