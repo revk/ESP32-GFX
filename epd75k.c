@@ -72,7 +72,7 @@
 #endif
 
 #define	T1	30
-#define	T2	10
+#define	T2	1
 #define	T3	30
 #define	T4	1
 #define	T5	10
@@ -249,12 +249,13 @@ gfx_driver_init (void)
 #endif
       //2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
       // We did PON, we need POFF else auto does not work
-      2, EPD75_POF, 0x00,
 #ifdef	USE_AUTO
       //2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
+      2, EPD75_POF, 0x00,
 #else
       // My settings
+   2,EPD75_PSR,0, // Reset
       5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,
       2, EPD75_VDCS, 0x26,      //
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,
@@ -269,7 +270,7 @@ gfx_driver_init (void)
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
       //2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
 #ifdef	USE_AUTO
-      //2, EPD75_PFS, 0x30,       // Power off sequence
+      2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
       2, EPD75_AMV, 0x11,       // VCOM
