@@ -1,3 +1,3 @@
 #ifdef	CONFIG_GFX_BUILD_SUFFIX_EPD75K
-s8	epd.tse	.set		// TSE Temperature adjust, -8 to +7
+s8	0	epd.tse	.set		// TSE Temperature adjust, -8 to +7
 #endif
