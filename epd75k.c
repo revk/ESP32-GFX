@@ -12,11 +12,12 @@
 #define	GFX_BUSY_LOW
 
 #ifndef	CONFIG_REVK_APPNAME
-const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 const uint8_t epdslow = 0;      // Default slow update LUT
+const uint8_t epdsleep = 0;     // Deep sleep
 const uint8_t epdamv = 1;       // Send AMV
 const uint8_t epdpfs = 1;       // Send PSR
 const uint8_t epdevs = 1;       // Send EDVS
+const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 #endif
 
 #define	EPD75_PSR	0x00
@@ -74,10 +75,6 @@ const uint8_t epdevs = 1;       // Send EDVS
 #define               USE_AUTO  // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
 
-#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
-#define		BUFFER_OLD      // Buffer and send old instead of sending after update
-#endif
-
 #define	T1	30
 #define	T2	1
 #define	T3	30
@@ -90,18 +87,14 @@ const uint8_t epdevs = 1;       // Send EDVS
 
 extern uint32_t uptime (void);
 
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
 static uint8_t lut = 0;
-#endif
 
 static void
 fastlut (void)
 {
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-   if (lut == 1)
+   if (!epdsleep && lut == 1)
       return;
    lut = 1;
-#endif
    ESP_LOGD (TAG, "Fast LUT");
    // My LUT
    const uint8_t lut[] = {
@@ -163,11 +156,9 @@ fastlut (void)
 static void
 slowlut (void)
 {                               // slow (flashy) update 
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-   if (lut == 2)
+   if (!epdsleep && lut == 2)
       return;
    lut = 2;
-#endif
    ESP_LOGD (TAG, "Slow LUT");
    // Waveshare example LUT
    const uint8_t lut[] = {
@@ -222,9 +213,7 @@ gfx_driver_init (void)
    uint64_t a = esp_timer_get_time ();
    int W = gfx_settings.width;  // Must be multiple of 8
    int H = gfx_settings.height;
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-   //gfx_command1 (EPD75_PSR, 0x00);      // Reset
-#endif
+   //if(!epdsleep)gfx_command1 (EPD75_PSR, 0x00);      // Reset
 
    const uint8_t init[] = {
 #if 0
@@ -280,11 +269,11 @@ gfx_driver_init (void)
 static const char *
 gfx_driver_sleep (void)
 {
-#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
+   if (!epdsleep)
+      return NULL;
    if (gfx_command0 (EPD75_DSLP))
       return "DSLP failed";
    gfx_settings.asleep = 1;
-#endif
    return NULL;
 }
 
@@ -292,7 +281,6 @@ static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
    uint64_t a = esp_timer_get_time ();
-#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
    static uint32_t waiting = 0;
    if (gfx_settings.asleep)
    {
@@ -310,7 +298,6 @@ gfx_driver_send (void)
       usleep (10000);
       gfx_driver_init ();
    }
-#endif
 
    if (epdslow)
       gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);   //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
@@ -331,50 +318,51 @@ gfx_driver_send (void)
                  0x01,          // new+old logic refresh
                  0x07);
 
-#ifndef	USE_N2OCP
-#ifdef	BUFFER_OLD
+   if (epdsleep)
+   {
 #define SIZE (GFX_DEFAULT_WIDTH/8*GFX_DEFAULT_HEIGHT)
-   static uint8_t *old = NULL;
-   if (!old)
-   {
-      old = malloc (SIZE);
+      static uint8_t *old = NULL;
+      if (!old)
+      {
+         old = malloc (SIZE);
+         if (old)
+            memset (old, 0, SIZE);
+         else
+            ESP_LOGE (TAG, "Cannot malloc old");
+      }
       if (old)
-         memset (old, 0, SIZE);
-      else
-         ESP_LOGE (TAG, "Cannot malloc old");
-   }
-   if (old)
-   {
-      if (gfx_command0 (EPD75_DTM1) || gfx_send_data (old, SIZE))
-         return "DTM1 failed";
-      memcpy (old, gfx_raw_b (), SIZE);
-   }
+      {
+         if (gfx_command0 (EPD75_DTM1) || gfx_send_data (old, SIZE))
+            return "DTM1 failed";
+         memcpy (old, gfx_raw_b (), SIZE);
+      }
 #undef SIZE
-#endif
-#endif
+   }
 
    if (gfx_command0 (EPD75_DTM2) || gfx_send_gfx (0))
       return "DTM2 failed";
 
 #ifdef	USE_AUTO
-#ifdef	CONFIG_GFX_USE_DEEP_SLEEP
-   if (gfx_command1 (EPD75_AUTO, 0xA7)) // PON->DRF->POF->DSLP
-      return "AUTO+DSLP failed";
-   if (gfx_settings.norefresh)
-   {                            // Reset to try and avoid fading
-      sleep (4);
-      gpio_set_level (gfx_settings.rst, 0);
-      usleep (10000);
-      gpio_set_level (gfx_settings.rst, 1);
-      usleep (10000);
+   if (epdsleep)
+   {
+      if (gfx_command1 (EPD75_AUTO, 0xA7))      // PON->DRF->POF->DSLP
+         return "AUTO+DSLP failed";
+      if (gfx_settings.norefresh)
+      {                         // Reset to try and avoid fading
+         sleep (4);
+         gpio_set_level (gfx_settings.rst, 0);
+         usleep (10000);
+         gpio_set_level (gfx_settings.rst, 1);
+         usleep (10000);
+      } else
+         waiting = uptime () + 10;
+      gfx_settings.asleep = 1;
    } else
-      waiting = uptime () + 10;
-   gfx_settings.asleep = 1;
-#else
-   if (gfx_command1 (EPD75_AUTO, 0xA5)) // PON->DRF->POF
-      return "AUTO failed";
-   gfx_busy_wait ();
-#endif
+   {
+      if (gfx_command1 (EPD75_AUTO, 0xA5))      // PON->DRF->POF
+         return "AUTO failed";
+      gfx_busy_wait ();
+   }
 #else // Not auto
    if (gfx_command0 (EPD75_PON))
       return "PON failed";
@@ -383,14 +371,11 @@ gfx_driver_send (void)
    gfx_command0 (EPD75_POF);
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-#ifndef	BUFFER_OLD
-#ifndef	USE_N2OCP
-   if (gfx_command0 (EPD75_DTM1) || gfx_send_gfx (0))
-      return "DTM1 failed";
-#endif
-#endif
-#endif
+   if (!epdsleep)
+   {
+      if (gfx_command0 (EPD75_DTM1) || gfx_send_gfx (0))
+         return "DTM1 failed";
+   }
    uint64_t b = esp_timer_get_time ();
    ESP_LOGD (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");
    return NULL;
