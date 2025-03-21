@@ -252,7 +252,7 @@ gfx_driver_init (void)
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
       //2, EPD75_PSR, 0,          // Reset
 #endif
-      5, EPD75_PWR, 0x07, 0x17, 0x3A, 0x3A, // or 17
+      5, EPD75_PWR, 0x07, 0x17, 0x3A, 0x3A,     // or 17
       2, EPD75_VDCS, 0x26,      //
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,
       2, EPD75_PLL, 0x06,       //
@@ -266,12 +266,12 @@ gfx_driver_init (void)
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
       //2, EPD75_TSE, 0x08,       // Temp sensor internal, offset -8
 #ifdef	USE_AUTO
-      2, EPD75_PFS, 0x30,       // Power off sequence
+      //2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-      //2, EPD75_AMV, 0x11,       // VCOM
+      2, EPD75_AMV, 0x11,       // VCOM
 #endif
-      2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
+      //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
       //2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
       2, EPD75_POF, 0x00,
 #endif
