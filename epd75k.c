@@ -246,7 +246,7 @@ gfx_driver_init (void)
 #ifdef	USE_AUTO
       //2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
-      2, EPD75_POF, 0x00,
+      1, EPD75_POF, 
 #else
       // My settings
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
@@ -273,8 +273,8 @@ gfx_driver_init (void)
       2, EPD75_AMV, 0x11,       // VCOM
 #endif
       //2, EPD75_EVS, 0x08,       // 0x08 floating
-      2, EPD75_EVS, 0x02,       // 0x02 DC
-      2, EPD75_POF, 0x00,
+      //2, EPD75_EVS, 0x02,       // 0x02 DC
+      1, EPD75_POF,
 #endif
       0
    };
@@ -392,7 +392,6 @@ gfx_driver_send (void)
    if (gfx_command0 (EPD75_DRF))
       return "DRF failed";
    gfx_command0 (EPD75_POF);
-   //gfx_command1 (EPD75_POF, 0x30);  // V2 has arg, V3 does not?
    gfx_driver_sleep ();         // Only sleeps if we are using DSLP
 #endif
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
