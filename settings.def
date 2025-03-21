@@ -1,4 +1,7 @@
 #ifdef	CONFIG_GFX_BUILD_SUFFIX_EPD75K
 s8	epd.tse	0	.set		// TSE Temperature adjust, -8 to +7
 bit	epd.slow			// Use slow (default) LUT for full refresh
+bit	epd.amv				// Send AMV (VCOM cal, slower start)
+bit	epd.pfs				// Send PFS
+bit	epd.evs				// Send EVS
 #endif

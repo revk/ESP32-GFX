@@ -13,7 +13,10 @@
 
 #ifndef	CONFIG_REVK_APPNAME
 const int8_t epdtse = 0x80;     // Default tse when no settings.def used
-const int8_t epdslow = 0;       // Default slow update LUT
+const uint8_t epdslow = 0;      // Default slow update LUT
+const uint8_t epdamv = 1;       // Send AMV
+const uint8_t epdpfs = 1;       // Send PSR
+const uint8_t epdevs = 1;       // Send EDVS
 #endif
 
 #define	EPD75_PSR	0x00
@@ -238,15 +241,6 @@ gfx_driver_init (void)
       3, EPD75_CDI, 0x10, 0x00, //
       2, EPD75_TCON, 0x22,      // 
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
-      // My bits
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-      //2, EPD75_AMV, 0x11,       // VCOM
-#endif
-      //2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
-      // We did PON, we need POFF else auto does not work
-#ifdef	USE_AUTO
-      //2, EPD75_PFS, 0x30,       // Power off sequence
-#endif
 #else
       // My settings
       5, EPD75_PWR, 0x07, 0x17, 0x3A, 0x3A,     // or 17
@@ -261,14 +255,6 @@ gfx_driver_init (void)
       3, EPD75_CDI, 0x10, 0x00, //
       2, EPD75_TCON, 0x22,      //
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
-#ifdef	USE_AUTO
-      2, EPD75_PFS, 0x30,       // Power off sequence
-#endif
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-      2, EPD75_AMV, 0x11,       // VCOM
-#endif
-      //2, EPD75_EVS, 0x08,       // 0x08 floating
-      //2, EPD75_EVS, 0x02,       // 0x02 DC
 #endif
       0
    };
@@ -276,9 +262,15 @@ gfx_driver_init (void)
       return "Init1 failed";
    if (epdtse)
       gfx_command1 (EPD75_TSE, epdtse & 0xF);   // Temp compensation -8 to +7
-   gfx_command0 (EPD75_POF);    // Needed as we did PON
+   if (epdamv)
+      gfx_command1 (EPD75_AMV, 0x11);   // VCOM cal
+   if (epdpfs)
+      gfx_command1 (EPD75_PFS, 0x30);   // Power down time
+   if (epdevs)
+      gfx_command1 (EPD75_EVS, 0x08);   // End voltage (floating)
    if (epdslow)
-      fastlut (); // We leave the LUT as the fast one rather than change each time
+      fastlut ();               // We leave the LUT as the fast one rather than change each time
+   gfx_command0 (EPD75_POF);    // Needed as we did PON
    gfx_busy_wait ();
    uint64_t b = esp_timer_get_time ();
    ESP_LOGD (TAG, "Init time %lldms", (b - a + 500) / 1000);
@@ -323,7 +315,7 @@ gfx_driver_send (void)
    if (epdslow)
       gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);   //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
    else
-   { // Always REG, switch LUT as needed
+   {                            // Always REG, switch LUT as needed
       if (gfx_settings.norefresh)
          fastlut ();
       else
