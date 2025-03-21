@@ -272,7 +272,7 @@ gfx_driver_init (void)
       2, EPD75_AMV, 0x11,       // VCOM
 #endif
       //2, EPD75_EVS, 0x08,       // 0x02 DC 0x08 floating
-      //2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
+      2, EPD75_EVS, 0x02,       // 0x02 DC 0x08 floating
       2, EPD75_POF, 0x00,
 #endif
       0
