@@ -319,7 +319,7 @@ gfx_driver_send (void)
                  0x07);
 
    if (epdsleep)
-   {
+   {                            // Send OLD
 #define SIZE (GFX_DEFAULT_WIDTH/8*GFX_DEFAULT_HEIGHT)
       static uint8_t *old = NULL;
       if (!old)
@@ -339,7 +339,7 @@ gfx_driver_send (void)
 #undef SIZE
    }
 
-   if (gfx_command0 (EPD75_DTM2) || gfx_send_gfx (0))
+   if (gfx_command0 (EPD75_DTM2) || gfx_send_gfx (0))   // Send NEW
       return "DTM2 failed";
 
 #ifdef	USE_AUTO

@@ -2,7 +2,7 @@
 bit	epd.slow			// Use slow (default) LUT for full refresh
 bit	epd.sleep			// Use deep sleep
 bit	epd.amv				// Send AMV (VCOM cal, slower start)
-bit	epd.pfs				// Send PFS
-bit	epd.evs				// Send EVS
+bit	epd.pfs				// Send PFS (Power off 3)
+bit	epd.evs				// Send EVS (Env voltage float)
 s8	epd.tse	0	.set		// TSE Temperature adjust, -8 to +7
 #endif
