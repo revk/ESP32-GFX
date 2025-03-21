@@ -239,7 +239,6 @@ gfx_driver_init (void)
       2, EPD75_TCON, 0x22,      // 
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
       // My bits
-      //2, EPD75_TSE, 0x00,       // Temp sensor internal no offset
 #ifndef	CONFIG_GFX_USE_DEEP_SLEEP
       //2, EPD75_AMV, 0x11,       // VCOM
 #endif
@@ -250,9 +249,6 @@ gfx_driver_init (void)
 #endif
 #else
       // My settings
-#ifndef	CONFIG_GFX_USE_DEEP_SLEEP
-      //2, EPD75_PSR, 0,          // Reset
-#endif
       5, EPD75_PWR, 0x07, 0x17, 0x3A, 0x3A,     // or 17
       2, EPD75_VDCS, 0x26,      //
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,
@@ -265,7 +261,6 @@ gfx_driver_init (void)
       3, EPD75_CDI, 0x10, 0x00, //
       2, EPD75_TCON, 0x22,      //
       5, EPD75_GSST, 0, 0, 0, 0,        // waveshare and esphome send this
-      //2, EPD75_TSE, 0x00,       // Temp sensor internal no offset
 #ifdef	USE_AUTO
       2, EPD75_PFS, 0x30,       // Power off sequence
 #endif
