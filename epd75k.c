@@ -251,7 +251,7 @@ gfx_driver_init (void)
       return "Init1 failed";
    if (epdtse)
       gfx_command1 (EPD75_TSE, epdtse & 0xF);   // Temp compensation -8 to +7
-   if (epdamv)
+   if (epdamv && !epdsleep)
       gfx_command1 (EPD75_AMV, 0x11);   // VCOM cal
    if (epdpfs)
       gfx_command1 (EPD75_PFS, 0x30);   // Power down time
