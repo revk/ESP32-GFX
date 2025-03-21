@@ -1489,7 +1489,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
 }
 #endif
 
-#ifndef	CONFIG_GFX_VECTOR
+#ifndef	CONFIG_GFX_VECTOR_ONLY
 void
 gfx_text_draw (uint8_t flags, uint8_t size, const char *text)
 {                               // Size negative for descenders
