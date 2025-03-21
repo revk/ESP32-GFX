@@ -256,7 +256,7 @@ gfx_driver_init (void)
 #else
       // My settings
       2, EPD75_PSR, 0,          // Reset
-      5, EPD75_PWR, 0x17, 0x17, 0x3A, 0x3A,
+      5, EPD75_PWR, 0x07, 0x17, 0x3A, 0x3A, // or 17
       2, EPD75_VDCS, 0x26,      //
       5, EPD75_BTST, 0x17, 0x17, 0x27, 0x17,
       2, EPD75_PLL, 0x06,       //
