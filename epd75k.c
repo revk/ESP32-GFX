@@ -87,7 +87,7 @@ const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 #define	KW	0x48
 #define	WK	0x84
 #define	KK	0x11	// 0x04
-#define	REPEAT	2
+#define	REPEAT	1
 
 extern uint32_t uptime (void);
 
