@@ -81,9 +81,9 @@ const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 #define	T3	30
 #define	T4	5
 #define	T5	10
-#define	T6	5
+#define	T6	1
 #define	T7	10
-#define	T8	5
+#define	T8	1
 #define	WW	0x22
 #define	WW2	0x02
 #define	KW	0x48
