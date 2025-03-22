@@ -1,3 +1,5 @@
+#ifdef	CONFIG_GFX_TUNING
+
 #ifdef	CONFIG_GFX_BUILD_SUFFIX_EPD75K
 bit	epd.slow	0		// Use slow (default) LUT for full refresh
 bit	epd.sleep	0		// Use deep sleep
@@ -6,4 +8,6 @@ bit	epd.pfs		1		// Send PFS (Power off 3)
 bit	epd.evs		0		// Send EVS (Env voltage float)
 s8	epd.tse		0	.set	// TSE Temperature adjust, -8 to +7
 u8	epd.repeat	1		// Additional fast update cycles
+#endif
+
 #endif
