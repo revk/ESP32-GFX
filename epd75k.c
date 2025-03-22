@@ -11,14 +11,14 @@
 #define GFX_BPP			1
 #define	GFX_BUSY_LOW
 
-#ifndef	CONFIG_REVK_APPNAME
+#ifndef	CONFIG_GFX_TUNING
 const uint8_t epdslow = 0;      // Default slow update LUT
 const uint8_t epdsleep = 0;     // Deep sleep
 const uint8_t epdamv = 1;       // Send AMV
 const uint8_t epdpfs = 1;       // Send PSR
-const uint8_t epdevs = 1;       // Send EDVS
+const uint8_t epdevs = 0;       // Send EDVS
 const uint8_t epdrepeat = 0;    // Additional fast update
-const int8_t epdtse = 0x80;     // Default tse when no settings.def used
+const int8_t epdtse = 0x80;     // Default tse when no settings.def used (0x80 is "set")
 #endif
 
 #define	EPD75_PSR	0x00

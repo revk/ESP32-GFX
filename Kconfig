@@ -44,6 +44,12 @@ menu "GFX"
 	help
 		GFX display height (0 for default for driver)
 
+	config GFX_TUNING
+	bool "Additional settings to fine tune GFX"
+	default y 
+	help
+		Enable fine tuning settings (RevK library)
+
 	config GFX_7SEG
 	bool "Include 7 seg font"
 	default y 
