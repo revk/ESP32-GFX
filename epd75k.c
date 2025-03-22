@@ -17,6 +17,7 @@ const uint8_t epdsleep = 0;     // Deep sleep
 const uint8_t epdamv = 1;       // Send AMV
 const uint8_t epdpfs = 1;       // Send PSR
 const uint8_t epdevs = 1;       // Send EDVS
+const uint8_t epdrepeat = 1;    // Additional fast update
 const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 #endif
 
@@ -87,7 +88,6 @@ const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 #define	KW	0x48
 #define	WK	0x84
 #define	KK	0x11	// 0x04
-#define	REPEAT	1
 
 extern uint32_t uptime (void);
 
@@ -104,7 +104,7 @@ fastlut (void)
    const uint8_t lut[] = {
       43, EPD75_LUT_VCOM,       // LUT (7 groups as no red)
       0x00, T1, T2, T3, T4, 1,
-      0x00, T5, T6, T7, T8, REPEAT,
+      0x00, T5, T6, T7, T8, epdrepeat,
       //0x00, T5, T6, T7, 0, 1,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -113,7 +113,7 @@ fastlut (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_WW,
       WW, T1, T2, T3, T4, 1,
-      WW, T5, T6, T7, T8, REPEAT,
+      WW, T5, T6, T7, T8, epdrepeat,
       //0x02, T5, T6, T7, 0, 1,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -122,7 +122,7 @@ fastlut (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_KW,
       KW, T1, T2, T3, T4, 1,
-      WW, T5, T6, T7, T8, REPEAT,
+      WW, T5, T6, T7, T8, epdrepeat,
       //0x02, T5, T6, T7, 0, 1,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -131,7 +131,7 @@ fastlut (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_WK,
       WK, T1, T2, T3, T4, 1,
-      KK, T5, T6, T7, T8, REPEAT,
+      KK, T5, T6, T7, T8, epdrepeat,
       //0x04, T5, T6, T7, 0, 1,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -140,7 +140,7 @@ fastlut (void)
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       43, EPD75_LUT_KK,
       KK, T1, T2, T3, T4, 1,
-      KK, T5, T6, T7, T8, REPEAT,
+      KK, T5, T6, T7, T8, epdrepeat,
       //0x04, T5, T6, T7, 0, 1,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -150,7 +150,7 @@ fastlut (void)
 #if 1
       43, EPD75_LUT_VCOM2,
       0x00, T1, T2, T3, T4, 1,
-      0x00, T5, T6, T7, T8, REPEAT,
+      0x00, T5, T6, T7, T8, epdrepeat,
       //0x00, T5, T6, T7, 0, 1,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
