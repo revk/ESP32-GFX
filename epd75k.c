@@ -319,7 +319,7 @@ gfx_driver_send (void)
 #ifdef	USE_N2OCP
                  8 |
 #endif
-                 (gfx_settings.norefresh ? 0x80 : 0x00) |       // Border if refresh
+                 0x00| // (gfx_settings.norefresh ? 0x80 : 0x00) |       // Border if refresh
                  ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20) |  // border colour
                  0x01,          // new+old logic refresh
                  0x07);
