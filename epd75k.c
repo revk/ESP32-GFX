@@ -17,7 +17,7 @@ const uint8_t epdsleep = 0;     // Deep sleep
 const uint8_t epdamv = 1;       // Send AMV
 const uint8_t epdpfs = 1;       // Send PSR
 const uint8_t epdevs = 1;       // Send EDVS
-const uint8_t epdrepeat = 1;    // Additional fast update
+const uint8_t epdrepeat = 0;    // Additional fast update
 const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 #endif
 
