@@ -1897,7 +1897,7 @@ gfx_message (const char *m)
             else if (*m == '|')
                flags |= GFX_TEXT_LIGHT;
             else if (isdigit ((unsigned char) *m))
-               s = s * 10 + *m = '0';
+               s = s * 10 + *m - '0';
             else if (isalpha ((unsigned char) *m))
             {                   /* colour */
                if ((isf++) & 1)
