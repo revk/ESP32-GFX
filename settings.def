@@ -7,7 +7,7 @@ bit	epd.amv		1		// Send AMV (VCOM cal, slower start, if not deep sleep)
 bit	epd.pfs		1		// Send PFS (Power off 3)
 bit	epd.evs		0		// Send EVS (Env voltage float)
 s8	epd.tse		0	.set	// TSE Temperature adjust, -8 to +7
-u8	epd.repeat	1		// Additional fast update cycles
+u8	epd.repeat	0		// Additional fast update cycles
 #endif
 
 #endif
