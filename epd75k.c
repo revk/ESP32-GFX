@@ -76,13 +76,13 @@ const int8_t epdtse = 0x80;     // Default tse when no settings.def used
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
 
 #define	T1	30
-#define	T2	1
+#define	T2	5
 #define	T3	30
-#define	T4	1
+#define	T4	5
 #define	T5	10
-#define	T6	1
+#define	T6	5
 #define	T7	10
-#define	T8	1
+#define	T8	5
 #define	WW	0x02
 #define	KW	0x48
 #define	WK	0x84
