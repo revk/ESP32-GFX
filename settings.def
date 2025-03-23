@@ -7,9 +7,9 @@ bit	epd.amv		1		// Send AMV (VCOM cal, slower start, if not deep sleep)
 u8	epd.pfs		3	.set .unit="frames"	// Send PFS (Power off)
 bit	epd.evs		0		// Send EVS (End voltage set float)
 s8	epd.tse		0	.set .unit="℃"	// TSE Temperature adjust, -8 to +7
-u8	epd.repeat	1		// Additional fast update cycles
 u8	epd.t1		30		// LUT Timer 1
 u8	epd.t2		5		// LUT Timer 2
+u8	epd.repeat	1		// Additional fast update cycles
 u8	epd.t3		10		// LUT Timer 3 (repeating)
 u8	epd.t4		1		// LUT Timer 4 (repeating)
 #endif
