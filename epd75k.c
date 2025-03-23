@@ -78,8 +78,8 @@ const uint8_t epdt4 1           // LUT Timer 4 (repeating)
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
 #define	T1	epdt1
 #define	T2	epdt2
-#define	T3	epdt2
-#define	T4	epdt2
+#define	T3	epdt3
+#define	T4	epdt4
 #define	WW	0x22
 #define	WW2	0x02
 #define	KW	0x48
