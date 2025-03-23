@@ -15,7 +15,7 @@
 const uint8_t epdslow = 0;      // Default slow update LUT
 const uint8_t epdsleep = 0;     // Deep sleep
 const uint8_t epdamv = 1;       // Send AMV
-const uint8_t epdpfs = 1;       // Send PSR
+const uint8_t epdpfs = 0x83;       // Send PSR (0x80 is set)
 const uint8_t epdevs = 0;       // Send EDVS
 const uint8_t epdrepeat = 0;    // Additional fast update
 const int8_t epdtse = 0x80;     // Default tse when no settings.def used (0x80 is "set")
