@@ -19,10 +19,10 @@ const uint8_t epdpfs = 0x83;    // Send PSR (0x80 is set)
 const uint8_t epdevs = 0;       // Send EDVS
 const uint8_t epdrepeat = 0;    // Additional fast update
 const int8_t epdtse = 0x80;     // Default tse when no settings.def used (0x80 is "set")
-const uint8_t lutt1 30          // LUT Timer 1
-const uint8_t lutt2 5           // LUT Timer 2
-const uint8_t lutt3 10          // LUT Timer 3 (repeating)
-const uint8_t lutt4 1           // LUT Timer 4 (repeating)
+const uint8_t epdt1 30          // LUT Timer 1
+const uint8_t epdt2 5           // LUT Timer 2
+const uint8_t epdt3 10          // LUT Timer 3 (repeating)
+const uint8_t epdt4 1           // LUT Timer 4 (repeating)
 #endif
 #define	EPD75_PSR	0x00
 #define	EPD75_PWR	0x01
@@ -76,10 +76,10 @@ const uint8_t lutt4 1           // LUT Timer 4 (repeating)
 #include <driver/rtc_io.h>
 #define               USE_AUTO  // Auto PON/DRF/POF sequence
 //#define       USE_N2OCP       // Auto copy buffer (seems not to work)
-#define	T1	lutt1
-#define	T2	lutt2
-#define	T3	lutt2
-#define	T4	lutt2
+#define	T1	epdt1
+#define	T2	epdt2
+#define	T3	epdt2
+#define	T4	epdt2
 #define	WW	0x22
 #define	WW2	0x02
 #define	KW	0x48
