@@ -260,7 +260,7 @@ gfx_driver_init (void)
    if (epdamv && !epdsleep)
       gfx_command1 (EPD75_AMV, 0x11);   // VCOM cal
    if (epdpfs)
-      gfx_command1 (EPD75_PFS, 0x30);   // Power down time
+      gfx_command1 (EPD75_PFS, (epdpfs & 3) << 4);      // Power down time
    if (epdevs)
       gfx_command1 (EPD75_EVS, 0x08);   // End voltage (floating)
    if (epdslow)
@@ -319,8 +319,8 @@ gfx_driver_send (void)
 #ifdef	USE_N2OCP
                  8 |
 #endif
-                 0x00| // (gfx_settings.norefresh ? 0x80 : 0x00) |       // Border if refresh
-                 (gfx_settings.norefresh?((gfx_settings.border ^ gfx_settings.invert) ? 0x00 : 0x30):((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20)) |  // border colour
+                 0x00 |         // (gfx_settings.norefresh ? 0x80 : 0x00) |       // Border if refresh
+                 (gfx_settings.norefresh ? ((gfx_settings.border ^ gfx_settings.invert) ? 0x00 : 0x30) : ((gfx_settings.border ^ gfx_settings.invert) ? 0x10 : 0x20)) | // border colour
                  0x01,          // new+old logic refresh
                  0x07);
 
