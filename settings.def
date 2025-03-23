@@ -8,6 +8,10 @@ u8	epd.pfs		3	.set .unit="frames"	// Send PFS (Power off)
 bit	epd.evs		0		// Send EVS (End voltage set float)
 s8	epd.tse		0	.set .unit="℃"	// TSE Temperature adjust, -8 to +7
 u8	epd.repeat	1		// Additional fast update cycles
+u8	lut.t1		30		// LUT Timer 1
+u8	lut.t2		5		// LUT Timer 2
+u8	lut.t3		10		// LUT Timer 3 (repeating)
+u8	lut.t4		1		// LUT Timer 4 (repeating)
 #endif
 
 #endif
