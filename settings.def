@@ -11,7 +11,7 @@ u8	epd.t1		30		// Quick LUT Timer 1
 u8	epd.t2		5		// Quick LUT Timer 2
 u8	epd.repeat	1		// Additional fast update cycles
 u8	epd.t3		10		// Quick LUT Timer 3 (repeating)
-u8	epd.t4		1		// Quick LUT Timer 4 (repeating)
+u8	epd.t4		5		// Quick LUT Timer 4 (repeating)
 #endif
 
 #endif
