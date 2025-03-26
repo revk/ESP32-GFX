@@ -212,7 +212,7 @@ gfx_raw_h (void)
    return 0;
 }
 
-uint8_t *
+void *
 gfx_raw_b (void)
 {
    return NULL;
