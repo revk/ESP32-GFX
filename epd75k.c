@@ -251,8 +251,6 @@ gfx_driver_init (void)
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
-   if (epdtse)
-      gfx_command1 (EPD75_TSE, epdtse & 0xF);   // Temp compensation -8 to +7
    if (epdamv && !epdsleep)
       gfx_command1 (EPD75_AMV, 0x11);   // VCOM cal
    if (epdpfs)
@@ -300,6 +298,9 @@ gfx_driver_send (void)
       usleep (10000);
       gfx_driver_init ();
    }
+
+   if (epdtse)
+      gfx_command1 (EPD75_TSE, epdtse & 0xF);   // Temp compensation -8 to +7
 
    if (epdslow)
       gfx_command1 (EPD75_PSR, gfx_settings.norefresh ? 0x3F : 0x1F);   //  KW, LUT=REG (fast update) or LUT=OTP (slow), dir could be used for flip, 
