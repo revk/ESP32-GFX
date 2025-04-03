@@ -1261,8 +1261,9 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
       x += (segs > 7 ? fontw : 6 * size);
       if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
       {
-         y += size * 9 / 2;
+         y += size * 9;
          size = ((size / 2) ? : 1);
+         y -= size * 9;
          fontw = 7 * size;      // pixel width of characters in font file
       }
    }
