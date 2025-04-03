@@ -1182,7 +1182,7 @@ gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
 }
 
 void
-gfx_7seg_size (int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
+gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
 {
    if (wp)
       *wp = 0;
@@ -1199,6 +1199,8 @@ gfx_7seg_size (int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
          w += 6 * size;
          if (p[1] == ':' || p[1] == '.')
             w += size;
+         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
+            size = ((size / 2) ? : 1);
       }
    if (wp)
       *wp = w;
@@ -1207,7 +1209,7 @@ gfx_7seg_size (int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
 }
 
 void
-gfx_7seg (int8_t size, const char *fmt, ...)
+gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
 {                               // Plot 7 segment digits
    if (!gfx)
       return;
@@ -1257,6 +1259,11 @@ gfx_7seg (int8_t size, const char *fmt, ...)
       for (int s = 0; s < segs; s++)
          gfx_mask_pack (x, y, 0, fontdata (s), (map & (1 << s)) ? 255 : 0);
       x += (segs > 7 ? fontw : 6 * size);
+      if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
+      {
+         size = ((size / 2) ? : 1);
+         fontw = 7 * size;      // pixel width of characters in font file
+      }
    }
    free (temp);
 }
