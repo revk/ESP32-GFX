@@ -1542,7 +1542,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
             for (int DY = 0; DY < size * 9; DY++)
                for (int DX = 0; DX < size * 5; DX++)
                   if (v5x9_pixel (&v, DX, DY))
-                     gfx_pixel (X + DX, Y + DY, 255);
+                     gfx_pixel (x + DX, y + DY, 255);
 #else
 
          // Find character
