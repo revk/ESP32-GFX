@@ -108,7 +108,7 @@ void gfx_text_size(uint8_t flags,uint8_t size,const char *,gfx_pos_t *w,gfx_pos_
 #define	GFX_7SEG_SMALL_DOT	(1<<0)	// Small (half size) after dot
 #define	GFX_7SEG_SMALL_COLON	(1<<1)	// Small (half size) after colon
 void gfx_7seg (uint8_t flags,int8_t size, const char *fmt, ...); // digits (allows : or , or space after a digit)
-void gfx_7seg_size(uint8_t flags,int8_t size,const char *,gfx_pos_t *w,fx_pos_t *h);
+void gfx_7seg_size(uint8_t flags,int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 
 uint8_t gfx_text_desc(const char *c);	// Has decenders
 
