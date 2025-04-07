@@ -231,21 +231,11 @@ static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len);
-static __attribute__((unused))
-     esp_err_t
-     gfx_command0 (uint8_t cmd);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command1 (uint8_t cmd, uint8_t a);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-     static __attribute__((unused))
-     esp_err_t
-     gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused)) esp_err_t gfx_command0 (uint8_t cmd);
+static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -298,119 +288,51 @@ static __attribute__((unused))
 #endif
 #endif
 
-#ifdef	CONFIG_GFX_VECTOR
 #ifdef	CONFIG_GFX_UNICODE
 #include "vector.h"
 #else
 #include "vector96.h"
 #endif
-#endif
 
-#if	GFX_BPP <= 2
-#ifdef	CONFIG_GFX_FONT0
-#include "packmono0.h"
-#endif
-#ifdef	CONFIG_GFX_FONT1
-#include "packmono1.h"
-#endif
-#ifdef	CONFIG_GFX_FONT2
-#include "packmono2.h"
-#endif
-#ifdef	CONFIG_GFX_FONT3
-#include "packmono3.h"
-#endif
-#ifdef	CONFIG_GFX_FONT4
-#include "packmono4.h"
-#endif
-#ifdef	CONFIG_GFX_FONT5
-#include "packmono5.h"
-#endif
-#ifdef	CONFIG_GFX_FONT6
-#include "packmono6.h"
-#endif
-#ifdef	CONFIG_GFX_FONT7
-#include "packmono7.h"
-#endif
-#ifdef	CONFIG_GFX_FONT8
-#include "packmono8.h"
-#endif
-#ifdef	CONFIG_GFX_FONT9
-#include "packmono9.h"
-#endif
-#else
-#ifdef	CONFIG_GFX_FONT0
-#include "packgrey0.h"
-#endif
-#ifdef	CONFIG_GFX_FONT1
-#include "packgrey1.h"
-#endif
-#ifdef	CONFIG_GFX_FONT2
-#include "packgrey2.h"
-#endif
-#ifdef	CONFIG_GFX_FONT3
-#include "packgrey3.h"
-#endif
-#ifdef	CONFIG_GFX_FONT4
-#include "packgrey4.h"
-#endif
-#ifdef	CONFIG_GFX_FONT5
-#include "packgrey5.h"
-#endif
-#ifdef	CONFIG_GFX_FONT6
-#include "packgrey6.h"
-#endif
-#ifdef	CONFIG_GFX_FONT7
-#include "packgrey7.h"
-#endif
-#ifdef	CONFIG_GFX_FONT8
-#include "packgrey8.h"
-#endif
-#ifdef	CONFIG_GFX_FONT9
-#include "packgrey9.h"
-#endif
-#endif
-
-     static char const
-        sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
-     static uint8_t const
-        sevensegmap[] = {
-        0x00,                   // space
-        0x3F,                   // 0
-        0x06,                   // 1
-        0x5B,                   // 2
-        0x4F,                   // 3
-        0x66,                   // 4
-        0x6D,                   // 5
-        0x7D,                   // 6
-        0x07,                   // 7
-        0x7F,                   // 8
-        0x6F,                   // 9
-        0x40,                   // -
-        0x08,                   // _
-        0x22,                   // "
-        0x02,                   // '
-        0x04,                   // ,
-        0x39,                   // [
-        0x0F,                   // ]
-        0x77,                   // A
-        0x7C,                   // B (b)
-        0x39,                   // C
-        0x5E,                   // D (d)
-        0x79,                   // E
-        0x71,                   // F
-        0x3D,                   // G
-        0x76,                   // H
-        0x30,                   // I
-        0x1E,                   // J
-        0x38,                   // L
-        0x37,                   // N
-        0x3F,                   // O
-        0x73,                   // P
-        0x50,                   // R (r)
-        0x6D,                   // S
-        0x3E,                   // U
-        0x5B,                   // Z
-     };
+static char const sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
+static uint8_t const sevensegmap[] = {
+   0x00,                        // space
+   0x3F,                        // 0
+   0x06,                        // 1
+   0x5B,                        // 2
+   0x4F,                        // 3
+   0x66,                        // 4
+   0x6D,                        // 5
+   0x7D,                        // 6
+   0x07,                        // 7
+   0x7F,                        // 8
+   0x6F,                        // 9
+   0x40,                        // -
+   0x08,                        // _
+   0x22,                        // "
+   0x02,                        // '
+   0x04,                        // ,
+   0x39,                        // [
+   0x0F,                        // ]
+   0x77,                        // A
+   0x7C,                        // B (b)
+   0x39,                        // C
+   0x5E,                        // D (d)
+   0x79,                        // E
+   0x71,                        // F
+   0x3D,                        // G
+   0x76,                        // H
+   0x30,                        // I
+   0x1E,                        // J
+   0x38,                        // L
+   0x37,                        // N
+   0x3F,                        // O
+   0x73,                        // P
+   0x50,                        // R (r)
+   0x6D,                        // S
+   0x3E,                        // U
+   0x5B,                        // Z
+};
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1368,7 +1290,6 @@ gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * w
       *hp = h;
 }
 
-#ifdef	CONFIG_GFX_VECTOR
 typedef struct v5x9_s v5x9_t;
 struct v5x9_s
 {
@@ -1577,91 +1498,6 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
       }
    }
 }
-#endif
-
-#ifndef	CONFIG_GFX_VECTOR_ONLY
-void
-gfx_text_draw (uint8_t flags, uint8_t size, const char *text)
-{                               // Size negative for descenders
-   if (!gfx || !fonts[size])
-      return;
-   uint8_t z = 7;
-   if (flags & GFX_TEXT_DESCENDERS)
-      z = 9;
-
-   gfx_pos_t x,
-     y,
-     w,
-     h;
-   gfx_text_draw_size (flags, size, text, &w, &h);
-
-   int fonth = (z + 1) * (size ? : 1);
-
-   const uint8_t *fontdata (char c)
-   {
-      return fonts[size][c - ' '];
-   }
-
-   gfx_pos_t ox = 0,
-      oy = 0;
-   gfx_draw (w, h, 1, 1, &ox, &oy);     // starting point
-   // Border
-   if (f != b)
-   {
-      for (gfx_pos_t n = -1; n <= w; n++)
-      {
-         gfx_pixel (ox + n, oy - 1, 0);
-         gfx_pixel (ox + n, oy + h, 0);
-      }
-      for (gfx_pos_t n = 0; n < h; n++)
-      {
-         gfx_pixel (ox - 1, oy + n, 0);
-         gfx_pixel (ox + w, oy + n, 0);
-      }
-   }
-   // Text
-   x = y = 0;
-   const char *p = text;
-   int c;
-   while ((c = utf8 (&p)) > 0)
-   {
-      if (!x && y + fonth > h)
-         fonth = h - y;         // Last line
-      int charw = cwidth (flags, size, c);
-      if (charw)
-      {
-         if (c <= 8)
-            c = ' ';
-         if (!cwidth (flags, size, *p))
-            charw -= (size ? : 1);      // Crop right edge border - messy for UTF8 but should be OK
-         int dx = (cwidth (flags, 1, c) == 2) ? 2 : 0;  // Narrow are offset
-         if (flags & GFX_TEXT_BLOCKY)
-         {
-#if	GFX_BPP <= 2            // TODO should really do full colour
-            gfx_block2N_pack (ox + x, oy + y, charw / size, fonth / (size ? : 1), dx / size, size, size, fonts[1][c - ' ']);
-#endif
-         } else
-         {
-#if    GFX_BPP <= 2
-            gfx_block2_pack (ox + x, oy + y, charw, fonth, dx, fontdata (c));
-#else
-            gfx_block16_pack (ox + x, oy + y, charw, fonth, dx, fontdata (c));
-#endif
-         }
-         x += charw;
-      }
-      if (!*p || *p == '\n')
-      {                         // End of line
-         for (gfx_pos_t X = x; X < w; X++)
-            for (gfx_pos_t Y = 0; Y < fonth; Y++)
-               gfx_pixel (ox + X, oy + y + Y, 0);       // Pack background
-         x = 0;
-         y += fonth;
-         continue;
-      }
-   }
-}
-#endif
 
 uint8_t
 gfx_text_desc (const char *c)
@@ -1679,12 +1515,6 @@ gfx_text (uint8_t flags, uint8_t size, const char *fmt, ...)
 {                               // Size negative for descenders
    if (!gfx)
       return;
-#ifdef	CONFIG_GFX_VECTOR_ONLY
-   flags |= GFX_TEXT_VECTOR;
-#endif
-#ifndef	CONFIG_GFX_VECTOR
-   flags &= ~GFX_TEXT_VECTOR;
-#endif
    if (!(flags & GFX_TEXT_VECTOR) && size > sizeof (fonts) / sizeof (*fonts) - 1)
       size = sizeof (fonts) / sizeof (*fonts) - 1;
    va_list ap;
@@ -1693,30 +1523,13 @@ gfx_text (uint8_t flags, uint8_t size, const char *fmt, ...)
    vasprintf (&temp, fmt, ap);
    va_end (ap);
    if (temp)
-   {
-#ifdef	CONFIG_GFX_VECTOR_ONLY
       gfx_vector_draw (flags, size, temp);
-#else
-#ifdef	CONFIG_GFX_VECTOR
-      if (flags & GFX_TEXT_VECTOR)
-         gfx_vector_draw (flags, size, temp);
-      else
-#endif
-         gfx_text_draw (flags, size, temp);
-#endif
-   }
    free (temp);
 }
 
 void
 gfx_text_size (uint8_t flags, uint8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
-#ifdef	CONFIG_GFX_VECTOR_ONLY
-   flags |= GFX_TEXT_VECTOR;
-#endif
-#ifndef	CONFIG_GFX_VECTOR
-   flags &= ~GFX_TEXT_VECTOR;
-#endif
    if (!(flags & GFX_TEXT_VECTOR) && size > sizeof (fonts) / sizeof (*fonts) - 1)
       size = sizeof (fonts) / sizeof (*fonts) - 1;
    gfx_text_draw_size (flags, size, t, w, h);
