@@ -1530,28 +1530,31 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
             c = ' ';
          if (!cwidth (flags, size, *p))
             charw -= (size ? : 1);      // Crop right edge border - messy for UTF8 but should be OK
-         int dx = size * ((cwidth (flags, 1, c) == 2) ? 2 : 0); // Narrow are offset
-         v5x9_t v;
+         if (ox + x >= 0 && ox + x + size * 5 < gfx_width () && oy + y >= 0 ||| oy + y + size * 9 < gfx_height ())
+         {
+            int dx = size * ((cwidth (flags, 1, c) == 2) ? 2 : 0);      // Narrow are offset
+            v5x9_t v;
 #if	GFX_BPP <= 2
-         if (v5x9_start (&v, c, size, s1))
-            for (int DY = 0; DY < size * 9; DY++)
-               for (int DX = 0; DX < size * 5; DX++)
-                  if (v5x9_pixel (&v, DX, DY))
-                     gfx_pixel (ox + x + DX - dx, oy + y + DY, 255);
+            if (v5x9_start (&v, c, size, s1))
+               for (int DY = 0; DY < size * 9; DY++)
+                  for (int DX = 0; DX < size * 5; DX++)
+                     if (v5x9_pixel (&v, DX, DY))
+                        gfx_pixel (ox + x + DX - dx, oy + y + DY, 255);
 #else
-         if (v5x9_start (&v, c, size * 4, s1 * 4))
-            for (int DY = 0; DY < size * 9; DY++)
-               for (int DX = 0; DX < size * 5; DX++)
-               {
-                  int v = 0;
-                  for (int sy = 0; sy < 4; sy++)
-                     for (int sx = 0; sx < 4; sx++)
-                        if (v5x9_pixel (&v, DX * 4 + sx, DY * 4 + sy))
-                           v++;
-                  if (v)
-                     gfx_pixel (ox + x + DX - dx, oy + y + DY, v * 255 / 16);
-               }
+            if (v5x9_start (&v, c, size * 4, s1 * 4))
+               for (int DY = 0; DY < size * 9; DY++)
+                  for (int DX = 0; DX < size * 5; DX++)
+                  {
+                     int v = 0;
+                     for (int sy = 0; sy < 4; sy++)
+                        for (int sx = 0; sx < 4; sx++)
+                           if (v5x9_pixel (&v, DX * 4 + sx, DY * 4 + sy))
+                              v++;
+                     if (v)
+                        gfx_pixel (ox + x + DX - dx, oy + y + DY, v * 255 / 16);
+                  }
 #endif
+         }
          x += charw;
       }
       if (!*p || *p == '\n')
