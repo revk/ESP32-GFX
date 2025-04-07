@@ -231,11 +231,21 @@ static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command0 (uint8_t cmd);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static __attribute__((unused))
+     esp_err_t
+     gfx_command0 (uint8_t cmd);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command1 (uint8_t cmd, uint8_t a);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+     static __attribute__((unused))
+     esp_err_t
+     gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -360,45 +370,47 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #endif
 #endif
 
-static char const sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
-static uint8_t const sevensegmap[] = {
-   0x00,                        // space
-   0x3F,                        // 0
-   0x06,                        // 1
-   0x5B,                        // 2
-   0x4F,                        // 3
-   0x66,                        // 4
-   0x6D,                        // 5
-   0x7D,                        // 6
-   0x07,                        // 7
-   0x7F,                        // 8
-   0x6F,                        // 9
-   0x40,                        // -
-   0x08,                        // _
-   0x22,                        // "
-   0x02,                        // '
-   0x04,                        // ,
-   0x39,                        // [
-   0x0F,                        // ]
-   0x77,                        // A
-   0x7C,                        // B (b)
-   0x39,                        // C
-   0x5E,                        // D (d)
-   0x79,                        // E
-   0x71,                        // F
-   0x3D,                        // G
-   0x76,                        // H
-   0x30,                        // I
-   0x1E,                        // J
-   0x38,                        // L
-   0x37,                        // N
-   0x3F,                        // O
-   0x73,                        // P
-   0x50,                        // R (r)
-   0x6D,                        // S
-   0x3E,                        // U
-   0x5B,                        // Z
-};
+     static char const
+        sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
+     static uint8_t const
+        sevensegmap[] = {
+        0x00,                   // space
+        0x3F,                   // 0
+        0x06,                   // 1
+        0x5B,                   // 2
+        0x4F,                   // 3
+        0x66,                   // 4
+        0x6D,                   // 5
+        0x7D,                   // 6
+        0x07,                   // 7
+        0x7F,                   // 8
+        0x6F,                   // 9
+        0x40,                   // -
+        0x08,                   // _
+        0x22,                   // "
+        0x02,                   // '
+        0x04,                   // ,
+        0x39,                   // [
+        0x0F,                   // ]
+        0x77,                   // A
+        0x7C,                   // B (b)
+        0x39,                   // C
+        0x5E,                   // D (d)
+        0x79,                   // E
+        0x71,                   // F
+        0x3D,                   // G
+        0x76,                   // H
+        0x30,                   // I
+        0x1E,                   // J
+        0x38,                   // L
+        0x37,                   // N
+        0x3F,                   // O
+        0x73,                   // P
+        0x50,                   // R (r)
+        0x6D,                   // S
+        0x3E,                   // U
+        0x5B,                   // Z
+     };
 
 static uint8_t const *const *sevenseg[] = {
 #ifdef	CONFIG_GFX_7SEG
@@ -1357,6 +1369,141 @@ gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * w
 }
 
 #ifdef	CONFIG_GFX_VECTOR
+typedef struct v5x9_s v5x9_t;
+struct v5x9_s
+{
+   uint16_t size;               // Size, pixels per unit
+   uint16_t weight;             // Weight, pixels per unit
+   uint32_t weight2;            // Weight squared (adjusted maybe)
+   uint16_t minx,
+     maxx;                      // Range of plot
+   uint16_t miny,
+     maxy;
+   uint8_t *start;              // Start in font_vector_data
+   uint8_t *end;                // End (start of next) in font_vector_data
+   uint8_t *last;               // Last checked point offset in font_vector_data
+};
+
+static v5x9_t *
+v5x9_start (v5x9_t * v, uint32_t u, uint16_t size, uint16_t weight)
+{
+   if (!v)
+      return NULL;
+   memset (v, 0, sizeof (*v));
+   if (u < 32 || !v)
+      return NULL;
+   int q;
+   if (u < 128)
+      q = u - 32;
+   else
+#ifdef CONFIG_GFX_UNICODE
+   {
+      for (q = 0; q < sizeof (font_vector_unicode) / sizeof (*font_vector_unicode); q++)
+         if (font_vector_unicode[q] == u)
+            break;
+      if (q == sizeof (font_vector_unicode) / sizeof (*font_vector_unicode))
+         return NULL;
+      q += 96;
+   }
+#else
+      return NULL;
+#endif
+   v->size = size;
+   v->weight = weight;
+   v->weight2 = weight * weight;
+   if (weight == 3)
+      v->weight2 = 7;
+   v->start = font_vector_data + font_vector_offset[q];
+   v->end = font_vector_data + font_vector_offset[q + 1];
+   if (v->start == v->end)
+      return NULL;
+   int8_t minx = -1,
+      maxx = -1,
+      miny = -1,
+      maxy = -1;
+   for (uint8_t * p = v->start; p < v->end; p++)
+   {
+      uint8_t x = (*p >> 4 & 7);
+      uint8_t y = (*p & 15);
+      if (minx < 0 || minx > x)
+         minx = x;
+      if (maxx < 0 || maxx < x)
+         maxx = x;
+      if (miny < 0 || miny > y)
+         miny = y;
+      if (maxy < 0 || maxy < y)
+         maxy = y;
+   }
+   v->minx = minx * size;
+   v->maxx = (maxx + 1) * size;
+   v->miny = miny * size;
+   v->maxy = (maxy + 1) * size;
+   return v;
+}
+
+static uint8_t
+v5x9_pixel (v5x9_t * v, int x, int y)
+{                               // return 1 if plot, 0 if not, based on x/y from top left
+   if (x < v->minx || x >= v->maxx || y < v->miny || y >= v->maxy)
+      return 0;                 // Out of range
+   x *= 2;
+   y *= 2;                      // We work on radius in this
+   uint8_t indot (uint8_t b)
+   {                            // x/y is within a circle weight radius from X,Y (from b)
+      int X = ((b >> 4 & 7) * v->size * 2 + v->size - 1) - x;
+      int Y = ((b & 15) * v->size * 2 + v->size - 1) - y;
+      if (debug)
+         warnx ("%d/%d %d/%d", x, y, X, Y);
+      if (X < -v->weight || X > v->weight || Y < -v->weight || Y > v->weight)
+         return 0;
+      if (X * X + Y * Y <= v->weight2)
+         return 1;
+      return 0;
+   }
+   uint8_t isline (int x1, int y1, int x2, int y2)
+   {                            // x/y is within a line weight wide from x1/y1 x2/y2
+      if ((x < x1 - v->weight && x < x2 - v->weight) || (x > x1 + v->weight && x > x2 + v->weight)
+          || (y < y1 - v->weight && y < y2 - v->weight) || (y > y1 + v->weight && y > y2 + v->weight))
+         return 0;              // Out of limits
+      int dx = x2 - x1;
+      int dy = y2 - y1;
+      int l = dx * dx + dy * dy;
+      int k = (dy * (x - x1) - dx * (y - y1));
+      int x3 = x - k * dy / l;
+      int y3 = y + k * dx / l;
+      if ((x3 < x1 && x3 < x2) || (x3 > x1 && x3 > x2) || (y3 < y1 && y3 < y2) || (y3 > y1 && y3 > y2))
+         return 0;              // Off ends
+      int d = (x - x3) * (x - x3) + (y - y3) * (y - y3);
+      if (d >= v->weight2)
+         return 0;              // Not on line
+      return 1;
+   }
+   // Dots
+   if (v->last && indot (*v->last))
+      return 1;
+   for (uint8_t * p = v->start; p < v->end; p++)
+      if (p != v->last && indot (*p))
+      {
+         v->last = p;
+         return 1;
+      }
+   v->last = NULL;
+   // Lines
+   int lx = 0,
+      ly = 0;
+   for (uint8_t * p = v->start; p < v->end; p++)
+   {
+      uint8_t b = *p;
+      int X = ((b >> 4 & 7) * v->size * 2 + v->size - 1);
+      int Y = ((b & 15) * v->size * 2 + v->size - 1);
+      if (!(b & 0x80) && isline (lx, ly, X, Y))
+         return 1;
+      lx = X;
+      ly = Y;
+   }
+   return 0;
+}
+
 void
 gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
 {
@@ -1384,9 +1531,11 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    int s1 = size;               // Stroke size
    if ((flags & GFX_TEXT_LIGHT) && size > 1)
       s1 = s1 * 2 / 3;
+#if 0
    int s2 = s1 * s1;
    if (s1 == 3)
       s2 = 7;
+#endif
    const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
@@ -1401,6 +1550,14 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
          if (!cwidth (flags, size, *p))
             charw -= (size ? : 1);      // Crop right edge border - messy for UTF8 but should be OK
          int dx = (cwidth (flags, 1, c) == 2) ? 2 : 0;  // Narrow are offset
+#if 1
+         v5x9_t v;
+         if (v5x9_start (&v, c, size, s1))
+            for (int DY = 0; DY < size * 9; DY++)
+               for (int DX = 0; DX < size * 5; DX++)
+                  gfx_pixel (X + DX, Y + DY, v5x9_pixel (&v, DX, DY) ? 255 : 0);
+#else
+
          // Find character
          uint16_t start = 0,
             end = 0;
@@ -1488,6 +1645,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
                   start++;
                }
          }
+#endif
          x += charw;
       }
       if (!*p || *p == '\n')
