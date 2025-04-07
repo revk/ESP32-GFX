@@ -361,59 +361,6 @@ static uint8_t const *const *sevenseg[] = {
 #endif
 };
 
-static uint8_t const *const *fonts[] = {
-#ifdef	CONFIG_GFX_FONT0
-   gfx_font_pack0,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT1
-   gfx_font_pack1,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT2
-   gfx_font_pack2,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT3
-   gfx_font_pack3,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT4
-   gfx_font_pack4,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT5
-   gfx_font_pack5,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT6
-   gfx_font_pack6,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT7
-   gfx_font_pack7,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT8
-   gfx_font_pack8,
-#else
-   NULL,
-#endif
-#ifdef	CONFIG_GFX_FONT9
-   gfx_font_pack9,
-#else
-   NULL,
-#endif
-};
-
 #define	BLACK	0
 
 #if GFX_BPP == 16               // 16 bit RGB
