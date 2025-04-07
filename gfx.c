@@ -1515,8 +1515,6 @@ gfx_text (uint8_t flags, uint8_t size, const char *fmt, ...)
 {                               // Size negative for descenders
    if (!gfx)
       return;
-   if (!(flags & GFX_TEXT_VECTOR) && size > sizeof (fonts) / sizeof (*fonts) - 1)
-      size = sizeof (fonts) / sizeof (*fonts) - 1;
    va_list ap;
    char *temp;
    va_start (ap, fmt);
@@ -1530,8 +1528,6 @@ gfx_text (uint8_t flags, uint8_t size, const char *fmt, ...)
 void
 gfx_text_size (uint8_t flags, uint8_t size, const char *t, gfx_pos_t * w, gfx_pos_t * h)
 {
-   if (!(flags & GFX_TEXT_VECTOR) && size > sizeof (fonts) / sizeof (*fonts) - 1)
-      size = sizeof (fonts) / sizeof (*fonts) - 1;
    gfx_text_draw_size (flags, size, t, w, h);
 }
 
