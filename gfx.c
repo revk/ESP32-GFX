@@ -1317,18 +1317,27 @@ v5x9_pixel (v5x9_t * v, int x, int y)
    int o = (v->size & ~1) - ((v->weight & 1) ^ 1);      // Offset
    x *= 2;
    y *= 2;                      // We work on radius in this
-   uint8_t indot (uint8_t b)
-   {                            // x/y is within a circle weight radius from X,Y (from b)
-      int X = ((b >> 4 & 7) * v->size * 2 + o) - x;
-      int Y = ((b & 15) * v->size * 2 + o) - y;
-      if (X < -v->weight || X > v->weight || Y < -v->weight || Y > v->weight)
-         return 0;
-      if (X * X + Y * Y <= v->weight2)
-         return 1;
-      return 0;
-   }
-   uint8_t isline (int x1, int y1, int x2, int y2)
-   {                            // x/y is within a line weight wide from x1/y1 x2/y2
+   uint8_t isline (uint8_t * p)
+   {                            // Check point and line
+      uint8_t b1 = *p;
+      int x1 = ((b1 >> 4 & 7) * v->size * 2 + o);
+      int y1 = ((b1 & 15) * v->size * 2 + o);
+      {
+         int X = x1 - x;
+         int Y = y1 - y;
+         if (X >= -v->weight && X <= v->weight && Y >= -v->weight && Y <= v->weight && X * X + Y * Y <= v->weight2)
+         {
+            v->last = p;
+            return 1;           // Indot
+         }
+      }
+      if (p + 1 >= v->end)
+         return 0;              // last point
+      uint8_t b2 = p[1];
+      if (b2 & 0x80)
+         return 0;              // last point in line
+      int x2 = ((b2 >> 4 & 7) * v->size * 2 + o);
+      int y2 = ((b2 & 15) * v->size * 2 + o);
       if ((x < x1 - v->weight && x < x2 - v->weight) || (x > x1 + v->weight && x > x2 + v->weight)
           || (y < y1 - v->weight && y < y2 - v->weight) || (y > y1 + v->weight && y > y2 + v->weight))
          return 0;              // Out of limits
@@ -1342,31 +1351,18 @@ v5x9_pixel (v5x9_t * v, int x, int y)
          return 0;              // Off ends
       int d = (x - x3) * (x - x3) + (y - y3) * (y - y3);
       if (d <= v->weight2)
-         return 1;              // In line
-      return 0;
-   }
-   // Dots
-   if (v->last && indot (*v->last))
-      return 1;
-   v->last = NULL;
-   // Lines
-   int lx = 0,
-      ly = 0;
-   for (uint8_t * p = v->start; p < v->end; p++)
-   {
-      uint8_t b = *p;
-      if (indot (b))
       {
          v->last = p;
-         return 1;
+         return 1;              // In line
       }
-      int X = ((b >> 4 & 7) * v->size * 2 + o);
-      int Y = ((b & 15) * v->size * 2 + o);
-      if (!(b & 0x80) && isline (lx, ly, X, Y))
-         return 1;
-      lx = X;
-      ly = Y;
+      return 0;
    }
+   for (uint8_t * p = v->last; p < v->end; p++)
+      if (isline (p))
+         return 1;
+   for (uint8_t * p = v->start; p < v->last; p++)
+      if (isline (p))
+         return 1;
    return 0;
 }
 
