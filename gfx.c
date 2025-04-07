@@ -1440,8 +1440,6 @@ v5x9_pixel (v5x9_t * v, int x, int y)
    {                            // x/y is within a circle weight radius from X,Y (from b)
       int X = ((b >> 4 & 7) * v->size * 2 + v->size - 1) - x;
       int Y = ((b & 15) * v->size * 2 + v->size - 1) - y;
-      if (debug)
-         warnx ("%d/%d %d/%d", x, y, X, Y);
       if (X < -v->weight || X > v->weight || Y < -v->weight || Y > v->weight)
          return 0;
       if (X * X + Y * Y <= v->weight2)
