@@ -8,30 +8,7 @@ if(! -e include) then
 endif
 /projects/tools/bin/5x9 --style=vector96 > "$d/include/vector96.h"
 /projects/tools/bin/5x9 --style=vector > "$d/include/vector.h"
-if(! -e /tmp/5x9JTDBold) then
-	/projects/tools/bin/5x9 --em=1000 --style=JTD --dir=/tmp/5x9JTDBold --bold
-	cd /tmp/5x9JTDBold
-	foreach u (u00[0-7]*.svg)
-		echo $u
-		inkscape --export-area=0:0:600:900 -o $u:r.png $u >& /dev/null
-	end
-endif
-if(! -e /tmp/5x9JTD) then
-	/projects/tools/bin/5x9 --em=1000 --style=JTD --dir=/tmp/5x9JTD
-	cd /tmp/5x9JTD
-	foreach u (u00[0-7]*.svg)
-		echo $u
-		inkscape --export-area=0:0:600:900 -o $u:r.png $u >& /dev/null
-	end
-endif
-if(! -e /tmp/5x9LCD) then
-	/projects/tools/bin/5x9 --em=1000 --style=LCD --dir=/tmp/5x9LCD --bold
-	cd /tmp/5x9LCD
-	foreach u (u00[0-7]*.svg)
-		echo $u
-		inkscape --export-area=50:50:650:950 -o $u:r.png $u >& /dev/null
-	end
-endif
+
 if(! -e /tmp/7seg) then
 	mkdir /tmp/7seg
 	cd /tmp/7seg
@@ -41,59 +18,7 @@ if(! -e /tmp/7seg) then
 	end
 endif
 
-sed "$d/include/grey0.h" \
-	    -e 's/0x00,0x00, /0x00,/g' \
-	    -e 's/0x00,0xF0, /0x20,/g' \
-	    -e 's/0x0F,0x00, /0x40,/g' \
-	    -e 's/0x0F,0xF0, /0x60,/g' \
-	    -e 's/0xF0,0x00, /0x80,/g' \
-	    -e 's/0xF0,0xF0, /0xA0,/g' \
-	    -e 's/0xFF,0x00, /0xC0,/g' \
-	    -e 's/0xFF,0xF0, /0xE0,/g' \
-	    > "$d/include/mono0.h"
-sed "$d/include/grey0.h" \
-	    -e 'sq^0q(const unsigned char[]){0,0,4,0q'	\
-	    -e 'sq, /q},	/q'				\
-	    -e 'sq(const unsigned char\[\]){0,0,4,0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00},qNULL,										q' \
-	    -e 'sqconst unsigned char gfx_fontqconst unsigned char * const gfx_font_packq'	\
-	    > "$d/include/packgrey0.h"
-sed "$d/include/mono0.h" \
-	    -e 'sq^0q(const unsigned char[]){0,0,4,0q'	\
-	    -e 'sq,/q},	/q'				\
-	    -e 'sq(const unsigned char\[\]){0,0,4,0x00,0x00,0x00,0x00,0x00},qNULL,							q' \
-	    -e 'sqconst unsigned char gfx_fontqconst unsigned char * const gfx_font_packq'	\
-	    > "$d/include/packmono0.h"
-
 foreach n (1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20)
-	if($n <= 9) then
-		cd /tmp/5x9JTD
-		if($n == 1) cd /tmp/5x9JTDBold
-		@ W = $n * 6
-		@ H = $n * 9
-
-		set f="grey$n.h"
-		echo "$f"
-
-		foreach u (u00[0-7]*.svg)
-			convert $u:r.png -flatten -negate -monochrome -dither None -scale ${W}x${H}'!' $u:r.gray
-		end
-
-		$d/fontpack -w$W -h$H -b4 u00[0-7]*.gray --head="gfx_font$n" >> "$d/include/$f"
-		$d/fontpack -w$W -h$H -b4 u00[0-7]*.gray --pack --head="gfx_font_pack$n" > "$d/include/pack$f"
-
-		set f="mono$n.h"
-		echo "$f"
-
-		if($n == 1) then
-			cd /tmp/5x9LCD
-			foreach u (u00[0-7]*.svg)
-				convert $u:r.png -flatten -monochrome -dither None -negate -scale ${W}x${H}'!' $u:r.gray
-			end
-		endif
-
-		$d/fontpack -w$W -h$H -b1 u00[0-7]*.gray --head="gfx_font$n" > "$d/include/$f"
-		$d/fontpack -w$W -h$H -b1 u00[0-7]*.gray --pack --head="gfx_font_pack$n" > "$d/include/pack$f"
-	endif
 	@ W = $n * 7
 	@ H = $n * 9
 	cd /tmp/7seg
