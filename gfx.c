@@ -1518,11 +1518,6 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    int s1 = size;               // Stroke size
    if ((flags & GFX_TEXT_LIGHT) && size > 1)
       s1 = s1 * 2 / 3;
-#if 0
-   int s2 = s1 * s1;
-   if (s1 == 3)
-      s2 = 7;
-#endif
    const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
@@ -1536,7 +1531,6 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
             c = ' ';
          if (!cwidth (flags, size, *p))
             charw -= (size ? : 1);      // Crop right edge border - messy for UTF8 but should be OK
-#if 1
          int dx = size * ((cwidth (flags, 1, c) == 2) ? 2 : 0); // Narrow are offset
          v5x9_t v;
          if (v5x9_start (&v, c, size, s1))
@@ -1544,96 +1538,6 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
                for (int DX = 0; DX < size * 5; DX++)
                   if (v5x9_pixel (&v, DX, DY))
                      gfx_pixel (ox + x + DX - dx, oy + y + DY, 255);
-#else
-         int dx = (cwidth (flags, 1, c) == 2) ? 2 : 0;  // Narrow are offset
-         // Find character
-         uint16_t start = 0,
-            end = 0;
-         if (c >= 32 && c < 128)
-         {
-            start = font_vector_offset[c - 32];
-            end = font_vector_offset[c - 31];
-         }
-#ifdef	CONFIG_GFX_UNICODE
-         else if (c >= 128)
-         {
-            for (int u = 0; u < sizeof (font_vector_unicode) / sizeof (*font_vector_unicode); u++)
-               if (font_vector_unicode[u] == c)
-               {
-                  start = font_vector_offset[u + 96];
-                  end = font_vector_offset[u + 97];
-                  break;
-               }
-         }
-#endif
-         while (start < end)
-         {
-            void line (int x1, int y1, int x2, int y2)
-            {
-               if (flags & GFX_TEXT_BLOCKY)
-               {
-                  while (1)
-                  {
-                     int X = ox + x + size * (x1 - dx);
-                     int Y = oy + y + size * y1;
-                     for (int DY = 0; DY < s1; DY++)
-                        for (int DX = 0; DX < s1; DX++)
-                           gfx_pixel (X + DX, Y + DY, 255);
-                     if (x1 == x2 && y1 == y2)
-                        break;
-                     if (x2 > x1)
-                        x1++;
-                     else if (x2 < x1)
-                        x1--;
-                     if (y2 > y1)
-                        y1++;
-                     else if (y2 < y1)
-                        y1--;
-                  }
-                  return;
-               }
-               x1 = ox + x + size * (x1 - dx) + (size - s1) / 2;
-               y1 = oy + y + size * y1 + (size - s1) / 2;
-               x2 = ox + x + size * (x2 - dx) + (size - s1) / 2;
-               y2 = oy + y + size * y2 + (size - s1) / 2;
-               for (int DY = 0; DY < s1; DY++)
-                  for (int DX = 0; DX < s1; DX++)
-                  {
-                     inline int check (int x, int y)
-                     {
-                        x = x * 2 - s1 + 1;
-                        y = y * 2 - s1 + 1;
-                        int d = x * x + y * y;
-                        if (d <= s2)
-                           return 1;
-                        return 0;
-                     }
-                     if (check (DX, DY))
-                        gfx_line (DX + x1, DY + y1, DX + x2, DY + y2, 255);
-                  }
-            }
-            uint8_t v = font_vector_data[start++];
-            if (!(v & 0x80))
-            {
-               ESP_LOGE (TAG, "Bad font %d", c);
-               break;
-            }
-            uint8_t x1 = ((v & 0x70) >> 4);
-            uint8_t y1 = (v & 0xF);
-            if (start == end || (font_vector_data[start] & 0x80))
-               line (x1, y1, x1, y1);   // Dot
-            else
-               while (start < end && !((v = font_vector_data[start]) & 0x80))
-               {
-                  uint8_t x2 = ((v & 0x70) >> 4);
-                  uint8_t y2 = (v & 0xF);
-                  line (x1, y1, x2, y2);
-                  x1 = x2;
-                  y1 = y2;
-                  start++;
-               }
-         }
-#endif
          x += charw;
       }
       if (!*p || *p == '\n')
