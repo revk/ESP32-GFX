@@ -1066,8 +1066,8 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
    if (y < gfx_height () && y + size * 9 >= 0)
    {
 #if	GFX_BPP>2
-      uint8_t a = malloc (size * 6);    // Alpha total
-      uint8_t c = malloc (size * 6);    // Colour total
+      uint8_t a = malloc (size * 7);    // Alpha total
+      uint8_t c = malloc (size * 7);    // Colour total
 #endif
       for (char *p = temp; *p; p++)
       {
@@ -1116,8 +1116,8 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
 #if	GFX_BPP>2
                   if (!(yy & 3))
                   {
-                     memset (a, 0, size * 6);
-                     memset (c, 0, size * 6);
+                     memset (a, 0, size * 7);
+                     memset (c, 0, size * 7);
                   }
 #endif
                   if (y7 == base + yy * unit / size)
@@ -1144,7 +1144,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                   }
 #if	GFX_BPP>2
                   if ((yy & 3) == 3)
-                     for (int xx = 0; xx < size * 6; xx++)
+                     for (int xx = 0; xx < size * 7; xx++)
                         if (a[xx])
                            gfx_pixel (x + xx, y + yy / 4, c[xx] & 255 / 16);
 #endif
