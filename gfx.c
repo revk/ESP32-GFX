@@ -1080,7 +1080,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             else
                map |= 0x200;
          }
-         if (size <= unit && x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
+         if (size <= width_7seg / 7 && x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
          {                      // Plot digit
 #if	GFX_BPP <= 2
             const uint16_t unit = width_7seg / 7;
