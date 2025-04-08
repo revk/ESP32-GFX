@@ -3,6 +3,7 @@
 *~
 *.swp
 fontpack
+7segpack
 .DS_Store
 */*-backups
 */*/*-backups

@@ -1,0 +1,13 @@
+#!/bin/csh -f
+
+make fontpack
+make 7segpack
+
+/projects/tools/bin/5x9 --style=vector96 > "include/vector96.h"
+/projects/tools/bin/5x9 --style=vector > "include/vector.h"
+
+foreach s (a b c d e f g h i j)
+	inkscape --actions="export-id:$s;export-id-only;export-area-page;export-background:white;export-filename:/tmp/$s.png;export-do" SevenSeg.svg >& /dev/null
+	convert -negate /tmp/$s.png /tmp/$s.gray
+end
+./7segpack /tmp/[a-j].gray > "include/7seg.h"
