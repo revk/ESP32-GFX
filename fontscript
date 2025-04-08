@@ -8,6 +8,7 @@ if(! -e include) then
 endif
 /projects/tools/bin/5x9 --style=vector96 > "$d/include/vector96.h"
 /projects/tools/bin/5x9 --style=vector > "$d/include/vector.h"
+inkscape --actions="export-area-page;export-background:white;export-filename:$d/7seg.png;export-do" $d/7seg.svg
 
 if(! -e /tmp/7seg) then
 	mkdir /tmp/7seg
