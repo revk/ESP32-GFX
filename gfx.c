@@ -1080,15 +1080,17 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             map |= 0x200;
       }
       // Plot
-      uint16_t step = (width_7seg / 7 + size - 1) / size;
+      const uint16_t unit = width_7seg / 7;
       if (step)
       {
-         uint16_t base = step / 2;
 #if	GFX_BPP <= 2
+         const uint16_t base = unit / size / 2;
          void plot (uint16_t x7, uint16_t y7, uint8_t l)
          {
-            if ((x7 % step) == base && (y7 % step) == base)
-               gfx_pixel (x + x7 / step, y + y7 / step, l);
+            int xx = x7 * size / unit,
+               yy = y7 * size / unit;
+            if (x7 == base + xx * unit / size && y7 == base + yy * unit / size)
+               gfx_pixel (x + xx, y + yy, l);
          }
 #else
          void plot (uint16_t x7, uint16_t y7, uint8_t l)
