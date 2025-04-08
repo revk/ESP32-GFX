@@ -1063,77 +1063,85 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
    gfx_7seg_size (flags, size, temp, &w, &h);
    gfx_draw (w, h, size, size, &x, &y); // starting point
    x += size * 9 / 20;          // Better alignment in box
-   for (char *p = temp; *p; p++)
-   {
-      char *m = strchr (sevensegchar, *p);
-      if (!m)
-         continue;
-      uint8_t segs = 7;
-      uint16_t map = 0;
-      map = sevensegmap[m - sevensegchar];
-      if (p[1] == ':' || p[1] == '.')
+   if (y < gfx_height () && y + size * 9 >= 0)
+      for (char *p = temp; *p; p++)
       {
-         segs = 10;
-         if (p[1] == ':')
-            map |= 0x180;
-         else
-            map |= 0x200;
-      }
-      // Plot
-      const uint16_t unit = width_7seg / 7;
-      if (size <= unit)
-      {
+         char *m = strchr (sevensegchar, *p);
+         if (!m)
+            continue;
+         uint8_t segs = 7;
+         uint16_t map = 0;
+         map = sevensegmap[m - sevensegchar];
+         if (p[1] == ':' || p[1] == '.')
+         {
+            segs = 10;
+            if (p[1] == ':')
+               map |= 0x180;
+            else
+               map |= 0x200;
+         }
+         const uint16_t unit = width_7seg / 7;
+         if (size <= unit && x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
+         {                      // Plot digit
 #if	GFX_BPP <= 2
-         const uint16_t base = unit / size / 2;
-         void plot (uint16_t x7, uint16_t y7, uint8_t l)
-         {
-            int xx = x7 * size / unit,
-               yy = y7 * size / unit;
-            if (x7 == base + xx * unit / size && y7 == base + yy * unit / size)
-               gfx_pixel (x + xx, y + yy, l);
-         }
-#else
-         void plot (uint16_t x7, uint16_t y7, uint8_t l)
-         {                      // antialiasing
-            // TODO
-         }
-#endif
-         uint8_t *i = pack_7seg,
-            *e = pack_7seg + sizeof (pack_7seg);
-         uint16_t y7 = 0;
-         while (i < e)
-         {
-            uint8_t dup = (*i & 0xF) + 1;
-            while (dup--)
+            const uint16_t base = unit / size / 2;
+            void plot (uint16_t x7, uint16_t y7, uint8_t l)
             {
-               uint8_t *I = i;
-               uint8_t seg = (*I++ >> 4);
-               uint16_t x7 = 0;
-               while (seg--)
-               {
-                  uint8_t S = (*I >> 4);
-                  uint16_t B = ((*I & 0xF) << 6) + (I[1] >> 2);
-                  uint16_t F = ((I[1] & 3) << 8) + I[2];
-                  x7 += B;
-                  S = ((map & (1 << S)) ? 255 : 0);
-                  while (F--)
-                     plot (x7++, y7, S);
-                  I += 3;
-               }
-               y7++;
+               int xx = x7 * size / unit,
+                  yy = y7 * size / unit;
+               if (x7 == base + xx * unit / size && y7 == base + yy * unit / size)
+                  gfx_pixel (x + xx, y + yy, l);
             }
-            i += 1 + (*i >> 4) * 3;
+#else
+            uint8_t a = malloc (size * 6);      // Alpha total
+            memset (a, 0, size * 6);
+            uint8_t c = malloc (size * 6);      // Colour total
+            memset (c, 0, size * 6);
+            void plot (uint16_t x7, uint16_t y7, uint8_t l)
+            {                   // antialiasing
+               // TODO
+            }
+#endif
+            uint8_t *i = pack_7seg,
+               *e = pack_7seg + sizeof (pack_7seg);
+            uint16_t y7 = 0;
+            while (i < e)
+            {
+               uint8_t dup = (*i & 0xF) + 1;
+               while (dup--)
+               {
+                  uint8_t *I = i;
+                  uint8_t seg = (*I++ >> 4);
+                  uint16_t x7 = 0;
+                  while (seg--)
+                  {
+                     uint8_t S = (*I >> 4);
+                     uint16_t B = ((*I & 0xF) << 6) + (I[1] >> 2);
+                     uint16_t F = ((I[1] & 3) << 8) + I[2];
+                     x7 += B;
+                     S = ((map & (1 << S)) ? 255 : 0);
+                     while (F--)
+                        plot (x7++, y7, S);
+                     I += 3;
+                  }
+#if	GFX_BPP>2
+                  // plot line at end of set of 4 lines
+                  // TODO
+#endif
+                  y7++;
+               }
+               i += 1 + (*i >> 4) * 3;
+            }
+         }
+         x += (segs > 7 ? fontw : 6 * size);
+         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
+         {
+            y += size * 9;
+            size = ((size / 2) ? : 1);
+            y -= size * 9;
+            fontw = 7 * size;   // pixel width of characters in font file
          }
       }
-      x += (segs > 7 ? fontw : 6 * size);
-      if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
-      {
-         y += size * 9;
-         size = ((size / 2) ? : 1);
-         y -= size * 9;
-         fontw = 7 * size;      // pixel width of characters in font file
-      }
-   }
    free (temp);
 }
 
