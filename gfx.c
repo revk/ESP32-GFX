@@ -1064,6 +1064,11 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
    gfx_draw (w, h, size, size, &x, &y); // starting point
    x += size * 9 / 20;          // Better alignment in box
    if (y < gfx_height () && y + size * 9 >= 0)
+   {
+#if	GFX_BPP>2
+      uint8_t a = malloc (size * 6);    // Alpha total
+      uint8_t c = malloc (size * 6);    // Colour total
+#endif
       for (char *p = temp; *p; p++)
       {
          char *m = strchr (sevensegchar, *p);
@@ -1092,10 +1097,8 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
 #else
             const uint16_t unit = width_7seg / 7 / 4;
             const uint16_t base = unit / size / 2;
-            uint8_t a = malloc (size * 6);      // Alpha total
-            uint8_t c = malloc (size * 6);      // Colour total
             void plot (uint16_t xx, uint16_t yy, uint8_t l)
-            {                   // antialiasing
+            {                   // antialiasing totals
                a[xx / 4]++;
                if (l)
                   c[xx / 4]++;
@@ -1143,7 +1146,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                   if ((yy & 3) == 3)
                      for (int xx = 0; xx < size * 6; xx++)
                         if (a[xx])
-                           gfx_pixel (x + xx, y + yy / 4, c[xx]);
+                           gfx_pixel (x + xx, y + yy / 4, c[xx] & 255 / 16);
 #endif
                   y7++;
                }
@@ -1159,6 +1162,11 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             fontw = 7 * size;   // pixel width of characters in font file
          }
       }
+#if	GFX_BPP>2
+      free (a);
+      free (c);
+#endif
+   }
    free (temp);
 }
 
