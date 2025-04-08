@@ -48,7 +48,7 @@ main (int argc, const char *argv[])
       while ((fn = poptGetArg (optCon)))
       {
          l++;
-         if (l == 16)
+         if (l == 17)
             errx (1, "Too many files");
          FILE *f = fopen (fn, "r");
          if (!f)
@@ -91,7 +91,10 @@ main (int argc, const char *argv[])
             printf ("0x%02X,", prev[i]);
          for (int i = prevp; i < 3 * 5; i++)
             printf ("     ");
-         printf (" // Rows %3d-%3d\n", y - prevn, y - 1);
+         if (prevn == 1)
+            printf (" // Row  %3d\n", y - 1);
+         else
+            printf (" // Rows %3d-%3d\n", y - prevn, y - 1);
       }
       for (y = 0; y < height; y++)
       {
@@ -123,7 +126,7 @@ main (int argc, const char *argv[])
                   errx (1, "segment run %d row %d", x - c, y);
                if (linep >= sizeof (line))
                   errx (1, "Too many runs row %d", y);
-               line[linep++] = (l << 4) + ((c - s) >> 6);
+               line[linep++] = ((l - 1) << 4) + ((c - s) >> 6);
                line[linep++] = ((c - s) << 2) | ((x - c) >> 8);
                line[linep++] = x - c;
             }

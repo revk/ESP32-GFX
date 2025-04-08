@@ -15,8 +15,8 @@
  * 
  */
 
-static __attribute__((unused))
-     const char TAG[] = "GFX";
+#define	UNUSED __attribute__((unused))
+static UNUSED const char TAG[] = "GFX";
 #define	DEBUG	ESP_LOGD
 
 #include <unistd.h>
@@ -40,7 +40,8 @@ static __attribute__((unused))
 #define	SPI_MAX	16384
 
 #ifdef	CONFIG_GFX_BUILD_SUFFIX_GFXNONE
-     const char *gfx_init_opts (gfx_init_t o)
+const char *
+gfx_init_opts (gfx_init_t o)
 {                               // Dummy - no driver
    return "Not configured";
 }
@@ -220,7 +221,7 @@ gfx_raw_b (void)
 #else
 
 // general global stuff
-     static gfx_init_t gfx_settings = { };
+static gfx_init_t gfx_settings = { };
 
 static TaskHandle_t gfx_task_id = NULL;
 static SemaphoreHandle_t gfx_mutex = NULL;
@@ -231,11 +232,11 @@ static void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len);
-static __attribute__((unused)) esp_err_t gfx_command0 (uint8_t cmd);
-static __attribute__((unused)) esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
-static __attribute__((unused)) esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
-static __attribute__((unused)) esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
-static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_code);
+static UNUSED esp_err_t gfx_command0 (uint8_t cmd);
+static UNUSED esp_err_t gfx_command1 (uint8_t cmd, uint8_t a);
+static UNUSED esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b);
+static UNUSED esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d);
+static UNUSED esp_err_t gfx_command_bulk (const uint8_t * init_code);
 
 // Driver (and defaults for driver)
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_SSD1351
@@ -263,35 +264,14 @@ static __attribute__((unused)) esp_err_t gfx_command_bulk (const uint8_t * init_
 #include "epd29k.c"
 #endif
 
-#ifdef	CONFIG_GFX_7SEG
-#include "pack7seg1.h"
-#include "pack7seg2.h"
-#include "pack7seg3.h"
-#include "pack7seg4.h"
-#include "pack7seg5.h"
-#include "pack7seg6.h"
-#include "pack7seg7.h"
-#include "pack7seg8.h"
-#include "pack7seg9.h"
-#ifdef  CONFIG_GFX_BIGDIGIT
-#include "pack7seg10.h"
-#include "pack7seg11.h"
-#include "pack7seg12.h"
-#include "pack7seg13.h"
-#include "pack7seg14.h"
-#include "pack7seg15.h"
-#include "pack7seg16.h"
-#include "pack7seg17.h"
-#include "pack7seg18.h"
-#include "pack7seg19.h"
-#include "pack7seg20.h"
-#endif
-#endif
-
 #ifdef	CONFIG_GFX_UNICODE
 #include "vector.h"
 #else
 #include "vector96.h"
+#endif
+
+#ifdef	CONFIG_GFX_7SEG
+#include "7seg.h"
 #endif
 
 static char const sevensegchar[] = " 0123456789-_\"',[]ABCDEFGHIJLNOPRSUZ";
@@ -332,33 +312,6 @@ static uint8_t const sevensegmap[] = {
    0x6D,                        // S
    0x3E,                        // U
    0x5B,                        // Z
-};
-
-static uint8_t const *const *sevenseg[] = {
-#ifdef	CONFIG_GFX_7SEG
-   gfx_7seg_pack1,
-   gfx_7seg_pack2,
-   gfx_7seg_pack3,
-   gfx_7seg_pack4,
-   gfx_7seg_pack5,
-   gfx_7seg_pack6,
-   gfx_7seg_pack7,
-   gfx_7seg_pack8,
-   gfx_7seg_pack9,
-#ifdef	CONFIG_GFX_BIGDIGIT
-   gfx_7seg_pack10,
-   gfx_7seg_pack11,
-   gfx_7seg_pack12,
-   gfx_7seg_pack13,
-   gfx_7seg_pack14,
-   gfx_7seg_pack15,
-   gfx_7seg_pack16,
-   gfx_7seg_pack17,
-   gfx_7seg_pack18,
-   gfx_7seg_pack19,
-   gfx_7seg_pack20,
-#endif
-#endif
 };
 
 #define	BLACK	0
@@ -530,15 +483,15 @@ gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len)
    return e;
 }
 
-static __attribute__((unused))
-     esp_err_t gfx_command0 (uint8_t cmd)
+static UNUSED esp_err_t
+gfx_command0 (uint8_t cmd)
 {
    DEBUG (TAG, "Command %02X", cmd);
    return gfx_send_command (cmd);
 }
 
-static __attribute__((unused))
-     esp_err_t gfx_command1 (uint8_t cmd, uint8_t a)
+static UNUSED esp_err_t
+gfx_command1 (uint8_t cmd, uint8_t a)
 {                               // Send a command with an arg
    DEBUG (TAG, "Command %02X %02X", cmd, a);
    esp_err_t e = gfx_send_command (cmd);
@@ -553,8 +506,8 @@ static __attribute__((unused))
    return spi_device_transmit (gfx_spi, &t);
 }
 
-static __attribute__((unused))
-     esp_err_t gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b)
+static UNUSED esp_err_t
+gfx_command2 (uint8_t cmd, uint8_t a, uint8_t b)
 {                               // Send a command with args
    DEBUG (TAG, "Command %02X %02X %02X", cmd, a, b);
    esp_err_t e = gfx_send_command (cmd);
@@ -569,8 +522,8 @@ static __attribute__((unused))
    return spi_device_transmit (gfx_spi, &t);
 }
 
-static __attribute__((unused))
-     esp_err_t gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+static UNUSED esp_err_t
+gfx_command4 (uint8_t cmd, uint8_t a, uint8_t b, uint8_t c, uint8_t d)
 {                               // Send a command with args
    DEBUG (TAG, "Command %02X %02X %02X %02X %02X", cmd, a, b, c, d);
    esp_err_t e = gfx_send_command (cmd);
@@ -585,8 +538,8 @@ static __attribute__((unused))
    return spi_device_transmit (gfx_spi, &t);
 }
 
-static __attribute__((unused))
-     esp_err_t gfx_command_bulk (const uint8_t * bulk)
+static UNUSED esp_err_t
+gfx_command_bulk (const uint8_t * bulk)
 {                               // Bulk command
    // Bulk is a sequence of blocks of the form :-
    // Len (0 for end) 0xFF is delay
@@ -862,9 +815,8 @@ gfx_pack (const uint8_t * data, uint8_t * lx, uint8_t * hx, uint8_t * ly, uint8_
    return data + 3;
 }
 
-static __attribute__((unused))
-     void gfx_block2N_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my,
-                            const uint8_t * data)
+static UNUSED void
+gfx_block2N_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, uint8_t mx, uint8_t my, const uint8_t * data)
 {                               // Draw a block from 2 bit image data, c is colour to plot where icon is black/set
    uint8_t lx,
      hx,
@@ -887,8 +839,8 @@ static __attribute__((unused))
    }
 }
 
-static __attribute__((unused))
-     void gfx_mask_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t dx, const uint8_t * data, gfx_intensity_t i)
+static UNUSED void
+gfx_mask_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t dx, const uint8_t * data, gfx_intensity_t i)
 {                               // Draw a block from 2 bit image data, c is colour to plot where icon is black/set - data is packed
    uint8_t lx,
      hx,
@@ -907,8 +859,8 @@ static __attribute__((unused))
       }
 }
 
-static __attribute__((unused))
-     void gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
+static UNUSED void
+gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data, int l)
 {                               // Draw a block from 2 bit image data, l is data width for each row, c is colour to plot where icon is black/set
    if (!l)
       l = (w + 7) / 8;          // default is pixels width
@@ -920,8 +872,8 @@ static __attribute__((unused))
    }
 }
 
-static __attribute__((unused))
-     void gfx_block2_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data)
+static UNUSED void
+gfx_block2_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data)
 {                               // Draw a block from 2 bit image data, c is colour to plot where icon is black/set
    uint8_t lx,
      hx,
@@ -941,8 +893,8 @@ static __attribute__((unused))
       }
 }
 
-static __attribute__((unused))
-     void gfx_block16 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const uint8_t * data)
+static UNUSED void
+gfx_block16 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, const uint8_t * data)
 {                               // Draw a block from 16 bit greyscale data, l is data width for each row
    uint8_t d = 0;
    for (gfx_pos_t row = 0; row < h; row++)
@@ -955,8 +907,8 @@ static __attribute__((unused))
       }
 }
 
-static __attribute__((unused))
-     void gfx_block16_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data)
+static UNUSED void
+gfx_block16_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, const uint8_t * data)
 {                               // Draw a block from 16 bit greyscale data
    uint8_t lx,
      hx,
@@ -1071,8 +1023,6 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
       *hp = 0;
    if (size < 1)
       size = 1;
-   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
-      size = sizeof (sevenseg) / sizeof (*sevenseg);
    gfx_pos_t w = 0;
    for (const char *p = t; *p; p++)
       if (strchr (sevensegchar, *p))
@@ -1096,10 +1046,6 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
       return;
    if (size < 1)
       size = 1;
-   if (size > sizeof (sevenseg) / sizeof (*sevenseg))
-      size = sizeof (sevenseg) / sizeof (*sevenseg);
-   if (!gfx || size < 1 || !sevenseg[size - 1])
-      return;
    va_list ap;
    char *temp;
    va_start (ap, fmt);
@@ -1109,10 +1055,6 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
       return;
 
    int fontw = 7 * size;        // pixel width of characters in font file
-   inline const uint8_t *fontdata (uint8_t s)
-   {
-      return sevenseg[size - 1][s];
-   }
 
    gfx_pos_t x,
      y,
@@ -1137,8 +1079,50 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
          else
             map |= 0x200;
       }
-      for (int s = 0; s < segs; s++)
-         gfx_mask_pack (x, y, 0, fontdata (s), (map & (1 << s)) ? 255 : 0);
+      // Plot
+      uint16_t step = (width_7seg / 7 + size - 1) / size;
+      if (step)
+      {
+         uint16_t base = step / 2;
+#if	GFX_BPP <= 2
+         void plot (uint16_t x7, uint16_t y7, uint8_t l)
+         {
+            if ((x7 % step) == base && (y7 % step) == base)
+               gfx_pixel (x + x7 / step, y + y7 / step, l);
+         }
+#else
+         void plot (uint16_t x7, uint16_t y7, uint8_t l)
+         {                      // antialiasing
+            // TODO
+         }
+#endif
+         uint8_t *i = pack_7seg,
+            *e = pack_7seg + sizeof (pack_7seg);
+         uint16_t y7 = 0;
+         while (i < e)
+         {
+            uint8_t dup = (*i & 0xF) + 1;
+            while (dup--)
+            {
+               uint8_t *I = i;
+               uint8_t seg = (*I++ >> 4);
+               uint16_t x7 = 0;
+               while (seg--)
+               {
+                  uint8_t S = (*I >> 4);
+                  uint16_t B = ((*I & 0xF) << 6) + (I[1] >> 2);
+                  uint16_t F = ((I[1] & 3) << 8) + I[2];
+                  x7 += B;
+                  S = ((map & (1 << S)) ? 255 : 0);
+                  while (F--)
+                     plot (x7++, y7, S);
+                  I += 3;
+               }
+               y7++;
+            }
+            i += 1 + (*i >> 4) * 3;
+         }
+      }
       x += (segs > 7 ? fontw : 6 * size);
       if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
       {
