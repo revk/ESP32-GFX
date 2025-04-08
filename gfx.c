@@ -1081,7 +1081,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
       }
       // Plot
       const uint16_t unit = width_7seg / 7;
-      if (step)
+      if (size <= unit)
       {
 #if	GFX_BPP <= 2
          const uint16_t base = unit / size / 2;
