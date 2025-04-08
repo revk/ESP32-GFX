@@ -1137,7 +1137,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                            int xx = x7 * size / unit;
                            if (x7 == base + xx * unit / size)
                               plot (xx, yy, S);
-                           plot (x7++, y7, S);
+                           x7++;
                         }
                         I += 3;
                      }
