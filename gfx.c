@@ -1085,7 +1085,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             else
                map |= 0x200;
          }
-         if (size <= width_7seg / 7 && x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
+         if (x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
          {                      // Plot digit
 #if	GFX_BPP <= 2
             const uint16_t unit = width_7seg / 7;
@@ -1106,7 +1106,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
 #endif
             uint8_t *i = pack_7seg,
                *e = pack_7seg + sizeof (pack_7seg);
-            uint16_t y7 = 0;
+            uint32_t y7 = 0;
             while (i < e)
             {
                uint8_t dup = (*i & 0xF) + 1;
@@ -1124,7 +1124,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                   {
                      uint8_t *I = i;
                      uint8_t seg = (*I++ >> 4);
-                     uint16_t x7 = 0;
+                     uint32_t x7 = 0;
                      while (seg--)
                      {
                         uint8_t S = (*I >> 4);
