@@ -1130,7 +1130,7 @@ static const uint8_t circle[256] = {
 };
 
 static void
-plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, uint16_t weight, uint8_t aa)
+plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, uint16_t weight, uint8_t aa, uint8_t italic)
 {                               // Plot a character, allow for antialiasing (aa), weight and size are pixel based
    if (u < 32)
       return;
@@ -1172,6 +1172,9 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
    {                            // Scan lines
       uint8_t sub = Y / 2 % aa;
       runs[sub] = 0;
+      gfx_pos_t i = 0;
+      if (italic)
+         i = size * (size * 9 * 2 - 1 - Y) / (size * 9 * 2);
       for (uint8_t * d = start; d < end; d++)
       {
          uint8_t b1 = *d;
@@ -1189,7 +1192,7 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
                   d = (Y - y1) * 255 / weight;
                w = circle[d] * weight / 255;
             }
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 - w) / 2, (x1 + w + 1) / 2);
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, i + (x1 - w) / 2, i + (x1 + w + 1) / 2);
          }
          if (d + 1 >= end)
             continue;
@@ -1213,13 +1216,13 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
             if (y1 == y2)
             {                   // Horizontal, simple
                if (x1 < x2)
-                  runs[sub] = add_run (run[sub], runs[sub], max_runs, x1 / 2, (x2 + 1) / 2);
+                  runs[sub] = add_run (run[sub], runs[sub], max_runs, i + x1 / 2, i + (x2 + 1) / 2);
                else
-                  runs[sub] = add_run (run[sub], runs[sub], max_runs, x2 / 2, (x1 + 1) / 2);
+                  runs[sub] = add_run (run[sub], runs[sub], max_runs, i + x2 / 2, i + (x1 + 1) / 2);
             } else if (x1 == x2)
             {                   // Vertical, simple
                if (Y >= y1 && Y <= y2)
-                  runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 - weight) / 2, (x1 + weight + 1) / 2);
+                  runs[sub] = add_run (run[sub], runs[sub], max_runs, i + (x1 - weight) / 2, i + (x1 + weight + 1) / 2);
             } else
             {                   // Diagonal (we cheat knowing 45 degress)
                gfx_pos_t d = (int32_t) weight * 7071 / 10000;
@@ -1249,7 +1252,7 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
                      else
                         r = x1 - (y1 - Y);
                   }
-                  runs[sub] = add_run (run[sub], runs[sub], max_runs, l / 2, (r + 1) / 2);
+                  runs[sub] = add_run (run[sub], runs[sub], max_runs, i + l / 2, i + (r + 1) / 2);
                }
             }
          }
@@ -1280,6 +1283,8 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
          if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
             size = ((size / 2) ? : 1);
       }
+   if (flags & GFX_7SEG_ITALIC)
+      w += size;
    if (wp)
       *wp = w;
    if (hp)
@@ -1367,6 +1372,8 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                      uint8_t *I = i;
                      uint8_t seg = (*I++ >> 4);
                      uint32_t x7 = 0;
+                     if (flags & GFX_7SEG_ITALIC)
+                        x7 = width_7seg * (height_7seg - 1 - y7) / height_7seg / 7;
                      while (seg--)
                      {
                         uint8_t S = (*I >> 4);
@@ -1491,7 +1498,7 @@ gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * w
    }
    if (x > w)
       w = x;
-   if (w)
+   if (w && !(flags & GFX_TEXT_ITALIC))
       w -= size;                // Margin right hand pixel needs removing from width
    if (!w)
       return;                   // nothing to print
@@ -1546,9 +1553,9 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
          {                      // On screen
             int dx = size * ((cwidth (flags, 1, c) == 2) ? 2 : 0);      // Narrow are offset
 #if	GFX_BPP <= 2
-            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, 1);
+            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, 1, flags & GFX_TEXT_ITALIC);
 #else
-            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, 4);
+            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, 4, flags & GFX_TEXT_ITALIC);
 #endif
          }
          x += charw;
