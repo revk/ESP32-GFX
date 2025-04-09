@@ -762,6 +762,12 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 #endif
 }
 
+static void
+gfx_pixel0 (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
+{
+   gfx_pixel (x, y, 0);
+}
+
 void
 gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp)
 {                               // move x/y based on drawing a box w/h, set x/y as top left of said box
@@ -1014,250 +1020,6 @@ gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
    }
 }
 
-void
-gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
-{
-   if (wp)
-      *wp = 0;
-   if (hp)
-      *hp = 0;
-   if (size < 1)
-      size = 1;
-   gfx_pos_t w = 0;
-   for (const char *p = t; *p; p++)
-      if (strchr (sevensegchar, *p))
-      {
-         w += 6 * size;
-         if (p[1] == ':' || p[1] == '.')
-            w += size;
-         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
-            size = ((size / 2) ? : 1);
-      }
-   if (wp)
-      *wp = w;
-   if (hp)
-      *hp = 9 * size;
-}
-
-void
-gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
-{                               // Plot 7 segment digits
-   if (!gfx)
-      return;
-   if (size < 1)
-      size = 1;
-   va_list ap;
-   char *temp;
-   va_start (ap, fmt);
-   vasprintf (&temp, fmt, ap);
-   va_end (ap);
-   if (!temp)
-      return;
-
-   int fontw = 7 * size;        // pixel width of characters in font file
-
-   gfx_pos_t x,
-     y,
-     w,
-     h;
-   gfx_7seg_size (flags, size, temp, &w, &h);
-   gfx_draw (w, h, size, size, &x, &y); // starting point
-   x += size * 9 / 20;          // Better alignment in box
-   if (y < gfx_height () && y + size * 9 >= 0)
-   {
-#if	GFX_BPP>2
-      uint8_t a = malloc (size * 7);    // Alpha total
-      uint8_t c = malloc (size * 7);    // Colour total
-#endif
-      for (char *p = temp; *p; p++)
-      {
-         char *m = strchr (sevensegchar, *p);
-         if (!m)
-            continue;
-         uint8_t segs = 7;
-         uint16_t map = 0;
-         map = sevensegmap[m - sevensegchar];
-         if (p[1] == ':' || p[1] == '.')
-         {
-            segs = 10;
-            if (p[1] == ':')
-               map |= 0x180;
-            else
-               map |= 0x200;
-         }
-         if (x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
-         {                      // Plot digit
-#if	GFX_BPP <= 2
-            const uint16_t unit = width_7seg / 7;
-            const uint16_t base = unit / size / 2;
-            void plot (uint16_t xx, uint16_t yy, uint8_t l)
-            {
-               gfx_pixel (x + xx, y + yy, l);
-            }
-#else
-            const uint16_t unit = width_7seg / 7 / 4;
-            const uint16_t base = unit / size / 2;
-            void plot (uint16_t xx, uint16_t yy, uint8_t l)
-            {                   // antialiasing totals
-               a[xx / 4]++;
-               if (l)
-                  c[xx / 4]++;
-            }
-#endif
-            uint8_t *i = pack_7seg,
-               *e = pack_7seg + sizeof (pack_7seg);
-            uint32_t y7 = 0;
-            while (i < e)
-            {
-               uint8_t dup = (*i & 0xF) + 1;
-               while (dup--)
-               {
-                  int yy = y7 * size / unit;
-#if	GFX_BPP>2
-                  if (!(yy & 3))
-                  {
-                     memset (a, 0, size * 7);
-                     memset (c, 0, size * 7);
-                  }
-#endif
-                  if (y7 == base + yy * unit / size)
-                  {
-                     uint8_t *I = i;
-                     uint8_t seg = (*I++ >> 4);
-                     uint32_t x7 = 0;
-                     while (seg--)
-                     {
-                        uint8_t S = (*I >> 4);
-                        uint16_t B = ((*I & 0xF) << 6) + (I[1] >> 2);
-                        uint16_t F = ((I[1] & 3) << 8) + I[2];
-                        x7 += B;
-                        S = ((map & (1 << S)) ? 255 : 0);
-                        while (F--)
-                        {
-                           int xx = x7 * size / unit;
-                           if (x7 == base + xx * unit / size)
-                              plot (xx, yy, S);
-                           x7++;
-                        }
-                        I += 3;
-                     }
-                  }
-#if	GFX_BPP>2
-                  if ((yy & 3) == 3)
-                     for (int xx = 0; xx < size * 7; xx++)
-                        if (a[xx])
-                           gfx_pixel (x + xx, y + yy / 4, c[xx] & 255 / 16);
-#endif
-                  y7++;
-               }
-               i += 1 + (*i >> 4) * 3;
-            }
-         }
-         x += (segs > 7 ? fontw : 6 * size);
-         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
-         {
-            y += size * 9;
-            size = ((size / 2) ? : 1);
-            y -= size * 9;
-            fontw = 7 * size;   // pixel width of characters in font file
-         }
-      }
-#if	GFX_BPP>2
-      free (a);
-      free (c);
-#endif
-   }
-   free (temp);
-}
-
-static uint32_t
-cwidth (uint8_t flags, uint8_t size, int c)
-{                               // character width as printed - some characters are done narrow, and <' ' is fixed size move
-   if (size)
-   {
-      if (c <= 8)
-         return c * size;       // Chars 1-8 are spacers
-      if (c < ' ')
-         return 0;
-      if (!(flags & GFX_TEXT_FIXED) && (c == ':' || c == '.' || c == '!' || c == '|' || c == 161))
-         return size * 2;
-   }
-   return 6 * size;
-}
-
-static int
-utf8 (const char **pp)
-{
-   if (!pp)
-      return -1;
-   const char *p = *pp;
-   if (!p)
-      return -1;
-   if (!*p)
-      return 0;
-   int i = 0;
-   if ((p[0] & 0xE0) == 0xC0 && (p[1] & 0xC0) == 0x80)
-   {
-      i = ((p[0] & 0x1F) << 6) + (p[1] & 0x3F);
-      p += 2;
-   } else if ((p[0] & 0xF0) == 0xE0 && (p[1] & 0xC0) == 0x80 && (p[2] & 0xC0) == 0x80)
-   {
-      i = ((p[0] & 0xF) << 12) + ((p[1] & 0x3F) << 6) + (p[2] & 0x3F);
-      p += 3;
-   } else if ((p[0] & 0xF8) == 0xF0 && (p[1] & 0xC0) == 0x80 && (p[2] & 0xC0) == 0x80 && (p[3] & 0xC0) == 0x80)
-   {
-      i = ((p[0] & 0xF) << 18) + ((p[1] & 0x3F) << 12) + ((p[2] & 0x3F) << 6) + (p[3] & 0x3F);
-      p += 4;
-   } else
-      i = *p++;
-   *pp = p;
-   return i;
-}
-
-static void
-gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * wp, gfx_pos_t * hp)
-{
-   if (wp)
-      *wp = 0;
-   if (hp)
-      *hp = 0;
-   if (!size)
-      return;
-   gfx_pos_t x = 0,
-      y = 0,
-      w = 0,
-      h = 0;
-   uint8_t z = 7;
-   if (flags & GFX_TEXT_DESCENDERS)
-      z = 9;
-   const char *p = text;
-   int c;
-   while ((c = utf8 (&p)) > 0)
-   {
-      if (c == '\n')
-      {
-         if (x > w)
-            w = x;
-         x = 0;
-         if (*p)
-            y++;
-         continue;
-      }
-      x += cwidth (flags, size, c);
-   }
-   if (x > w)
-      w = x;
-   if (w)
-      w -= size;                // Margin right hand pixel needs removing from width
-   if (!w)
-      return;                   // nothing to print
-   h = ((y + 1) * (z + 1) - 1) * size;  // Margin bottom needs removing
-   if (wp)
-      *wp = w;
-   if (hp)
-      *hp = h;
-}
-
 typedef void gfx_pixel_t (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i);
 
 // Run length plotting
@@ -1497,6 +1259,247 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
    }
    for (int i = 0; i < aa; i++)
       free (run[i]);
+}
+
+void
+gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
+{
+   if (wp)
+      *wp = 0;
+   if (hp)
+      *hp = 0;
+   if (size < 1)
+      size = 1;
+   gfx_pos_t w = 0;
+   for (const char *p = t; *p; p++)
+      if (strchr (sevensegchar, *p))
+      {
+         w += 6 * size;
+         if (p[1] == ':' || p[1] == '.')
+            w += size;
+         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
+            size = ((size / 2) ? : 1);
+      }
+   if (wp)
+      *wp = w;
+   if (hp)
+      *hp = 9 * size;
+}
+
+void
+gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
+{                               // Plot 7 segment digits
+   if (!gfx)
+      return;
+   if (size < 1)
+      size = 1;
+   va_list ap;
+   char *temp;
+   va_start (ap, fmt);
+   vasprintf (&temp, fmt, ap);
+   va_end (ap);
+   if (!temp)
+      return;
+
+   int fontw = 7 * size;        // pixel width of characters in font file
+
+   gfx_pos_t x,
+     y,
+     w,
+     h;
+   gfx_7seg_size (flags, size, temp, &w, &h);
+   gfx_draw (w, h, size, size, &x, &y); // starting point
+   x += size * 9 / 20;          // Better alignment in box
+   if (y < gfx_height () && y + size * 9 >= 0)
+   {
+#if	GFX_BPP <= 2
+      const uint8_t aa = 1;
+#else
+      const uint8_t aa = 4;
+#endif
+      const uint8_t max_runs = 4;
+      gfx_pos_t *a[aa];
+      uint8_t an[aa];
+      gfx_pos_t *c[aa];
+      uint8_t cn[aa];
+      for (int r = 0; r < aa; r++)
+      {
+         a[r] = malloc (sizeof (gfx_pos_t) * max_runs * 2);
+         c[r] = malloc (sizeof (gfx_pos_t) * max_runs * 2);
+      }
+      for (char *p = temp; *p; p++)
+      {
+         char *m = strchr (sevensegchar, *p);
+         if (!m)
+            continue;
+         uint8_t segs = 7;
+         uint16_t map = 0;
+         map = sevensegmap[m - sevensegchar];
+         if (p[1] == ':' || p[1] == '.')
+         {
+            segs = 10;
+            if (p[1] == ':')
+               map |= 0x180;
+            else
+               map |= 0x200;
+         }
+         if (x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
+         {                      // Plot digit
+            const uint16_t unit = width_7seg / 7 / aa;
+            const uint16_t base = unit / size / 2;
+            uint8_t *i = pack_7seg,
+               *e = pack_7seg + sizeof (pack_7seg);
+            uint32_t y7 = 0;
+            while (i < e)
+            {
+               uint8_t dup = (*i & 0xF) + 1;
+               while (dup--)
+               {
+                  int yy = y7 * size / unit;
+                  uint8_t sub = yy % aa;
+                  if (y7 == base + yy * unit / size)
+                  {
+                     if (!sub)
+                     {
+                        memset (an, 0, aa);
+                        memset (cn, 0, aa);
+                     }
+                     uint8_t *I = i;
+                     uint8_t seg = (*I++ >> 4);
+                     uint32_t x7 = 0;
+                     while (seg--)
+                     {
+                        uint8_t S = (*I >> 4);
+                        uint16_t B = ((*I & 0xF) << 6) + (I[1] >> 2);
+                        uint16_t F = ((I[1] & 3) << 8) + I[2];
+                        x7 += B;
+                        gfx_pos_t l = x7 * size / unit;
+                        x7 += F;
+                        gfx_pos_t r = x7 * size / unit;
+                        an[sub] = add_run (a[sub], an[sub], max_runs, l, r);
+                        if (map & (1 << S))
+                           cn[sub] = add_run (c[sub], cn[sub], max_runs, l, r);
+                        I += 3;
+                     }
+                     if (sub == aa - 1)
+                     {
+                        plot_runs (gfx_pixel0, x, y + yy / aa, aa, an, a);      // background clear
+                        plot_runs (gfx_pixel, x, y + yy / aa, aa, cn, c);       // plot
+                     }
+                  }
+                  y7++;
+               }
+               i += 1 + (*i >> 4) * 3;
+            }
+         }
+         x += (segs > 7 ? fontw : 6 * size);
+         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
+         {
+            y += size * 9;
+            size = ((size / 2) ? : 1);
+            y -= size * 9;
+            fontw = 7 * size;   // pixel width of characters in font file
+         }
+      }
+      for (int r = 0; r < aa; r++)
+      {
+         free (a[r]);
+         free (c[r]);
+      }
+#if	GFX_BPP>2
+      free (a);
+      free (c);
+#endif
+   }
+   free (temp);
+}
+
+static uint32_t
+cwidth (uint8_t flags, uint8_t size, int c)
+{                               // character width as printed - some characters are done narrow, and <' ' is fixed size move
+   if (size)
+   {
+      if (c <= 8)
+         return c * size;       // Chars 1-8 are spacers
+      if (c < ' ')
+         return 0;
+      if (!(flags & GFX_TEXT_FIXED) && (c == ':' || c == '.' || c == '!' || c == '|' || c == 161))
+         return size * 2;
+   }
+   return 6 * size;
+}
+
+static int
+utf8 (const char **pp)
+{
+   if (!pp)
+      return -1;
+   const char *p = *pp;
+   if (!p)
+      return -1;
+   if (!*p)
+      return 0;
+   int i = 0;
+   if ((p[0] & 0xE0) == 0xC0 && (p[1] & 0xC0) == 0x80)
+   {
+      i = ((p[0] & 0x1F) << 6) + (p[1] & 0x3F);
+      p += 2;
+   } else if ((p[0] & 0xF0) == 0xE0 && (p[1] & 0xC0) == 0x80 && (p[2] & 0xC0) == 0x80)
+   {
+      i = ((p[0] & 0xF) << 12) + ((p[1] & 0x3F) << 6) + (p[2] & 0x3F);
+      p += 3;
+   } else if ((p[0] & 0xF8) == 0xF0 && (p[1] & 0xC0) == 0x80 && (p[2] & 0xC0) == 0x80 && (p[3] & 0xC0) == 0x80)
+   {
+      i = ((p[0] & 0xF) << 18) + ((p[1] & 0x3F) << 12) + ((p[2] & 0x3F) << 6) + (p[3] & 0x3F);
+      p += 4;
+   } else
+      i = *p++;
+   *pp = p;
+   return i;
+}
+
+static void
+gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * wp, gfx_pos_t * hp)
+{
+   if (wp)
+      *wp = 0;
+   if (hp)
+      *hp = 0;
+   if (!size)
+      return;
+   gfx_pos_t x = 0,
+      y = 0,
+      w = 0,
+      h = 0;
+   uint8_t z = 7;
+   if (flags & GFX_TEXT_DESCENDERS)
+      z = 9;
+   const char *p = text;
+   int c;
+   while ((c = utf8 (&p)) > 0)
+   {
+      if (c == '\n')
+      {
+         if (x > w)
+            w = x;
+         x = 0;
+         if (*p)
+            y++;
+         continue;
+      }
+      x += cwidth (flags, size, c);
+   }
+   if (x > w)
+      w = x;
+   if (w)
+      w -= size;                // Margin right hand pixel needs removing from width
+   if (!w)
+      return;                   // nothing to print
+   h = ((y + 1) * (z + 1) - 1) * size;  // Margin bottom needs removing
+   if (wp)
+      *wp = w;
+   if (hp)
+      *hp = h;
 }
 
 void
