@@ -1258,133 +1258,245 @@ gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * w
       *hp = h;
 }
 
-typedef struct v5x9_s v5x9_t;
-struct v5x9_s
-{
-   uint16_t size;               // Size, pixels per unit
-   uint16_t weight;             // Weight, pixels per unit
-   uint32_t weight2;            // Weight squared (adjusted maybe)
-   uint16_t minx,
-     maxx;                      // Range of plot
-   uint16_t miny,
-     maxy;
-   uint8_t *start;              // Start in font_vector_data
-   uint8_t *end;                // End (start of next) in font_vector_data
-   uint8_t *last;               // Last checked point offset in font_vector_data
-};
+typedef void gfx_pixel_t (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i);
 
-static v5x9_t *
-v5x9_start (v5x9_t * v, uint32_t u, uint16_t size, uint16_t weight)
-{
-   if (!v)
-      return NULL;
-   memset (v, 0, sizeof (*v));
-   if (u < 32 || !v)
-      return NULL;
-   int q;
-   if (u < 128)
-      q = u - 32;
-   else
-#ifdef CONFIG_GFX_UNICODE
+// Run length plotting
+
+static void
+plot_run (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t runs, gfx_pos_t * run)
+{                               // Simple plot of run lengths (run length is pixels)
+   while (runs--)
    {
-      for (q = 0; q < sizeof (font_vector_unicode) / sizeof (*font_vector_unicode); q++)
-         if (font_vector_unicode[q] == u)
-            break;
-      if (q == sizeof (font_vector_unicode) / sizeof (*font_vector_unicode))
-         return NULL;
-      q += 96;
+      gfx_pos_t l = *run++;
+      gfx_pos_t r = *run++;
+      while (l < r)
+         p (x + l++, y, (gfx_intensity_t) - 1);
    }
-#else
-      return NULL;
-#endif
-   v->size = size;
-   v->weight = weight;
-   v->weight2 = weight * weight;
-   if (weight == 3)
-      v->weight2 = 6;
-   v->last = v->start = font_vector_data + font_vector_offset[q];
-   v->end = font_vector_data + font_vector_offset[q + 1];
-   if (v->start == v->end)
-      return NULL;
-   int8_t minx = -1,
-      maxx = -1,
-      miny = -1,
-      maxy = -1;
-   for (uint8_t * p = v->start; p < v->end; p++)
+}
+
+
+static void
+plot_runs (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs, gfx_pos_t ** run)
+{                               // Anti-alias plot of runs aa x aa (run length is pixels*aa)
+   if (!aa)
+      return;
+   if (aa == 1)
    {
-      uint8_t x = (*p >> 4 & 7);
-      uint8_t y = (*p & 15);
-      if (minx < 0 || minx > x)
-         minx = x;
-      if (maxx < 0 || maxx < x)
-         maxx = x;
-      if (miny < 0 || miny > y)
-         miny = y;
-      if (maxy < 0 || maxy < y)
-         maxy = y;
+      plot_run (p, x, y, *runs, *run);
+      return;
    }
-   v->minx = minx * size;
-   v->maxx = (maxx + 1) * size;
-   v->miny = miny * size;
-   v->maxy = (maxy + 1) * size;
-   return v;
+   uint8_t pos[aa];
+   memset (pos, 0, aa);
+   uint8_t sum = 0;
+   gfx_pos_t l = 0;
+   while (1)
+   {
+      gfx_pos_t r = -1;         // Next step
+      for (uint8_t a = 0; a < aa; a++)
+         if (pos[a] < runs[a] * 2 && (r < 0 || run[a][pos[a]] < r))
+            r = run[a][pos[a]];
+      if (r < 0)
+         break;
+      uint8_t c = 0;            // Count how many in range
+      for (uint8_t a = 0; a < aa; a++)
+         if (pos[a] & 1)
+            c++;
+      while (l < r)
+      {
+         sum += c;
+         l++;
+         if (!(l % aa))
+         {
+            if (sum)
+               p (x + l / aa - 1, y, (int16_t) ((gfx_intensity_t) - 1) * sum / aa / aa);
+            sum = 0;
+         }
+      }
+      l = r;
+      for (uint8_t a = 0; a < aa; a++)
+         if (pos[a] < runs[a] * 2 && run[a][pos[a]] <= l)
+            pos[a]++;
+   }
 }
 
 static uint8_t
-v5x9_pixel (v5x9_t * v, int x, int y)
-{                               // return 1 if plot, 0 if not, based on x/y from top left
-   if (x < v->minx || x >= v->maxx || y < v->miny || y >= v->maxy)
-      return 0;                 // Out of range
-   int o = (v->size & ~1) - ((v->weight & 1) ^ 1);      // Offset
-   x *= 2;
-   y *= 2;                      // We work on radius in this
-   uint8_t isline (uint8_t * p)
-   {                            // Check point and line
-      uint8_t b1 = *p;
-      int x1 = ((b1 >> 4 & 7) * v->size * 2 + o);
-      int y1 = ((b1 & 15) * v->size * 2 + o);
+add_run (gfx_pos_t * run, uint8_t runs, uint8_t max, gfx_pos_t l, gfx_pos_t r)
+{                               // Update run with new run l to r, return new run len
+   if (runs == max)
+      return runs;
+   uint8_t n = 0;
+   while (n < runs && run[n * 2] < l)
+      n++;
+   if (n < runs)
+      memmove (run + n * 2 + 2, run + n * 2, (runs - n) * 2 * sizeof (*run));
+   runs++;
+   run[n * 2] = l;
+   run[n * 2 + 1] = r;
+   void merge (void)
+   {                            // merge to next
+      while (n + 1 < runs && run[n * 2 + 1] >= run[n * 2 + 2])
+      {                         // merge next
+         if (run[n * 2 + 3] > run[n * 2 + 1])
+            run[n * 2 + 1] = run[n * 2 + 3];
+         if (n + 1 < runs)
+            memmove (run + n * 2 + 2, run + n * 2 + 4, (runs - n - 1) * 2 * sizeof (*run));
+         runs--;
+      }
+   }
+   merge ();
+   if (!n)
+      return runs;
+   n--;
+   merge ();
+   return runs;
+}
+
+static const uint8_t circle[256] = {
+   0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+   0xFF, 0xFF, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFC, 0xFC, 0xFC,
+   0xFC, 0xFC, 0xFC, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xF9, 0xF9, 0xF9, 0xF9, 0xF8, 0xF8, 0xF8, 0xF8,
+   0xF7, 0xF7, 0xF7, 0xF7, 0xF6, 0xF6, 0xF6, 0xF6, 0xF5, 0xF5, 0xF5, 0xF4, 0xF4, 0xF4, 0xF3, 0xF3, 0xF3, 0xF3, 0xF2, 0xF2, 0xF1,
+   0xF1, 0xF1, 0xF0, 0xF0, 0xF0, 0xEF, 0xEF, 0xEF, 0xEE, 0xEE, 0xED, 0xED, 0xED, 0xEC, 0xEC, 0xEB, 0xEB, 0xEB, 0xEA, 0xEA, 0xE9,
+   0xE9, 0xE8, 0xE8, 0xE7, 0xE7, 0xE6, 0xE6, 0xE5, 0xE5, 0xE4, 0xE4, 0xE3, 0xE3, 0xE2, 0xE2, 0xE1, 0xE1, 0xE0, 0xE0, 0xDF, 0xDF,
+   0xDE, 0xDD, 0xDD, 0xDC, 0xDC, 0xDB, 0xDB, 0xDA, 0xD9, 0xD9, 0xD8, 0xD7, 0xD7, 0xD6, 0xD5, 0xD5, 0xD4, 0xD3, 0xD3, 0xD2, 0xD1,
+   0xD1, 0xD0, 0xCF, 0xCF, 0xCE, 0xCD, 0xCC, 0xCC, 0xCB, 0xCA, 0xC9, 0xC9, 0xC8, 0xC7, 0xC6, 0xC5, 0xC4, 0xC4, 0xC3, 0xC2, 0xC1,
+   0xC0, 0xBF, 0xBE, 0xBE, 0xBD, 0xBC, 0xBB, 0xBA, 0xB9, 0xB8, 0xB7, 0xB6, 0xB5, 0xB4, 0xB3, 0xB2, 0xB1, 0xB0, 0xAF, 0xAE, 0xAD,
+   0xAC, 0xAB, 0xA9, 0xA8, 0xA7, 0xA6, 0xA5, 0xA4, 0xA2, 0xA1, 0xA0, 0x9F, 0x9D, 0x9C, 0x9B, 0x99, 0x98, 0x97, 0x95, 0x94, 0x93,
+   0x91, 0x90, 0x8E, 0x8D, 0x8B, 0x8A, 0x88, 0x87, 0x85, 0x83, 0x82, 0x80, 0x7E, 0x7C, 0x7B, 0x79, 0x77, 0x75, 0x73, 0x71, 0x6F,
+   0x6D, 0x6B, 0x68, 0x66, 0x64, 0x61, 0x5F, 0x5D, 0x5A, 0x57, 0x54, 0x52, 0x4F, 0x4B, 0x48, 0x45, 0x41, 0x3D, 0x39, 0x34, 0x2F,
+   0x2A, 0x23, 0x1B, 0x0F
+};
+
+static void
+plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, uint16_t weight, uint8_t aa)
+{                               // Plot a character, allow for antialiasing (aa), weight and size are pixel based
+   if (u < 32)
+      return;
+   if (!aa || size == 1)
+      aa = 1;
+   size *= aa;
+   weight *= aa;
+   uint8_t *start,
+    *end;
+   {                            // Find character start/end
+      int q;
+      if (u < 128)
+         q = u - 32;
+      else
+#if	CONFIG_GFX_UNICODE
       {
-         int X = x1 - x;
-         int Y = y1 - y;
-         if (X >= -v->weight && X <= v->weight && Y >= -v->weight && Y <= v->weight && X * X + Y * Y <= v->weight2)
+         for (q = 0; q < sizeof (font_vector_unicode) / sizeof (*font_vector_unicode); q++)
+            if (font_vector_unicode[q] == u)
+               break;
+         if (q == sizeof (font_vector_unicode) / sizeof (*font_vector_unicode))
+            return;
+         q += 96;
+      }
+#else
+         return;
+#endif
+      start = font_vector_data + font_vector_offset[q];
+      end = font_vector_data + font_vector_offset[q + 1];
+   }
+   gfx_pos_t offset = weight;
+   if (weight == 3)
+      weight--;                 // Adjust else 3 is a square which looks chunky
+   const uint8_t max_runs = 6;  // Worst case
+   uint8_t runs[aa];
+   gfx_pos_t *run[aa];
+   for (int i = 0; i < aa; i++)
+      run[i] = malloc (sizeof (gfx_pos_t) * 2 * max_runs);
+   for (gfx_pos_t Y = 1; Y < size * 9 * 2; Y += 2)
+   {                            // Scan lines
+      uint8_t sub = Y / 2 % aa;
+      runs[sub] = 0;
+      for (uint8_t * d = start; d < end; d++)
+      {
+         uint8_t b1 = *d;
+         gfx_pos_t x1 = ((b1 >> 4 & 7) * size * 2 + offset);
+         gfx_pos_t y1 = ((b1 & 15) * size * 2 + offset);
+         if (Y >= y1 - weight && Y <= y1 + weight)
+         {                      // Possible dot
+            gfx_pos_t w = weight;
+            if (Y != y1)
+            {
+               uint8_t d;
+               if (Y < y1)
+                  d = (y1 - Y) * 255 / weight;
+               else
+                  d = (Y - y1) * 255 / weight;
+               w = circle[d] * weight / 255;
+            }
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 - w) / 2, (x1 + w + 1) / 2);
+         }
+         if (d + 1 >= end)
+            continue;
+         uint8_t b2 = d[1];
+         if (b2 & 0x80)
+            continue;
+         gfx_pos_t x2 = ((b2 >> 4 & 7) * size * 2 + offset);
+         gfx_pos_t y2 = ((b2 & 15) * size * 2 + offset);
+         if (y2 < y1)
          {
-            v->last = p;
-            return 1;           // In dot
+            gfx_pos_t s;
+            s = x1;
+            x1 = x2;
+            x2 = s;
+            s = y1;
+            y1 = y2;
+            y2 = s;
+         }
+         if (Y >= y1 - weight && Y <= y2 + weight)
+         {                      // Possible line
+            if (y1 == y2)
+            {                   // Horizontal, simple
+               if (x1 < x2)
+                  runs[sub] = add_run (run[sub], runs[sub], max_runs, x1 / 2, (x2 + 1) / 2);
+               else
+                  runs[sub] = add_run (run[sub], runs[sub], max_runs, x2 / 2, (x1 + 1) / 2);
+            } else if (x1 == x2)
+            {                   // Vertical, simple
+               if (Y >= y1 && Y <= y2)
+                  runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 - weight) / 2, (x1 + weight + 1) / 2);
+            } else
+            {                   // Diagonal (we cheat knowing 45 degress)
+               gfx_pos_t d = (int32_t) weight * 7071 / 10000;
+               if (Y >= y1 - d && Y <= y2 + d)
+               {
+                  gfx_pos_t l = 0,
+                     r = 0;
+                  if (x1 < x2)
+                  {             // right
+                     if (Y < y1 + d)
+                        l = x1 + (y1 - Y);
+                     else
+                        l = x1 - d * 2 + (Y - y1);
+                     if (Y < y2 - d)
+                        r = x2 + d * 2 - (y2 - Y);
+                     else
+                        r = x2 + (y2 - Y);
+
+                  } else
+                  {             // left
+                     if (Y < y2 - d)
+                        l = x2 - d * 2 + (y2 - Y);
+                     else
+                        l = x2 - (y2 - Y);
+                     if (Y > y1 + d)
+                        r = x1 + d * 2 + (y1 - Y);
+                     else
+                        r = x1 - (y1 - Y);
+                  }
+                  runs[sub] = add_run (run[sub], runs[sub], max_runs, l / 2, (r + 1) / 2);
+               }
+            }
          }
       }
-      if (p + 1 >= v->end)
-         return 0;              // last point
-      uint8_t b2 = p[1];
-      if (b2 & 0x80)
-         return 0;              // last point in line
-      int x2 = ((b2 >> 4 & 7) * v->size * 2 + o);
-      int y2 = ((b2 & 15) * v->size * 2 + o);
-      if ((x < x1 - v->weight && x < x2 - v->weight) || (x > x1 + v->weight && x > x2 + v->weight)
-          || (y < y1 - v->weight && y < y2 - v->weight) || (y > y1 + v->weight && y > y2 + v->weight))
-         return 0;              // Out of limits
-      int dx = x2 - x1;
-      int dy = y2 - y1;
-      int l = dx * dx + dy * dy;
-      int k = (dy * (x - x1) - dx * (y - y1));
-      int x3 = x - k * dy / l;
-      int y3 = y + k * dx / l;
-      if ((x3 < x1 && x3 < x2) || (x3 > x1 && x3 > x2) || (y3 < y1 && y3 < y2) || (y3 > y1 && y3 > y2))
-         return 0;              // Off ends
-      int d = (x - x3) * (x - x3) + (y - y3) * (y - y3);
-      if (d <= v->weight2)
-      {
-         v->last = p;
-         return 1;              // In line
-      }
-      return 0;
+      if (sub == aa - 1)
+         plot_runs (p, x, y + Y / 2 / aa, aa, runs, run);
    }
-   for (uint8_t * p = v->last; p < v->end; p++)
-      if (isline (p))
-         return 1;
-   for (uint8_t * p = v->start; p < v->last; p++)
-      if (isline (p))
-         return 1;
-   return 0;
+   for (int i = 0; i < aa; i++)
+      free (run[i]);
 }
 
 void
@@ -1430,26 +1542,10 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
          if (ox + x + gfx_width () >= 0 && ox + x < gfx_width () && oy + y + size * 9 >= 0 && oy + y < gfx_height ())
          {                      // On screen
             int dx = size * ((cwidth (flags, 1, c) == 2) ? 2 : 0);      // Narrow are offset
-            v5x9_t v;
 #if	GFX_BPP <= 2
-            if (v5x9_start (&v, c, size, s1))
-               for (int DY = 0; DY < size * 9; DY++)
-                  for (int DX = 0; DX < size * 5; DX++)
-                     if (v5x9_pixel (&v, DX, DY))
-                        gfx_pixel (ox + x + DX - dx, oy + y + DY, 255);
+            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, 1);
 #else
-            if (v5x9_start (&v, c, size * 4, s1 * 4))
-               for (int DY = 0; DY < size * 9; DY++)
-                  for (int DX = 0; DX < size * 5; DX++)
-                  {
-                     int v = 0;
-                     for (int sy = 0; sy < 4; sy++)
-                        for (int sx = 0; sx < 4; sx++)
-                           if (v5x9_pixel (&v, DX * 4 + sx, DY * 4 + sy))
-                              v++;
-                     if (v)
-                        gfx_pixel (ox + x + DX - dx, oy + y + DY, v * 255 / 16);
-                  }
+            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, 4);
 #endif
          }
          x += charw;
