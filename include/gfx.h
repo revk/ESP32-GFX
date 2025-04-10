@@ -7,6 +7,7 @@ extern const uint8_t sin256[256];	// sin constants
 typedef	uint8_t gfx_intensity_t; // The intensity of a pixel 0-255
 typedef int16_t gfx_pos_t;	 // X/Y location of a pixel - off screen allowed (and ignored)
 typedef	uint8_t gfx_align_t;	// Alignment options (GFX_x)
+typedef	uint32_t gfx_colour_t; // Colour RGB as low three bytes
 
 #define	GFX_T	0x01	// top align
 #define	GFX_M	0x03	// middle align
@@ -74,8 +75,8 @@ void gfx_pos(gfx_pos_t x,gfx_pos_t y,gfx_align_t);	// Set position and alignment
 // For 7seg, segments are plotted only, as foreground (on) or background (off)
 // For epaper (1bpp) you only set K/W (or R for 2bpp e-paper)
 // Setting background and foreground the same colour only plots for intensity 255 (using foreground) - i.e. mask mode
-void gfx_colour(char);	// Set foreground - colour is a character
-void gfx_background(char);	// Set background - colour is a character
+void gfx_foreground(gfx_colour_t);	// Set foreground - colour is a character
+void gfx_background(gfx_colour_t);	// Set background - colour is a character
 
 // State get
 uint16_t	gfx_width(void);	// Display width
@@ -84,8 +85,9 @@ uint8_t	gfx_bpp(void);	// Display app
 gfx_pos_t gfx_x(void);	// Current x
 gfx_pos_t gfx_y(void); // Current y
 gfx_align_t gfx_a(void); // Current alignment
-char gfx_f(void);	// Current foreground colour
-char gfx_b(void);	// Current background colour
+gfx_colour_t gfx_rgb(char);	// Colour letter to colour
+gfx_colour_t gfx_f(void);	// Current foreground colour
+gfx_colour_t gfx_b(void);	// Current background colour
 
 // Raw
 uint16_t gfx_raw_w(void);	// Raw frame buffer width
@@ -93,6 +95,7 @@ uint16_t gfx_raw_h(void);	// Raw frame buffer height
 void *gfx_raw_b(void);	// Raw frame buffer
 
 // Drawing
+void gfx_pixel_colour(gfx_pos_t x, gfx_pos_t y, gfx_colour_t); // Plot colour
 void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp); // Work out drawing position for object
 void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i); // set pixel directly (uses current foreogrund/background colour)
 void gfx_clear(gfx_intensity_t);	// clear whole display - same as gfx_pixel for all points

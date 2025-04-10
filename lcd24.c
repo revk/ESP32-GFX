@@ -49,7 +49,7 @@ gfx_driver_init (void)
       2, 0xC1, 0x10,            // Sets the factor used in the step-up circuits. To reduce power consumption, set a smaller factor.
       3, 0xC5, 0x3E, 0x28,      // Adjusting VCOM 1 and 2 can control display brightness
       2, 0xC7, 0x86,            //
-      2, 0x36, 0x80,            // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
+      2, 0x36, 0x88,            // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
       // 1,0x21, // invert colours
       1, 0x20,                  // no invert colours
       2, 0x3A, 0x55,            // 16bpp

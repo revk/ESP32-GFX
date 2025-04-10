@@ -72,12 +72,12 @@ gfx_pos (gfx_pos_t x, gfx_pos_t y, gfx_align_t a)
 }
 
 void
-gfx_colour (char c)
+gfx_foreground (gfx_colour_t)
 {                               // Dummy - no driver
 }
 
 void
-gfx_background (char c)
+gfx_background (gfx_colour_t)
 {                               // Dummy - no driver
 }
 
@@ -117,16 +117,27 @@ gfx_a (void)
    return 0;
 }
 
-char
+gfx_colour_t
+gfx_rgb (char c)
+{                               // Dummy - no driver
+   return 0;
+}
+
+gfx_colour_t
 gfx_f (void)
 {                               // Dummy - no driver
    return 0;
 }
 
-char
+gfx_colour_t
 gfx_b (void)
 {                               // Dummy - no driver
    return 0;
+}
+
+void
+gfx_pixel_colour (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
+{                               // Dummy - no driver
 }
 
 void
@@ -330,29 +341,12 @@ static uint8_t const sevensegmap[] = {
 #define G       (1<<5)
 #define B       (1)
 
-#define RED     (R+R)
-#define GREEN   (G+G+G+G)
-#define BLUE    (B+B)
-
-#define CYAN    (GREEN+BLUE)
-#define MAGENTA (RED+BLUE)
-#define YELLOW  (RED+GREEN)
-
-#define	black	0
-#define WHITE   (RED+GREEN+BLUE)
-
 #elif GFX_BPP == 1              // Mono
-
-#define WHITE   1
 
 #elif GFX_BPP == 2              // Black/red/white
 
-#define WHITE   1
-#define	RED	2
-
 #elif GFX_BPP <= 8              // Greyscale or mono
 
-#define WHITE   255
 #define GFX_INTENSITY_BPP  GFX_BPP
 
 #endif
@@ -384,7 +378,7 @@ static gfx_cell_t *gfx = NULL;
 static gfx_pos_t x = 0,
    y = 0;                       // position
 static gfx_align_t a = 0;       // alignment and movement
-static char f = 0,              // colour
+static gfx_colour_t f = 0,      // colour
    b = 0;
 #if GFX_BPP <= 8
 static uint8_t f_mul = 0;
@@ -580,62 +574,50 @@ gfx_pos (gfx_pos_t newx, gfx_pos_t newy, gfx_align_t newa)
    a = (newa ? : (GFX_L | GFX_T | GFX_H));
 }
 
-static uint32_t
-gfx_colour_lookup (char c)
-{                               // character to colour mapping, default is white
-   switch (c)
-   {
-   case 'k':
-   case 'K':
-      return BLACK;
-#if GFX_BPP ==2
-   case 'R':
-      return RED;
-#elif GFX_BPP > 8
-   case 'r':
-      return (RED >> 1);
-   case 'R':
-      return RED;
-   case 'g':
-      return (GREEN >> 1);
-   case 'G':
-      return GREEN;
-   case 'b':
-      return (BLUE >> 1);
-   case 'B':
-      return BLUE;
-   case 'c':
-      return (CYAN >> 1);
-   case 'C':
-      return CYAN;
-   case 'm':
-      return (MAGENTA >> 1);
-   case 'M':
-      return MAGENTA;
-   case 'y':
-      return (YELLOW >> 1);
-   case 'Y':
-      return YELLOW;
-   case 'w':
-      return (WHITE >> 1);
-   case 'o':
-   case 'O':
-      return RED + (GREEN >> 1);
+#if GFX_BPP <= 8
+uint8_t
+gfx_colour_map (gfx_colour_t c)
+{                               // Map to a base colour we can multiply by intensity (0-15)
+   uint8_t i = (((c >> 16) & 0xFF) + ((c >> 8) & 0xFF) + (c & 0xFF)) / 3;
+#if GFX_BPP == 1
+   return c >> 7;
+#elif GFX_BPP == 2
+   if ((c & 0x800000) && !(c & 0x008080))
+      return 2;
+   return c >> 7;
+#else
+   return c;
 #endif
-   }
-   return WHITE;
 }
+#else
+uint32_t
+gfx_colour_map (gfx_colour_t c)
+{
+#if GFX_BPP > 16
+   return c;                    // 24 bit?
+#else
+   // We have to create a multiply base that allows red (0-2), green (0-4), blue (0-2) which when multiplied gives max 30, 60, 30
+   uint8_t r = (c >> 16);
+   uint8_t g = (c >> 8);
+   uint8_t b = c;
+   r /= 86;                     // 0-2
+   g /= 52;                     // 0-4
+   b /= 86;                     // 0-2
+   return R * r + G * g + B * b;        // Allows for intensity separately to colour
+#endif
+}
+#endif
 
 void
-gfx_colour (char newf)
+gfx_foreground (gfx_colour_t rgb)
 {                               // Set foreground
-   f_mul = gfx_colour_lookup (f = newf);
+   f_mul = gfx_colour_map (f = rgb);
 }
 
 void
-gfx_background (char newb)
+gfx_background (gfx_colour_t rgb)
 {                               // Set background
-   b_mul = gfx_colour_lookup (b = newb);
+   b_mul = gfx_colour_map (b = rgb);
 }
 
 // Basic settings
@@ -676,20 +658,52 @@ gfx_a (void)
    return a;
 }
 
-char
+gfx_colour_t
 gfx_f (void)
 {
    return f;
 }
 
-char
+gfx_colour_t
 gfx_b (void)
 {
    return b;
 }
 
-// support
-inline void
+void
+gfx_pixel_colour (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
+{
+   if (!gfx)
+      return;
+   uint8_t r = (c >> 16);
+   uint8_t g = (c >> 8);
+   uint8_t b = c;
+#if GFX_BPP <=8
+   gfx_pixel (x, y, (r + g + b / 3));
+#else
+   if (gfx_settings.flip & 4)
+   {
+      gfx_pos_t t = x;
+      x = y;
+      y = t;
+   };
+   if (gfx_settings.flip & 1)
+      x = gfx_settings.width - 1 - x;
+   if (gfx_settings.flip & 2)
+      y = gfx_settings.height - 1 - y;
+   if (x < 0 || x >= gfx_settings.width || y < 0 || y >= gfx_settings.height)
+      return;                   // out of display
+   uint16_t v = (r >> 3) * R + (g >> 2) * G + (b >> 3);
+   v = ntohs (v);
+   if (v != gfx[(y * gfx_settings.width) + x])
+   {
+      gfx[(y * gfx_settings.width) + x] = v;
+      gfx_settings.changed = 1;
+   }
+#endif
+}
+
+void
 gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 {                               // set a pixel
    if (!gfx)
@@ -761,7 +775,9 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
       gfx_settings.changed = 1;
    }
 #else // Colour (ignore invert)
-   uint16_t v = ntohs (f_mul * (i >> (8 - GFX_INTENSITY_BPP)) + b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP)));
+   uint16_t v = f_mul * (i >> (8 - GFX_INTENSITY_BPP));
+   v += b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP));
+   v = ntohs (v);
    if (v != gfx[(y * gfx_settings.width) + x])
    {
       gfx[(y * gfx_settings.width) + x] = v;
@@ -1822,14 +1838,8 @@ gfx_lock (void)
    if (!gfx)
       return;
    xSemaphoreTake (gfx_mutex, portMAX_DELAY);
-   // preset state
-#if GFX_BPP > 2                 // Assume dark
-   gfx_background ('k');
-   gfx_colour ('w');
-#else // Assume light
-   gfx_background ('W');
-   gfx_colour ('K');
-#endif
+   gfx_background (0);
+   gfx_foreground (0xFFFFFF);
    gfx_pos (0, 0, GFX_L | GFX_T | GFX_H);
 }
 
@@ -1876,6 +1886,29 @@ gfx_wait (void)
    }
 }
 
+gfx_colour_t
+gfx_rgb (char c)
+{
+   uint8_t u = 255,
+      r = 0,
+      g = 0,
+      b = 0;
+   if (islower ((int) (uint8_t) c))
+   {
+      u = 127;
+      c = toupper ((int) (uint8_t) c);
+   }
+   if (strchr ("RMYW", c))
+      r = u;
+   if (strchr ("GCYW", c))
+      g = u;
+   if (strchr ("BCMW", c))
+      b = u;
+   if (c == 'O')
+      r = u, g = u / 2;         // Orange
+   return (r << 16) | (g << 8) | b;
+}
+
 void
 gfx_message (const char *m)
 {
@@ -1901,10 +1934,11 @@ gfx_message (const char *m)
                s = s * 10 + *m - '0';
             else if (isalpha ((unsigned char) *m))
             {                   /* colour */
+               gfx_colour_t c = gfx_rgb (*m);;
                if ((isf++) & 1)
-                  gfx_colour (*m);
+                  gfx_foreground (c);
                else
-                  gfx_background (*m);
+                  gfx_background (c);
             }
          if (*m)
             m++;
