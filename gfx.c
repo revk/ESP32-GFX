@@ -17,7 +17,6 @@
 
 #define	UNUSED __attribute__((unused))
 static UNUSED const char TAG[] = "GFX";
-#define	DEBUG	ESP_LOGD
 
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -35,6 +34,12 @@ static UNUSED const char TAG[] = "GFX";
 #include "gfx.h"
 #ifdef	  CONFIG_REVK_APPNAME
 #include "../../main/settings.h"
+#endif
+
+#ifdef	CONFIG_GFX_DEBUG
+#define	DEBUG	ESP_LOGE
+#else
+#define	DEBUG	ESP_LOGD
 #endif
 
 #define	SPI_MAX	16384
@@ -1675,6 +1680,10 @@ gfx_init_opts (gfx_init_t o)
       o.width = GFX_DEFAULT_WIDTH;
    if (!o.height)
       o.height = GFX_DEFAULT_HEIGHT;
+   if (!o.bl)
+      o.bl = CONFIG_GFX_BL;
+   if (!o.pwr)
+      o.pwr = CONFIG_GFX_PWR;
    // Check
    if (!o.mosi)
       return "MOSI not set";
