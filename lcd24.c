@@ -67,12 +67,16 @@ gfx_driver_init (void)
       return "Init1 failed";
    usleep (120000);
    gfx_command0 (0x29);         // Display on
+   if (gfx_settings.bl)
+      gpio_set_level (gfx_settings.bl, 1);
    return NULL;
 }
 
 static const char *
 gfx_driver_sleep (void)
 {
+   if (gfx_settings.bl)
+      gpio_set_level (gfx_settings.bl, 0);
    gfx_command0 (0x28);         // Display off
    gfx_command0 (0x10);         // Sleep
    usleep (120000);

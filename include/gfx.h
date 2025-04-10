@@ -28,6 +28,8 @@ typedef struct {
  uint8_t rst;	// The GPIO port for RST (Reset), if 0 then default / not used
  uint8_t ena;	// The GPIO port for ENA (Enable), if 0 then default / not used
  uint8_t busy;	// The GPIO port for BUSY (Busy), if 0 then default / not used
+ uint8_t pwr;	// The GPIO port for PWE (Power), if 0 then default / not used
+ uint8_t bl;	// The GPIO port for BL (Backlight), if 0 then default / not used
  uint8_t contrast;	// Contracts, if display supports it, 0 for default
  uint16_t width;	// Display width
  uint16_t height;	// Display width
