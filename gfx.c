@@ -726,7 +726,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    else if (gfx_settings.contrast < 4)
       i >>= (8 - gfx_settings.contrast);        // Extra dim
 #endif
-   if (i < 128 && f == b)
+   if (i && f == b)
       return;                   // Mask mode
 #if GFX_BPP == 1                // Black/white
    const int shift = 7 - (x % 8);
@@ -776,7 +776,8 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    }
 #else // Colour (ignore invert)
    uint16_t v = f_mul * (i >> (8 - GFX_INTENSITY_BPP));
-   v += b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP));
+   if (f != b)
+      v += b_mul * ((0xFF ^ i) >> (8 - GFX_INTENSITY_BPP));
    v = ntohs (v);
    if (v != gfx[(y * gfx_settings.width) + x])
    {
