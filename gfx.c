@@ -1737,7 +1737,11 @@ gfx_init_opts (gfx_init_t o)
    {
       gpio_reset_pin (gfx_settings.ena);
       gpio_set_direction (gfx_settings.ena, GPIO_MODE_OUTPUT);
+#ifdef	GFX_ENA_LOW
+      gpio_set_level (gfx_settings.ena, 0);     // Enable
+#else
       gpio_set_level (gfx_settings.ena, 1);     // Enable
+#endif
    }
    gpio_reset_pin (gfx_settings.dc);
    gpio_set_direction (gfx_settings.dc, GPIO_MODE_OUTPUT);
