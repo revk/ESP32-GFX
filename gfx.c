@@ -580,13 +580,13 @@ gfx_colour_map (gfx_colour_t c)
 {                               // Map to a base colour we can multiply by intensity (0-15)
    uint8_t i = (((c >> 16) & 0xFF) + ((c >> 8) & 0xFF) + (c & 0xFF)) / 3;
 #if GFX_BPP == 1
-   return c >> 7;
+   return i >> 7;
 #elif GFX_BPP == 2
    if ((c & 0x800000) && !(c & 0x008080))
       return 2;
-   return c >> 7;
+   return i >> 7;
 #else
-   return c;
+   return i;
 #endif
 }
 #else
@@ -726,7 +726,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
    else if (gfx_settings.contrast < 4)
       i >>= (8 - gfx_settings.contrast);        // Extra dim
 #endif
-   if (i && f == b)
+   if (!i && f == b)
       return;                   // Mask mode
 #if GFX_BPP == 1                // Black/white
    const int shift = 7 - (x % 8);
@@ -1839,8 +1839,13 @@ gfx_lock (void)
    if (!gfx)
       return;
    xSemaphoreTake (gfx_mutex, portMAX_DELAY);
+#if GFX_BPP>8
    gfx_background (0);
    gfx_foreground (0xFFFFFF);
+#else
+   gfx_background (0xFFFFFF);
+   gfx_foreground (0);
+#endif
    gfx_pos (0, 0, GFX_L | GFX_T | GFX_H);
 }
 
