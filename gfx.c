@@ -1396,11 +1396,9 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                      while (seg--)
                      {
                         uint8_t S = (*I >> 4);
-                        uint16_t B = ((*I & 0xF) << 6) + (I[1] >> 2);
-                        uint16_t F = ((I[1] & 3) << 8) + I[2];
-                        x7 += B;
+                        x7 += ((*I & 0xF) << 6) + (I[1] >> 2);
                         gfx_pos_t l = x7 * size / unit;
-                        x7 += F;
+                        x7 += ((I[1] & 3) << 8) + I[2];
                         gfx_pos_t r = x7 * size / unit;
                         an[sub] = add_run (a[sub], an[sub], max_runs, l, r);
                         if (map & (1 << S))
