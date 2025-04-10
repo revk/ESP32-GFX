@@ -1,6 +1,9 @@
 // Simple display and text logic
 // Copyright © 2019-22 Adrian Kennard Andrews & Arnold Ltd
 
+extern const uint8_t circle256[256];	// circle constants
+extern const uint8_t sin256[256];	// sin constants
+
 typedef	uint8_t gfx_intensity_t; // The intensity of a pixel 0-255
 typedef int16_t gfx_pos_t;	 // X/Y location of a pixel - off screen allowed (and ignored)
 typedef	uint8_t gfx_align_t;	// Alignment options (GFX_x)
