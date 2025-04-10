@@ -1082,11 +1082,12 @@ plot_runs (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs
             sum = 0;
          }
       }
-      l = r;
       for (uint8_t a = 0; a < aa; a++)
          if (pos[a] < runs[a] * 2 && run[a][pos[a]] <= l)
             pos[a]++;
    }
+   if ((l % aa) && sum)
+      p (x + l / aa, y, (int16_t) ((gfx_intensity_t) - 1) * sum / aa / aa);
 }
 
 static uint8_t
@@ -1191,7 +1192,7 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
    uint8_t runs[aa];
    gfx_pos_t *run[aa];
    for (int i = 0; i < aa; i++)
-      run[i] = malloc (sizeof (gfx_pos_t) * 2 * max_runs);
+      run[i] = alloca (sizeof (gfx_pos_t) * 2 * max_runs);
    for (gfx_pos_t Y = 1; Y < size * 9 * 2; Y += 2)
    {                            // Scan lines
       uint8_t sub = Y / 2 % aa;
@@ -1284,8 +1285,6 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
       if (sub == aa - 1)
          plot_runs (p, x, y + Y / 2 / aa, aa, runs, run);
    }
-   for (int i = 0; i < aa; i++)
-      free (run[i]);
 }
 
 void
@@ -1346,6 +1345,8 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
 #else
       const uint8_t aa = 4;
 #endif
+      const uint16_t unit = width_7seg / 7 / aa;
+      const uint16_t base = unit / size / 2;
       const uint8_t max_runs = 4;
       gfx_pos_t *a[aa];
       uint8_t an[aa];
@@ -1374,8 +1375,6 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
          }
          if (x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
          {                      // Plot digit
-            const uint16_t unit = width_7seg / 7 / aa;
-            const uint16_t base = unit / size / 2;
             uint8_t *i = pack_7seg,
                *e = pack_7seg + sizeof (pack_7seg);
             uint32_t y7 = 0;
@@ -1385,9 +1384,9 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                while (dup--)
                {
                   int yy = y7 * size / unit;
-                  uint8_t sub = yy % aa;
                   if (y7 == base + yy * unit / size)
                   {
+                     uint8_t sub = yy % aa;
                      if (!sub)
                      {
                         memset (an, 0, aa);
@@ -1405,14 +1404,18 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                         gfx_pos_t l = x7 * size / unit;
                         x7 += ((I[1] & 3) << 8) + I[2];
                         gfx_pos_t r = x7 * size / unit;
-                        an[sub] = add_run (a[sub], an[sub], max_runs, l, r);
-                        if (map & (1 << S))
-                           cn[sub] = add_run (c[sub], cn[sub], max_runs, l, r);
+                        if (S < segs)
+                        {
+                           an[sub] = add_run (a[sub], an[sub], max_runs, l, r);
+                           if (map & (1 << S))
+                              cn[sub] = add_run (c[sub], cn[sub], max_runs, l, r);
+                        }
                         I += 3;
                      }
                      if (sub == aa - 1)
                      {
-                        plot_runs (gfx_pixel0, x, y + yy / aa, aa, an, a);      // background clear
+                        if (f != b)
+                           plot_runs (gfx_pixel0, x, y + yy / aa, aa, an, a);   // background clear
                         plot_runs (gfx_pixel, x, y + yy / aa, aa, cn, c);       // plot
                      }
                   }
