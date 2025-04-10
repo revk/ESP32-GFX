@@ -228,7 +228,7 @@ static SemaphoreHandle_t gfx_mutex = NULL;
 static spi_device_handle_t gfx_spi;
 
 // Driver support
-static void gfx_busy_wait (void);       // Manual wait if no busy set
+static UNUSED void gfx_busy_wait (void);       // Manual wait if no busy set
 static esp_err_t gfx_send_gfx (uint8_t);
 static esp_err_t gfx_send_data (const void *data, uint32_t len);
 static esp_err_t gfx_command (uint8_t cmd, const uint8_t * buf, uint8_t len);
