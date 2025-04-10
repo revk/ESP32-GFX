@@ -82,7 +82,7 @@ gfx_driver_sleep (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   gfx  command0 (DISPLAY_WRITE_PIXELS);
+   gfx_command0 (DISPLAY_WRITE_PIXELS);
    gfx_send_gfx (0);
    return NULL;
 }
