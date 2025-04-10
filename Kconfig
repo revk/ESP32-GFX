@@ -30,6 +30,9 @@ menu "GFX"
 	config GFX_BUILD_SUFFIX_EPD29K
 		bool "Waveshare 2.9in epaper 128x296  1bpp+1bpp"
 
+	config GFX_BUILD_SUFFIX_LED24
+		bool "Waveshare 2.4in LCD 240x320 16bpp"
+
 	endchoice
 
 	config GFX_WIDTH
