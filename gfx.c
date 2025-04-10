@@ -1329,8 +1329,8 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
       uint8_t cn[aa];
       for (int r = 0; r < aa; r++)
       {
-         a[r] = malloc (sizeof (gfx_pos_t) * max_runs * 2);
-         c[r] = malloc (sizeof (gfx_pos_t) * max_runs * 2);
+         a[r] = alloca (sizeof (gfx_pos_t) * max_runs * 2);
+         c[r] = alloca (sizeof (gfx_pos_t) * max_runs * 2);
       }
       for (char *p = temp; *p; p++)
       {
@@ -1408,15 +1408,6 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             fontw = 7 * size;   // pixel width of characters in font file
          }
       }
-      for (int r = 0; r < aa; r++)
-      {
-         free (a[r]);
-         free (c[r]);
-      }
-#if	GFX_BPP>2
-      free (a);
-      free (c);
-#endif
    }
    free (temp);
 }
