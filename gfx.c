@@ -787,11 +787,13 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 #endif
 }
 
+#if	GFX_BPP>2
 static void
 gfx_pixel0 (gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i)
 {
    gfx_pixel (x, y, 0);
 }
+#endif
 
 void
 gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp)
