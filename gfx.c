@@ -658,9 +658,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
       K = (((x + y) & 1) ? 255 : 0);    // low level dither
    uint8_t *A = gfx + line * y + (x / 8);
    if (K & 0x80)
-      *A |= (1 << (7 - (x & 7)));
+      *A |= (0x80 >> (x & 7));
    else
-      *A &= ~(1 << (7 - (x & 7)));
+      *A &= ~(0x80 >> (x & 7));
 #elif	GFX_BPP == 2            // 2 BPP Black/Red/White
    if (!(a & 0x80))
       return;                   // Do not plot - simple cut off alpha
@@ -677,14 +677,14 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    }
    uint8_t *A = gfx + line * y + (x / 8);
    if (K & 0x80)
-      *A |= (1 << (7 - (x & 7)));
+      *A |= (0x80 >> (x & 7));
    else
-      *A &= ~(1 << (7 - (x & 7)));
+      *A &= ~(0x80 >> (x & 7));
    A += GFX_PAGE;
    if (R & 0x80)
-      *A |= (1 << (7 - (x & 7)));
+      *A |= (0x80 >> (x & 7));
    else
-      *A &= ~(1 << (7 - (x & 7)));
+      *A &= ~(0x80 >> (x & 7));
 #elif	GFX_BPP == 8
    if (!a)
       return;                   // Do not plot
@@ -693,8 +693,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1840,8 +1841,13 @@ gfx_lock (void)
       return;
    xSemaphoreTake (gfx_mutex, portMAX_DELAY);
    gfx_settings.updated = 1;
+#if	GFX_BPP <= 2
+   gfx_background (0xFFFFFF);
+   gfx_foreground (0);
+#else
    gfx_background (0);
    gfx_foreground (0xFFFFFF);
+#endif
    gfx_pos (0, 0, GFX_L | GFX_T | GFX_H);
 }
 
