@@ -40,8 +40,6 @@ gfx_driver_init (void)
 {                               // Initialise
    gfx_command0 (0x01);         // Reset
    usleep (5000);
-   int W = gfx_settings.width;
-   int H = gfx_settings.height;
    const uint8_t init[] = {
       1, 0x28,                  // Off
       6, 0xCB, 0x39, 0x2C, 0x00, 0x34, 0x02,    // These are the same as power on.
