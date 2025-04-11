@@ -1697,7 +1697,7 @@ gfx_init_opts (gfx_init_t o)
    if (!o.pwr)
       o.pwr = CONFIG_GFX_PWR;
 #ifdef	GFX_FLIP_XY
-   if (flip & 4)
+   if (o.flip & 4)
    {                            // Flip done in hardware
       gfx_pos_t s = o.width;
       o.width = o.height;
