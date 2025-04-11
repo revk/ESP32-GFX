@@ -1588,8 +1588,6 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    int c;
    while ((c = utf8 (&p)) > 0)
    {
-      if (!x && y + fonth > h)
-         fonth = h - y;         // Last line
       int charw = cwidth (flags, size, c);
       if (charw)
       {
