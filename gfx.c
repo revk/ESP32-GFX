@@ -348,7 +348,7 @@ static uint8_t const sevensegmap[] = {
 #define GFX_PAGE (gfx_settings.width * gfx_settings.height/2)
 #elif GFX_BPP == 2
 #define GFX_PAGE ((gfx_settings.width + 7) / 8 * gfx_settings.height)
-#define GFX_PAGE (GFX_PAGE*2)
+#define GFX_SIZE (GFX_PAGE*2)
 #elif GFX_BPP == 1
 #define GFX_PAGE ((gfx_settings.width + 7) / 8 * gfx_settings.height)
 #endif
