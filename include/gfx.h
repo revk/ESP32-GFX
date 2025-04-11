@@ -4,7 +4,7 @@
 extern const uint8_t circle256[256];	// circle constants
 extern const uint8_t sin256[256];	// sin constants
 
-typedef	uint8_t gfx_intensity_t; // The intensity of a pixel 0-255
+typedef	uint8_t gfx_alpha_t; // The alpha of a pixel 0-255
 typedef int16_t gfx_pos_t;	 // X/Y location of a pixel - off screen allowed (and ignored)
 typedef	uint8_t gfx_align_t;	// Alignment options (GFX_x)
 typedef	uint32_t gfx_colour_t; // Colour RGB as low three bytes
@@ -42,7 +42,7 @@ typedef struct {
  uint8_t sleep:1;	// E-Paper sleep mode
  uint8_t direct:1;	// Update on unlock, not on a task
  // Some dynamic values - don't set in init
- uint8_t changed:1;	// There has been a change, cleared when sent
+ uint8_t updated:1;	// Update done (task then displays)
  uint8_t norefresh:1;	// Next update does not need full refresh, can be set in init to avoid normal startup process (e.g. from deep sleep)
  uint8_t update:1;	// Controls update, cleared when updated
  uint8_t asleep:1;	// Device is asleep
@@ -60,11 +60,10 @@ void gfx_wait(void);	// Wait for updates to be done
 void gfx_load(const void *data); // Block load whole image (does not allow for logical invert)
 int gfx_ok(void);	// GFX is enabled
 void gfx_sleep(void);	// Put device to sleep
-void gfx_flip(uint8_t flip);	// Change flip
 void gfx_border(uint8_t border);	// Change border
 
 // Overall display contrast setting if supported by display
-void gfx_set_contrast(gfx_intensity_t);
+void gfx_set_contrast(uint8_t);
 
 // Drawing functions - do a lock first
 // State setting
@@ -74,7 +73,7 @@ void gfx_pos(gfx_pos_t x,gfx_pos_t y,gfx_align_t);	// Set position and alignment
 // For text foreground and background are normally plotted with a 1 pixel border around text (see mask mode below)
 // For 7seg, segments are plotted only, as foreground (on) or background (off)
 // For epaper (1bpp) you only set K/W (or R for 2bpp e-paper)
-// Setting background and foreground the same colour only plots for intensity 255 (using foreground) - i.e. mask mode
+// Setting background and foreground the same colour only plots for alpha 255 (using foreground) - i.e. mask mode
 void gfx_foreground(gfx_colour_t);	// Set foreground - colour is a character
 void gfx_background(gfx_colour_t);	// Set background - colour is a character
 
@@ -92,16 +91,20 @@ gfx_colour_t gfx_b(void);	// Current background colour
 // Raw
 uint16_t gfx_raw_w(void);	// Raw frame buffer width
 uint16_t gfx_raw_h(void);	// Raw frame buffer height
-void *gfx_raw_b(void);	// Raw frame buffer
+uint8_t *gfx_raw_b(void);	// Raw frame buffer
+uint8_t gfx_flip(void);	// Get effective flip
+
+// Pixel setting with colour and/or alpha
+void gfx_pixel_argb(gfx_pos_t x, gfx_pos_t y, gfx_colour_t);
+void gfx_pixel_rgb(gfx_pos_t x, gfx_pos_t y, gfx_colour_t);
+void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_alpha_t i);
 
 // Drawing
-void gfx_pixel_colour(gfx_pos_t x, gfx_pos_t y, gfx_colour_t); // Plot colour
 void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp); // Work out drawing position for object
-void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_intensity_t i); // set pixel directly (uses current foreogrund/background colour)
-void gfx_clear(gfx_intensity_t);	// clear whole display - same as gfx_pixel for all points
-void gfx_box(gfx_pos_t w,gfx_pos_t h,gfx_intensity_t); // draw a box, not filled
-void gfx_fill(gfx_pos_t w,gfx_pos_t h,gfx_intensity_t); // draw a filled rectangle
-void gfx_line(gfx_pos_t x1,gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_intensity_t); // Draw a line
+void gfx_clear(gfx_alpha_t);	// clear whole display - same as gfx_pixel for all points
+void gfx_box(gfx_pos_t w,gfx_pos_t h,gfx_alpha_t); // draw a box, not filled
+void gfx_fill(gfx_pos_t w,gfx_pos_t h,gfx_alpha_t); // draw a filled rectangle
+void gfx_line(gfx_pos_t x1,gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_alpha_t); // Draw a line
 
 void gfx_vector(int8_t size, const char *fmt,...); // vector, use -ve size for descenders versions
 void gfx_vector_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
