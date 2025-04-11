@@ -1351,9 +1351,18 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
    gfx_pos_t x,
      y,
      w,
-     h;
+     h,
+     ox,
+     oy;
    gfx_7seg_size (flags, size, temp, &w, &h);
-   gfx_draw (w, h, size, size, &x, &y); // starting point
+   gfx_draw (w, h, size, size, &ox, &oy);       // starting point
+#if GFX_BPP > 2
+   if (f != b)
+      for (x = -size; x < w + size; x++)
+         for (y = -size; y < h + size; y++)
+            gfx_pixel (ox + x, oy + y, 0);      // background
+#endif
+   x = ox, y = oy;
    x += size * 9 / 20;          // Better alignment in box
    if (y < gfx_height () && y + size * 9 >= 0)
    {
@@ -1365,8 +1374,10 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
       const uint16_t unit = width_7seg / 7 / aa;
       const uint16_t base = unit / size / 2;
       const uint8_t max_runs = 4;
+#if	GFX_BPP>2
       gfx_pos_t *a[aa];
       uint8_t an[aa];
+#endif
       gfx_pos_t *c[aa];
       uint8_t cn[aa];
       for (int r = 0; r < aa; r++)
@@ -1423,7 +1434,9 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                         gfx_pos_t r = x7 * size / unit;
                         if (S < segs)
                         {
+#if	GFX_BPP>2
                            an[sub] = add_run (a[sub], an[sub], max_runs, l, r);
+#endif
                            if (map & (1 << S))
                               cn[sub] = add_run (c[sub], cn[sub], max_runs, l, r);
                         }
@@ -1431,8 +1444,10 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                      }
                      if (sub == aa - 1)
                      {
+#if	GFX_BPP>2
                         if (f != b)
                            plot_runs (gfx_pixel0, x, y + yy / aa, aa, an, a);   // background clear
+#endif
                         plot_runs (gfx_pixel, x, y + yy / aa, aa, cn, c);       // plot
                      }
                   }
@@ -1560,10 +1575,10 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    int fonth = (z + 1) * size;
    gfx_pos_t ox = 0,
       oy = 0;
-   gfx_draw (w, h, 1, 1, &ox, &oy);     // starting point
+   gfx_draw (w, h, size, size, &ox, &oy);       // starting point
    if (f != b)
-      for (x = -1; x <= w; x++)
-         for (y = -1; y <= h; y++)
+      for (x = -size; x < w + size; x++)
+         for (y = -size; y < h + size; y++)
             gfx_pixel (ox + x, oy + y, 0);      // background
    x = y = 0;
    int s1 = size;               // Stroke size
@@ -1895,6 +1910,8 @@ gfx_wait (void)
 gfx_colour_t
 gfx_rgb (char c)
 {
+   if (!c)
+      return 0;
    uint8_t u = 255,
       r = 0,
       g = 0,
