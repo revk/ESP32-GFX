@@ -703,9 +703,7 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
       *A &= ~(0x80 >> (x & 7));
 #elif	GFX_BPP == 2            // 2 BPP Black/Red/White
    uint8_t R = (r > g && r > b) ? 0xFF : 0;
-   if (R)
-      K = 0;
-   if (K & 0x80)
+   if (!R && K & 0x80)
       *A |= (0x80 >> (x & 7));
    else
       *A &= ~(0x80 >> (x & 7));
@@ -722,9 +720,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
