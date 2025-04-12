@@ -18,6 +18,8 @@ Note that the current state, graphics buffer, etc, are global, so only one displ
 
 Displays with simple solid colour, such as black/white, black/red/white, etc, are handled quite simply with each pixel being one of the solid colours. The colour picked simply mapper from the RGB specified.
 
+A simple dithering is applied on grey levels.
+
 Anti-aliasing and alpha blending are not supported (top bit of alpha determines if plotted of not). As such italics is not recommended (text and 7 segment).
 
 ### Greyscale and colour
