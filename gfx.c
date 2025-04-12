@@ -1770,28 +1770,29 @@ gfx_init_opts (gfx_init_t o)
    if (gfx_settings.pwr)
    {
       gpio_reset_pin (gfx_settings.pwr);
-      gpio_set_direction (gfx_settings.pwr, GPIO_MODE_OUTPUT);
 #ifdef	GFX_PWR_LOW
       gpio_set_level (gfx_settings.pwr, 0);     // Power
 #else
       gpio_set_level (gfx_settings.pwr, 1);     // Power
 #endif
+      gpio_set_direction (gfx_settings.pwr, GPIO_MODE_OUTPUT);
       usleep (100000);
    }
    if (gfx_settings.bl)
    {
       gpio_reset_pin (gfx_settings.bl);
+      gpio_set_level (gfx_settings.bl, 0);     // Off
       gpio_set_direction (gfx_settings.bl, GPIO_MODE_OUTPUT);
    }
    if (gfx_settings.ena)
    {
       gpio_reset_pin (gfx_settings.ena);
-      gpio_set_direction (gfx_settings.ena, GPIO_MODE_OUTPUT);
 #ifdef	GFX_ENA_LOW
       gpio_set_level (gfx_settings.ena, 0);     // Enable
 #else
       gpio_set_level (gfx_settings.ena, 1);     // Enable
 #endif
+      gpio_set_direction (gfx_settings.ena, GPIO_MODE_OUTPUT);
    }
    gpio_reset_pin (gfx_settings.dc);
    gpio_set_direction (gfx_settings.dc, GPIO_MODE_OUTPUT);
