@@ -450,7 +450,7 @@ gfx_send_data (const void *data, uint32_t len)
 static esp_err_t
 gfx_send_gfx (uint8_t page)
 {
-   DEBUG (TAG, "Data page %d: %d", page, GFX_PAGE);
+   DEBUG (TAG, "Data page %d (%dx%d): %d", page, gfx_settings.width, gfx_settings.height, GFX_PAGE);
    return gfx_send_data (gfx + page * GFX_PAGE, GFX_PAGE);
 }
 
@@ -696,9 +696,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1784,7 +1783,7 @@ gfx_init_opts (gfx_init_t o)
    if (gfx_settings.bl)
    {
       gpio_reset_pin (gfx_settings.bl);
-      gpio_set_level (gfx_settings.bl, 0);     // Off
+      gpio_set_level (gfx_settings.bl, 0);      // Off
       gpio_set_direction (gfx_settings.bl, GPIO_MODE_OUTPUT);
    }
    if (gfx_settings.ena)
