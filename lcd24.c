@@ -4,41 +4,21 @@
 #define GFX_DEFAULT_WIDTH	240
 #define GFX_DEFAULT_HEIGHT	320
 #define GFX_BPP			16
-#define GFX_FLIP_XY     // 90 degree flip in hardware
+#define GFX_FLIP_XY             // 90 degree flip in hardware
 #define	GFX_FLIP_X              // X flip in hardware
 #define	GFX_FLIP_Y              // Y fli in hardware
 
-#define DISPLAY_SET_CURSOR_X 0x2A
-#define DISPLAY_SET_CURSOR_Y 0x2B
-#define DISPLAY_WRITE_PIXELS 0x2C
-
-#define ILI9341_FRAMERATE_61_HZ 0x1F
-#define ILI9341_FRAMERATE_63_HZ 0x1E
-#define ILI9341_FRAMERATE_65_HZ 0x1D
-#define ILI9341_FRAMERATE_68_HZ 0x1C
-#define ILI9341_FRAMERATE_70_HZ 0x1B
-#define ILI9341_FRAMERATE_73_HZ 0x1A
-#define ILI9341_FRAMERATE_76_HZ 0x19
-#define ILI9341_FRAMERATE_79_HZ 0x18
-#define ILI9341_FRAMERATE_83_HZ 0x17
-#define ILI9341_FRAMERATE_86_HZ 0x16
-#define ILI9341_FRAMERATE_90_HZ 0x15
-#define ILI9341_FRAMERATE_95_HZ 0x14
-#define ILI9341_FRAMERATE_100_HZ 0x13
-#define ILI9341_FRAMERATE_106_HZ 0x12
-#define ILI9341_FRAMERATE_112_HZ 0x11
 #define ILI9341_FRAMERATE_119_HZ 0x10
 
 #define ILI9341_UPDATE_FRAMERATE ILI9341_FRAMERATE_119_HZ
 
-#define ILI9341_PUMP_CONTROL_2XVCI 0x20
 #define ILI9341_PUMP_CONTROL_3XVCI 0x30
 #define ILI9341_PUMP_CONTROL ILI9341_PUMP_CONTROL_3XVCI
 
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   gfx_command0 (DISPLAY_WRITE_PIXELS);
+   gfx_command0 (0x2C);
    gfx_send_gfx (0);
    return NULL;
 }
@@ -61,8 +41,8 @@ gfx_driver_init (void)
       3, 0xC5, 0x3E, 0x28,      // Adjusting VCOM 1 and 2 can control display brightness
       2, 0xC7, 0x86,            //
 #ifdef	GFX_FLIP_XY
-      4,0x2A,0,0,gfx_settings.width>>8,gfx_settings.width,
-      4,0x2B,0,0,gfx_settings.height>>8,gfx_settings.height,
+      4, 0x2A, 0, 0, gfx_settings.width >> 8, gfx_settings.width,
+      4, 0x2B, 0, 0, gfx_settings.height >> 8, gfx_settings.height,
 #endif
       1, 0x20,                  // no invert colours
       2, 0x3A, 0x55,            // 16bpp
@@ -89,7 +69,7 @@ gfx_driver_init (void)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
    usleep (120000);
-   gfx_driver_send();
+   gfx_driver_send ();
    gfx_command0 (0x29);         // Display on
    if (gfx_settings.bl)
       gpio_set_level (gfx_settings.bl, 1);
