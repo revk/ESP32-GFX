@@ -99,6 +99,7 @@ void gfx_pixel_argb(gfx_pos_t x, gfx_pos_t y, gfx_colour_t);
 void gfx_pixel_rgb(gfx_pos_t x, gfx_pos_t y, gfx_colour_t);
 void gfx_pixel(gfx_pos_t x, gfx_pos_t y, gfx_alpha_t i);
 void gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
+void gfx_pixel_fb (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
 
 // Drawing
 void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp); // Work out drawing position for object

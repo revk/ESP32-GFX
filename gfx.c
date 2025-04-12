@@ -623,6 +623,23 @@ gfx_b (void)
    return b;
 }
 
+static gfx_colour_t blend(gfx_alpha_t a)
+{
+   uint8_t fr = (f >> 16);
+   uint8_t fg = (f >> 8);
+   uint8_t fb = f;
+   if (a < 255)
+   {
+      uint8_t br = (b >> 16);
+      uint8_t bg = (b >> 8);
+      uint8_t bb = b;
+      fr = ((fr * a) + (br * (255 - a))) / 255;
+      fg = ((fg * a) + (bg * (255 - a))) / 255;
+      fb = ((fb * a) + (bb * (255 - a))) / 255;
+   }
+   return ((fr << 16) | (fg << 8) | fb);
+}
+
 void
 gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
 {
@@ -754,8 +771,16 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
 
 void
 gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
-{                               // Fixed full background set (a ignored)
-   gfx_pixel_rgb (x, y, b);
+{                               // set a background pixel
+   gfx_pixel_argb (x, y, (a << 24) | b);
+}
+
+void
+gfx_pixel_fg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
+{                               // set based on foreground / background blend
+	if(f==b)fdx_pixel(x,y,a);
+	else
+   gfx_pixel_rgb (x, y,blend(a));
 }
 
 void
@@ -930,19 +955,7 @@ gfx_clear (gfx_alpha_t a)
 {                               // Mix bg and fg
    if (!gfx)
       return;
-   uint8_t fr = (f >> 16);
-   uint8_t fg = (f >> 8);
-   uint8_t fb = f;
-   if (a < 255)
-   {
-      uint8_t br = (b >> 16);
-      uint8_t bg = (b >> 8);
-      uint8_t bb = b;
-      fr = ((fr * a) + (br * (255 - a))) / 255;
-      fg = ((fg * a) + (bg * (255 - a))) / 255;
-      fb = ((fb * a) + (bb * (255 - a))) / 255;
-   }
-   gfx_colour_t c = ((fr << 16) | (fg << 8) | fb);
+   gfx_colour_t c = blend(a);
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
       for (gfx_pos_t x = 0; x < gfx_width (); x++)
          gfx_pixel_rgb (x, y, c);
@@ -1338,7 +1351,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
    if (f != b)
       for (x = -size; x < w + size; x++)
          for (y = -size; y < h + size; y++)
-            gfx_pixel_bg (ox + x, oy + y, 0);   // background
+            gfx_pixel_bg (ox + x, oy + y, 255);   // background
 #endif
    x = ox, y = oy;
    x += size * 9 / 20;          // Better alignment in box
@@ -1561,7 +1574,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    if (f != b)
       for (x = -size; x < w + size; x++)
          for (y = -size; y < h + size; y++)
-            gfx_pixel_bg (ox + x, oy + y, 0);   // background
+            gfx_pixel_bg (ox + x, oy + y, 255);   // background
    x = y = 0;
    int s1 = size;               // Stroke size
    if ((flags & GFX_TEXT_LIGHT) && size > 1)

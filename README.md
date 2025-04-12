@@ -50,9 +50,11 @@ These set the current foreground and background to use. For text and 7 segment a
 
 This set a pixel based on a 32 bit value (AARRGGBB), an alpha of 0xFF is plot, 0x00 is don't plot, otherwise alpha blend (non antialiasing displays simply test top bit of alpha to plot or not plot).
 
-- `gfx_pixel` plots using current foreground colour and specified  alpha
+- `gfx_pixel` plots using current foreground colour width specified alpha
+- `gfx_pixel_bg` plots using current background colour width specified alpha
 - `gfx_pixel_rgb` plots specified colour (RRGGBB), same as alpha 0xFF
 - `gfx_clear` plots a blend of current background and current foreground for whole display based on an alpha value
+- `gfx_pixel_fb` plots a blend of current background and current foreground for a pixel based on an alpha value (if background/foreground same then does `gfx_pixel`)
 
 #### `gfx_pos`
 
