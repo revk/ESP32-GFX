@@ -752,7 +752,7 @@ gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
    gfx_pixel_argb (x, y, (a << 24) | f);
 }
 
-static void
+void
 gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
 {                               // Fixed full background set (a ignored)
    gfx_pixel_rgb (x, y, b);
