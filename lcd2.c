@@ -27,8 +27,8 @@ gfx_driver_init (void)
       1, 0x21,                  // Invert control
       1, 0x13,                  //
 #ifdef	GFX_FLIP_XY
-      4,0x2A,0,0,gfx_settings.width>>8,gfx_settings.width,
-      4,0x2B,0,0,gfx_settings.height>>8,gfx_settings.height,
+      5,0x2A,0,0,gfx_settings.width>>8,gfx_settings.width,
+      5,0x2B,0,0,gfx_settings.height>>8,gfx_settings.height,
 #endif
       0
    };

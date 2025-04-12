@@ -41,8 +41,8 @@ gfx_driver_init (void)
       3, 0xC5, 0x3E, 0x28,      // Adjusting VCOM 1 and 2 can control display brightness
       2, 0xC7, 0x86,            //
 #ifdef	GFX_FLIP_XY
-      4, 0x2A, 0, 0, gfx_settings.width >> 8, gfx_settings.width,
-      4, 0x2B, 0, 0, gfx_settings.height >> 8, gfx_settings.height,
+      5, 0x2A, 0, 0, gfx_settings.width >> 8, gfx_settings.width, //
+      5, 0x2B, 0, 0, gfx_settings.height >> 8, gfx_settings.height, //
 #endif
       1, 0x20,                  // no invert colours
       2, 0x3A, 0x55,            // 16bpp
