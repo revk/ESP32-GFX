@@ -78,6 +78,7 @@ gfx_driver_init (void)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
    usleep (120000);
+   gfx_driver_send();
    gfx_command0 (0x29);         // Display on
    if (gfx_settings.bl)
       gpio_set_level (gfx_settings.bl, 1);

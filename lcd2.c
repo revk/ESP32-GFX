@@ -34,10 +34,10 @@ gfx_driver_init (void)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
 #ifdef	GFX_FLIP_XY
-   if (gfx_settings.flip & 4)
-      gfx_command1 (0x27, 320 - GFX_DEFAULT_WIDTH);
+   gfx_command1 (0x27, 320 - (gfx_settings.flip & 4 ? GFX_DEFAULT_WIDTH : 0));
 #endif
    usleep (10000);
+   gfx_driver_send ();
    gfx_command0 (0x29);         // Display on
    if (gfx_settings.bl)
       gpio_set_level (gfx_settings.bl, 1);
