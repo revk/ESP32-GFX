@@ -26,6 +26,10 @@ gfx_driver_init (void)
    const uint8_t init[] = {
       1, 0x21,                  // Invert control
       1, 0x13,                  //
+#ifdef	GFX_FLIP_XY
+      4,0x2A,0,0,gfx_settings.width>>8,gfx_settings.width,
+      4,0x2B,0,0,gfx_settings.height>>8,gfx_settings.height,
+#endif
       0
    };
    if (gfx_command_bulk (init))
@@ -41,9 +45,6 @@ gfx_driver_init (void)
                  + (gfx_settings.flip & 1 ? 0x40 : 0)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
-#ifdef	GFX_FLIP_XY
-   gfx_command1 (0x27, gfx_settings.flip & 4 ? 80 : 0);
-#endif
    usleep (10000);
    gfx_driver_send ();
    gfx_command0 (0x29);         // Display on
