@@ -668,35 +668,43 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
 #endif
    if (x < 0 || x >= gfx_settings.width || y < 0 || y >= gfx_settings.height)
       return;                   // out of display
-#if	GFX_BPP == 1            // 1 BPP Black/White
+#if	GFX_BPP <= 2
    if (!(a & 0x80))
       return;                   // Do not plot - simple cut off alpha
    const int line = (gfx_settings.width + 7) / 8;
    uint8_t K = (r * 2 + g * 3 + b) / 6;
    if (gfx_settings.invert)
       K = 255 - K;
-   if (K >= 85 && K < 170)
-      K = (((x + y) & 1) ? 255 : 0);    // low level dither
+   // Low level dither options on a 2x2
+   switch (K / 51)
+   {
+   case 0:
+      K = 0;
+      break;
+   case 1:
+      K = (!(y & 1) && !(y & 1)) ? 255 : 0;
+      break;
+   case 2:
+      K = ((x & 1) ^ (y & 1)) ? 255 : 0;
+      break;
+   case 3:
+      K = (!(y & 1) && !(y & 1)) ? 0 : 255;
+      break;
+   case 4:
+      K = 255;
+      break;
+   }
    uint8_t *A = gfx + line * y + (x / 8);
+#endif
+#if	GFX_BPP == 1            // 1 BPP Black/White
    if (K & 0x80)
       *A |= (0x80 >> (x & 7));
    else
       *A &= ~(0x80 >> (x & 7));
 #elif	GFX_BPP == 2            // 2 BPP Black/Red/White
-   if (!(a & 0x80))
-      return;                   // Do not plot - simple cut off alpha
-   const int line = (gfx_settings.width + 7) / 8;
-   uint8_t K = 0,
-      R = (r > g && r > b) ? 0xFF : 0;
-   if (!R)
-   {
-      K = (r * 2 + g * 3 + b) / 6;
-      if (gfx_settings.invert)
-         K = 255 - K;
-      if (K >= 85 && K < 170)
-         K = (((x + y) & 1) ? 255 : 0); // low level dither
-   }
-   uint8_t *A = gfx + line * y + (x / 8);
+   uint8_t R = (r > g && r > b) ? 0xFF : 0;
+   if (R)
+      K = 0;
    if (K & 0x80)
       *A |= (0x80 >> (x & 7));
    else
@@ -781,7 +789,7 @@ void
 gfx_pixel_fb (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
 {                               // set based on foreground / background blend
    if (f == b)
-      gfx_pixel_argb (x, y, (a << 24) | f); // Mask mode
+      gfx_pixel_argb (x, y, (a << 24) | f);     // Mask mode
    else
       gfx_pixel_rgb (x, y, blend (a));
 }
