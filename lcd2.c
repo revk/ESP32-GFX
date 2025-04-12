@@ -1,8 +1,8 @@
 // Waveshare 2" ST7789V
 // https://github.com/waveshareteam/waveshare_fbcp/tree/main/src/lcd_driver
 
-#define GFX_DEFAULT_WIDTH	240
-#define GFX_DEFAULT_HEIGHT	320
+#define GFX_DEFAULT_WIDTH	320
+#define GFX_DEFAULT_HEIGHT	240
 #define GFX_BPP			16
 //#define       GFX_FLIP_XY     // 90 degree flip in hardware
 #define	GFX_FLIP_X              // X flip in hardware
@@ -17,13 +17,12 @@ gfx_driver_init (void)
    usleep (120000);
    const uint8_t init[] = {
 	   1,0x20, // No invert
-	   2,0x37,320-gfx_settings.width,
 	   1,0x13, //
       0
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
-   gfx_command1 (0x36, 0x08+0x20
+   gfx_command1 (0x36, 0x08
 #ifdef	GFX_FLIP_XY
                  + (gfx_settings.flip & 4 ? 0x20 : 0)
 #endif
@@ -34,6 +33,9 @@ gfx_driver_init (void)
                  + (gfx_settings.flip & 1 ? 0x40 : 0)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
+#ifdef	GFX_FLIP_XY
+   if(gfx_settings.flip & 4)gfx_command1(,0x27,320-GFX_DEFAULT_HEIGHT);
+#endif
    usleep (10000);
    gfx_command0 (0x29);         // Display on
    if (gfx_settings.bl)
