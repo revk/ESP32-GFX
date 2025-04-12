@@ -691,7 +691,6 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
       K = (!(x & 1) && !(y & 1)) ? 0 : 255;
       break;
    case 4:
-   case 5:
       K = 255;
       break;
    }
