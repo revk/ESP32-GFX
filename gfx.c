@@ -623,7 +623,8 @@ gfx_b (void)
    return b;
 }
 
-static gfx_colour_t blend(gfx_alpha_t a)
+static gfx_colour_t
+blend (gfx_alpha_t a)
 {
    uint8_t fr = (f >> 16);
    uint8_t fg = (f >> 8);
@@ -713,8 +714,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -778,9 +780,10 @@ gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
 void
 gfx_pixel_fg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
 {                               // set based on foreground / background blend
-	if(f==b)fdx_pixel(x,y,a);
-	else
-   gfx_pixel_rgb (x, y,blend(a));
+   if (f == b)
+      gfx_pixel (x, y, a); // Mask mode
+   else
+      gfx_pixel_rgb (x, y, blend (a));
 }
 
 void
@@ -955,7 +958,7 @@ gfx_clear (gfx_alpha_t a)
 {                               // Mix bg and fg
    if (!gfx)
       return;
-   gfx_colour_t c = blend(a);
+   gfx_colour_t c = blend (a);
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
       for (gfx_pos_t x = 0; x < gfx_width (); x++)
          gfx_pixel_rgb (x, y, c);
@@ -1351,7 +1354,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
    if (f != b)
       for (x = -size; x < w + size; x++)
          for (y = -size; y < h + size; y++)
-            gfx_pixel_bg (ox + x, oy + y, 255);   // background
+            gfx_pixel_bg (ox + x, oy + y, 255); // background
 #endif
    x = ox, y = oy;
    x += size * 9 / 20;          // Better alignment in box
@@ -1574,7 +1577,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    if (f != b)
       for (x = -size; x < w + size; x++)
          for (y = -size; y < h + size; y++)
-            gfx_pixel_bg (ox + x, oy + y, 255);   // background
+            gfx_pixel_bg (ox + x, oy + y, 255); // background
    x = y = 0;
    int s1 = size;               // Stroke size
    if ((flags & GFX_TEXT_LIGHT) && size > 1)
