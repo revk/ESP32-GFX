@@ -1152,7 +1152,7 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
 {                               // Plot a character, allow for antialiasing (aa), weight and size are pixel based
    if (u < 32)
       return;
-   if (!aa || size == 1)
+   if (!aa || weight == 1)
       aa = 1;
    size *= aa;
    weight *= aa;
