@@ -1,10 +1,10 @@
 // Waveshare 2" ST7789V
 // https://github.com/waveshareteam/waveshare_fbcp/tree/main/src/lcd_driver
 
-#define GFX_DEFAULT_WIDTH	320
-#define GFX_DEFAULT_HEIGHT	240
+#define GFX_DEFAULT_WIDTH	240
+#define GFX_DEFAULT_HEIGHT	320
 #define GFX_BPP			16
-#define       GFX_FLIP_XY       // 90 degree flip in hardware
+#define GFX_FLIP_XY             // 90 degree flip in hardware
 #define	GFX_FLIP_X              // X flip in hardware
 #define	GFX_FLIP_Y              // Y fli in hardware
 
