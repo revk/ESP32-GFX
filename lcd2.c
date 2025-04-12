@@ -22,7 +22,7 @@ gfx_driver_init (void)
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
-   gfx_command1 (0x36, 0x08
+   gfx_command1 (0x36, 0x00
 #ifdef	GFX_FLIP_XY
                  + (gfx_settings.flip & 4 ? 0x20 : 0)
 #endif
@@ -35,7 +35,7 @@ gfx_driver_init (void)
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
 #ifdef	GFX_FLIP_XY
    if (gfx_settings.flip & 4)
-      gfx_command1 (0x27, 320 - GFX_DEFAULT_HEIGHT);
+      gfx_command1 (0x27, 320 - GFX_DEFAULT_WIDTH);
 #endif
    usleep (10000);
    gfx_command0 (0x29);         // Display on
