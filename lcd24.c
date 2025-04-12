@@ -65,7 +65,7 @@ gfx_driver_init (void)
                  + (gfx_settings.flip & 2 ? 0x80 : 0)
 #endif
 #ifdef	GFX_FLIP_X
-                 + (gfx_settings.flip & 1 ? 0x40 : 0)
+                 + (gfx_settings.flip & 1 ? 0 : 0x40)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
    usleep (120000);
