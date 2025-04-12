@@ -16,7 +16,7 @@ gfx_driver_init (void)
    gfx_command1 (0x3A,0x05); // 16 bpp
    usleep (120000);
    const uint8_t init[] = {
-	   1,0x20, // No invert
+	   1,0x21, // Invert control
 	   1,0x13, //
       0
    };
