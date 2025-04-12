@@ -682,13 +682,13 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
       K = 0;
       break;
    case 1:
-      K = (!(y & 1) && !(y & 1)) ? 255 : 0;
+      K = (!(x & 1) && !(y & 1)) ? 255 : 0;
       break;
    case 2:
       K = ((x & 1) ^ (y & 1)) ? 255 : 0;
       break;
    case 3:
-      K = (!(y & 1) && !(y & 1)) ? 0 : 255;
+      K = (!(x & 1) && !(y & 1)) ? 0 : 255;
       break;
    case 4:
       K = 255;
