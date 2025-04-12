@@ -42,7 +42,7 @@ gfx_driver_init (void)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
 #ifdef	GFX_FLIP_XY
-   gfx_command1 (0x27, 320 - (gfx_settings.flip & 4 ? GFX_DEFAULT_WIDTH : 0));
+   gfx_command1 (0x27, gfx_settings.flip & 4 ? 80 : 0);
 #endif
    usleep (10000);
    gfx_driver_send ();
