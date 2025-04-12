@@ -35,8 +35,6 @@ gfx_driver_init (void)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
    usleep (10000);
-   gfx_command0 (DISPLAY_WRITE_PIXELS);
-   gfx_send_gfx (0);
    gfx_command0 (0x29);         // Display on
    if (gfx_settings.bl)
       gpio_set_level (gfx_settings.bl, 1);
@@ -57,7 +55,7 @@ gfx_driver_sleep (void)
 static const char *
 gfx_driver_send (void)
 {                               // Send buffer and update display
-   gfx_command0 (DISPLAY_WRITE_PIXELS);
+   gfx_command0 (0x2C);
    gfx_send_gfx (0);
    return NULL;
 }
