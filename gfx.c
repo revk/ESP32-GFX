@@ -1963,7 +1963,7 @@ gfx_message (const char *m)
       m = e;
       if (*m == '/')
       {
-         gfx_pos (gfx_x (), gfx_y () + size - 1, gfx_a ());
+         gfx_pos (gfx_x (), gfx_y () + size, gfx_a ());
          m++;
       }
    }
