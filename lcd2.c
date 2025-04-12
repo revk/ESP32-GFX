@@ -4,20 +4,20 @@
 #define GFX_DEFAULT_WIDTH	320
 #define GFX_DEFAULT_HEIGHT	240
 #define GFX_BPP			16
-#define       GFX_FLIP_XY     // 90 degree flip in hardware
+#define       GFX_FLIP_XY       // 90 degree flip in hardware
 #define	GFX_FLIP_X              // X flip in hardware
 #define	GFX_FLIP_Y              // Y fli in hardware
 
 static const char *
 gfx_driver_init (void)
 {                               // Initialise
-   gfx_command0 (0x11); // Sleep out
+   gfx_command0 (0x11);         // Sleep out
    usleep (120000);
-   gfx_command1 (0x3A,0x05); // 16 bpp
+   gfx_command1 (0x3A, 0x05);   // 16 bpp
    usleep (120000);
    const uint8_t init[] = {
-	   1,0x21, // Invert control
-	   1,0x13, //
+      1, 0x21,                  // Invert control
+      1, 0x13,                  //
       0
    };
    if (gfx_command_bulk (init))
@@ -34,7 +34,8 @@ gfx_driver_init (void)
 #endif
       );                        // bit3:RGB, bit5:rowcolswap, bit6:colrev, bit7:rowrev
 #ifdef	GFX_FLIP_XY
-   if(gfx_settings.flip & 4)gfx_command1(,0x27,320-GFX_DEFAULT_HEIGHT);
+   if (gfx_settings.flip & 4)
+      gfx_command1 (0x27, 320 - GFX_DEFAULT_HEIGHT);
 #endif
    usleep (10000);
    gfx_command0 (0x29);         // Display on
