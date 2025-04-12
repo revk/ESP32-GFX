@@ -283,6 +283,9 @@ static UNUSED esp_err_t gfx_command_bulk (const uint8_t * init_code);
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_LCD24
 #include "lcd24.c"
 #endif
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_LCD2
+#include "lcd2.c"
+#endif
 
 #ifdef	CONFIG_GFX_UNICODE
 #include "vector.h"

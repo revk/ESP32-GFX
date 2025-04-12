@@ -33,6 +33,9 @@ menu "GFX"
 	config GFX_BUILD_SUFFIX_LCD24
 		bool "Waveshare 2.4in LCD 240x320 16bpp"
 
+	config GFX_BUILD_SUFFIX_LCD2
+		bool "Waveshare 2in LCD 240x320 16bpp"
+
 	endchoice
 
 	config GFX_WIDTH
