@@ -36,6 +36,14 @@
 #define ILI9341_PUMP_CONTROL ILI9341_PUMP_CONTROL_3XVCI
 
 static const char *
+gfx_driver_send (void)
+{                               // Send buffer and update display
+   gfx_command0 (DISPLAY_WRITE_PIXELS);
+   gfx_send_gfx (0);
+   return NULL;
+}
+
+static const char *
 gfx_driver_init (void)
 {                               // Initialise
    gfx_command0 (0x01);         // Reset
@@ -93,13 +101,5 @@ gfx_driver_sleep (void)
    gfx_command0 (0x28);         // Display off
    gfx_command0 (0x10);         // Sleep
    usleep (120000);
-   return NULL;
-}
-
-static const char *
-gfx_driver_send (void)
-{                               // Send buffer and update display
-   gfx_command0 (DISPLAY_WRITE_PIXELS);
-   gfx_send_gfx (0);
    return NULL;
 }
