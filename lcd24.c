@@ -4,7 +4,7 @@
 #define GFX_DEFAULT_WIDTH	240
 #define GFX_DEFAULT_HEIGHT	320
 #define GFX_BPP			16
-//#define       GFX_FLIP_XY     // 90 degree flip in hardware
+#define GFX_FLIP_XY     // 90 degree flip in hardware
 #define	GFX_FLIP_X              // X flip in hardware
 #define	GFX_FLIP_Y              // Y fli in hardware
 
@@ -60,7 +60,10 @@ gfx_driver_init (void)
       2, 0xC1, 0x10,            // Sets the factor used in the step-up circuits. To reduce power consumption, set a smaller factor.
       3, 0xC5, 0x3E, 0x28,      // Adjusting VCOM 1 and 2 can control display brightness
       2, 0xC7, 0x86,            //
-      // 1,0x21, // invert colours
+#ifdef	GFX_FLIP_XY
+      4,0x2A,0,0,gfx_settings.width>>8,gfx_settings.width,
+      4,0x2B,0,0,gfx_settings.height>>8,gfx_settings.height,
+#endif
       1, 0x20,                  // no invert colours
       2, 0x3A, 0x55,            // 16bpp
       3, 0xB1, 0x00, ILI9341_UPDATE_FRAMERATE,  //
