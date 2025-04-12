@@ -23,7 +23,7 @@ gfx_driver_init (void)
    };
    if (gfx_command_bulk (init))
       return "Init1 failed";
-   gfx_command1 (0x36, 0x08
+   gfx_command1 (0x36, 0x08+0x20
 #ifdef	GFX_FLIP_XY
                  + (gfx_settings.flip & 4 ? 0x20 : 0)
 #endif
