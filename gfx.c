@@ -778,7 +778,7 @@ gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
 }
 
 void
-gfx_pixel_fg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
+gfx_pixel_fb (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
 {                               // set based on foreground / background blend
    if (f == b)
       gfx_pixel_argb (x, y, (a << 24) | f); // Mask mode
