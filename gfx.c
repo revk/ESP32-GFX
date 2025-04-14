@@ -214,12 +214,12 @@ gfx_border (uint8_t border)
 }
 
 void
-gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke, gfx_alpha_t l)
+gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke, gfx_alpha_t l)
 {                               // Dummy - no driver
 }
 
 void
-gfx_circle (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t stroke, gfx_alpha_t a)
+gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t stroke, gfx_alpha_t a)
 {                               // Dummy - no driver
 }
 
@@ -725,9 +725,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -2045,12 +2044,16 @@ gfx_border (uint8_t border)
 }
 
 void
-gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke, gfx_alpha_t a)
-{                               // Draw a line
+gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke, gfx_alpha_t a)
+{                               // Draw a line (half pixel units)
    if (!gfx)
       return;
    if (stroke <= 1)
    {                            // Simple solid pixel plot
+      x1 /= 2;
+      y1 /= 2;
+      x2 /= 2;
+      y2 /= 2;
       gfx_pos_t dx = (x2 - x1),
          adx = dx,
          sdx = 1;
@@ -2101,10 +2104,13 @@ gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stro
 }
 
 void
-gfx_circle (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t stroke, gfx_alpha_t a)
-{                               // Draw a circle
+gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t stroke, gfx_alpha_t a)
+{                               // Draw a circle (half pixel units)
    if (stroke <= 1)
    {                            // Simple solid pixel
+      x /= 2;
+      y /= 2;
+      r /= 2;
       // TODO
       return;
    }
