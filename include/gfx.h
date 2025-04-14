@@ -102,14 +102,13 @@ void gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
 void gfx_pixel_fb (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
 
 // Drawing
+void gfx_clear(gfx_alpha_t);	// clear whole display 
 void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t * xp, gfx_pos_t * yp); // Work out drawing position for object
-void gfx_clear(gfx_alpha_t);	// clear whole display - same as gfx_pixel for all points
 void gfx_box(gfx_pos_t w,gfx_pos_t h,gfx_alpha_t); // draw a box, not filled
 void gfx_fill(gfx_pos_t w,gfx_pos_t h,gfx_alpha_t); // draw a filled rectangle
-void gfx_line(gfx_pos_t x1,gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_alpha_t); // Draw a line
 
-void gfx_vector(int8_t size, const char *fmt,...); // vector, use -ve size for descenders versions
-void gfx_vector_size(int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
+void gfx_line(gfx_pos_t x1,gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke,gfx_alpha_t); // Draw a line
+void gfx_circle (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t stroke, gfx_alpha_t a); // Draw a circle
 
 // gfx_text flags
 #define	GFX_TEXT_DESCENDERS	(1<<0)	// Allow descenders

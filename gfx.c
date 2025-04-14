@@ -214,8 +214,13 @@ gfx_border (uint8_t border)
 }
 
 void
-gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_alpha_t l)
-{                               // Draw a line
+gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke, gfx_alpha_t l)
+{                               // Dummy - no driver
+}
+
+void
+gfx_circle (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t stroke, gfx_alpha_t a)
+{                               // Dummy - no driver
 }
 
 uint16_t
@@ -720,8 +725,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1560,7 +1566,7 @@ gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * w
       *hp = h;
 }
 
-void
+static void
 gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
 {
    if (!gfx || !size)
@@ -2039,53 +2045,71 @@ gfx_border (uint8_t border)
 }
 
 void
-gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_alpha_t a)
+gfx_line (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke, gfx_alpha_t a)
 {                               // Draw a line
    if (!gfx)
       return;
-   gfx_pos_t dx = (x2 - x1),
-      adx = dx,
-      sdx = 1;
-   gfx_pos_t dy = (y2 - y1),
-      ady = dy,
-      sdy = 1;
-   if (dx < 0)
-      adx = (sdx = -1) * dx;
-   if (dy < 0)
-      ady = (sdy = -1) * dy;
-   if (dx || dy)
-   {
-      if (adx > ady)
+   if (stroke <= 1)
+   {                            // Simple solid pixel plot
+      gfx_pos_t dx = (x2 - x1),
+         adx = dx,
+         sdx = 1;
+      gfx_pos_t dy = (y2 - y1),
+         ady = dy,
+         sdy = 1;
+      if (dx < 0)
+         adx = (sdx = -1) * dx;
+      if (dy < 0)
+         ady = (sdy = -1) * dy;
+      if (dx || dy)
       {
-         gfx_pos_t d = adx / 2;
-         while (x1 != x2)
+         if (adx > ady)
          {
-            gfx_pixel (x1, y1, a);
-            d += ady;
-            if (d >= adx)
+            gfx_pos_t d = adx / 2;
+            while (x1 != x2)
             {
-               d -= adx;
-               y1 += sdy;
-            }
-            x1 += sdx;
-         }
-      } else
-      {
-         gfx_pos_t d = ady / 2;
-         while (y1 != y2)
-         {
-            gfx_pixel (x1, y1, a);
-            d += adx;
-            if (d >= ady)
-            {
-               d -= ady;
+               gfx_pixel (x1, y1, a);
+               d += ady;
+               if (d >= adx)
+               {
+                  d -= adx;
+                  y1 += sdy;
+               }
                x1 += sdx;
             }
-            y1 += sdy;
+         } else
+         {
+            gfx_pos_t d = ady / 2;
+            while (y1 != y2)
+            {
+               gfx_pixel (x1, y1, a);
+               d += adx;
+               if (d >= ady)
+               {
+                  d -= ady;
+                  x1 += sdx;
+               }
+               y1 += sdy;
+            }
          }
       }
+      gfx_pixel (x1, y1, a);
+   return}
+   // Stroke width based
+   // TODO
+
+}
+
+void
+gfx_circle (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t stroke, gfx_alpha_t a)
+{                               // Draw a circle
+   if (stroke <= 1)
+   {                            // Simple solid pixel
+      // TODO
+      return;
    }
-   gfx_pixel (x1, y1, a);
+// Stroke width based
+// TODO
 }
 
 uint16_t
