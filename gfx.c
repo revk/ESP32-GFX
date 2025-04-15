@@ -532,8 +532,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1014,13 +1015,11 @@ icircle (int16_t y, int16_t r)
    // TODO interpolate if r>255
    if (y < 0)
       y = -y;
-   if (y >= r)
-      return 0;
-   if (y == r)
-      return 0;
    if (!y)
       return r;
-   return r * circle256[255 * y / r];
+   if (y >= r)
+      return 0;
+   return r * circle256[255 * y / r] / 255;
 }
 
 static void
