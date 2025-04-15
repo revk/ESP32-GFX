@@ -532,8 +532,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1904,7 +1905,8 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t str
          }
       }
       gfx_pixel (x1, y1, a);
-   return}
+      return;
+   }
    // Stroke width based
    // TODO
 
