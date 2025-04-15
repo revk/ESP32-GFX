@@ -532,9 +532,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1011,12 +1010,16 @@ icos (int16_t a, int16_t r)
 
 int16_t
 icircle (int16_t y, int16_t r)
-{                               // x for circuit at y within r, -1 if over r
+{                               // x for circuit at y within r
    // TODO interpolate if r>255
-   if (a > r || a < r)
-      return -1;
-   if (a == r || a == -r)
+   if (y < 0)
+      y = -y;
+   if (y >= r)
       return 0;
+   if (y == r)
+      return 0;
+   if (!y)
+      return r;
    return r * circle256[255 * y / r];
 }
 
@@ -1073,16 +1076,7 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
          gfx_pos_t y1 = ((b1 & 15) * size * 2 + offset);
          if (Y >= y1 - weight && Y <= y1 + weight)
          {                      // Possible dot
-            gfx_pos_t w = weight;
-            if (Y != y1)
-            {
-               uint8_t d;
-               if (Y < y1)
-                  d = (y1 - Y) * 255 / weight;
-               else
-                  d = (Y - y1) * 255 / weight;
-               w = circle256[d] * weight / 255;
-            }
+            gfx_pos_t w = icircle (Y - y1, weight);
             runs[sub] = add_run (run[sub], runs[sub], max_runs, i + (x1 - w) / 2, i + (x1 + w + 1) / 2);
          }
          if (d + 1 >= end)
