@@ -1960,7 +1960,7 @@ void
 gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
 {                               // Draw a circle (half pixel units)
    const uint8_t max_runs = 2;
-   if (s <= 1)
+   if (s == 1)
    {                            // Simple solid pixel
       x /= 2;
       y /= 2;
@@ -1995,10 +1995,12 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
       return;
    }
    {                            // Stroke width based
-#if	GFX_BPP <=2
+#if	GFX_BPP <= 2
       const uint8_t aa = 1;
 #else
       const uint8_t aa = 4;
+      r *= aa;
+      s *= aa;
 #endif
       uint8_t runs[aa];
       gfx_pos_t *run[aa];
@@ -2026,21 +2028,22 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
             plot_runs (gfx_pixel_bg, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
       }
       sub = 0;
-      for (yy = -r - s; yy <= r + s; yy += 2)
-      {
-         if (!sub)
-            memset (runs, 0, aa);
-         gfx_pos_t wo = icircle (yy, r + s);
-         gfx_pos_t wi = icircle (yy, r - s);
-         runs[sub] = add_run (run[sub], runs[sub], max_runs, -wo / 2, (-wi - 1) / 2);
-         runs[sub] = add_run (run[sub], runs[sub], max_runs, (wi + 1) / 2, wo / 2);
-         sub++;
-         if (sub == aa)
+      if (s)
+         for (yy = -r - s; yy <= r + s; yy += 2)
          {
-            sub = 0;
-            plot_runs (gfx_pixel, x / 2, y / 2 - (yy + 1) / aa / 2, aa, runs, run);
+            if (!sub)
+               memset (runs, 0, aa);
+            gfx_pos_t wo = icircle (yy, r + s);
+            gfx_pos_t wi = icircle (yy, r - s);
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, -wo / 2, (-wi - 1) / 2);
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, (wi + 1) / 2, wo / 2);
+            sub++;
+            if (sub == aa)
+            {
+               sub = 0;
+               plot_runs (gfx_pixel, x / 2, y / 2 - (yy + 1) / aa / 2, aa, runs, run);
+            }
          }
-      }
       if (sub)
          plot_runs (gfx_pixel, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
    }
