@@ -1856,7 +1856,7 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t str
 {                               // Draw a line (half pixel units)
    if (!gfx)
       return;
-   if (stroke <= 1)
+   if (stroke <= 2)
    {                            // Simple solid pixel plot
       x1 /= 2;
       y1 /= 2;
