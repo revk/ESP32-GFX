@@ -983,7 +983,7 @@ const uint8_t sin256[256] = {
    0xFE, 0xFE, 0xFE, 0xFF
 };
 
-int16_t
+inline int16_t
 isin (int16_t a, int16_t r)
 {                               // sin of a (degrees) scaled to r
    // TODO interpolate if r>255
@@ -1009,7 +1009,7 @@ icos (int16_t a, int16_t r)
    return isin (a + 90, r);
 }
 
-int16_t
+inline int16_t
 icircle (int16_t y, int16_t r)
 {                               // x for circuit at y within r
    // TODO interpolate if r>255
