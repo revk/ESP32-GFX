@@ -534,9 +534,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -875,7 +874,6 @@ plot_run (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t runs, gfx_pos_t * r
    }
 }
 
-
 static void
 plot_runs (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs, gfx_pos_t ** run)
 {                               // Anti-alias plot of runs aa x aa (run length is pixels*aa)
@@ -889,30 +887,33 @@ plot_runs (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs
    uint8_t pos[aa];
    memset (pos, 0, aa);
    uint8_t sum = 0;
-   gfx_pos_t l = 0;
+   gfx_pos_t l = -32768;
    while (1)
    {
-      gfx_pos_t r = -1;         // Next step
+      gfx_pos_t r = -32768;     // Next step
       for (uint8_t a = 0; a < aa; a++)
-         if (pos[a] < runs[a] * 2 && (r < 0 || run[a][pos[a]] < r))
+         if (pos[a] < runs[a] * 2 && (r == -32768 || run[a][pos[a]] < r))
             r = run[a][pos[a]];
-      if (r < 0)
+      if (r == -32768)
          break;
       uint8_t c = 0;            // Count how many in range
       for (uint8_t a = 0; a < aa; a++)
          if (pos[a] & 1)
             c++;
-      while (l < r)
-      {
-         sum += c;
-         l++;
-         if (!(l % aa))
+      if (!c)
+         l = r;
+      else
+         while (l < r)
          {
-            if (sum)
-               p (x + l / aa - 1, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa);
-            sum = 0;
+            sum += c;
+            l++;
+            if (!(l % aa))
+            {
+               if (sum)
+                  p (x + l / aa - 1, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa);
+               sum = 0;
+            }
          }
-      }
       for (uint8_t a = 0; a < aa; a++)
          if (pos[a] < runs[a] * 2 && run[a][pos[a]] <= l)
             pos[a]++;
@@ -985,8 +986,8 @@ const uint8_t sin256[256] = {
    0xFE, 0xFE, 0xFE, 0xFF
 };
 
-inline int16_t
-isin (int16_t a, int16_t r)
+inline int32_t
+isin (int32_t a, int32_t r)
 {                               // sin of a (degrees) scaled to r
    // TODO interpolate if r>255
    a %= 360;
@@ -1005,14 +1006,14 @@ isin (int16_t a, int16_t r)
    return -r * sin256[(360 - a) * 256 / 90] / 255;
 }
 
-int16_t
-icos (int16_t a, int16_t r)
+int32_t
+icos (int32_t a, int32_t r)
 {                               // cos of a (degrees) scaled to r
    return isin (a + 90, r);
 }
 
-inline int16_t
-icircle (int16_t y, int16_t r)
+inline int32_t
+icircle (int32_t y, int32_t r)
 {                               // x for circuit at y within r
    // TODO interpolate if r>255
    if (y < 0)
@@ -2035,8 +2036,8 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
                memset (runs, 0, aa);
             gfx_pos_t wo = icircle (yy, r + s);
             gfx_pos_t wi = icircle (yy, r - s);
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, -wo / 2, (-wi - 1) / 2);
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, (wi + 1) / 2, wo / 2);
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, -wo / 2, -wi / 2);
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, wi / 2, wo / 2);
             sub++;
             if (sub == aa)
             {

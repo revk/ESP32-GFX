@@ -3,9 +3,9 @@
 
 extern const uint8_t circle256[256];    // circle constants
 extern const uint8_t sin256[256];       // sin constants
-extern int16_t isin (int16_t a, int16_t r);     // sin of a (degrees) scaled to r
-extern int16_t icos (int16_t a, int16_t r);     // cos of a (degrees) scaled to r
-extern int16_t icircle (int16_t y, int16_t r);  // x for circuit at y within r
+extern int32_t isin (int32_t a, int32_t r);     // sin of a (degrees) scaled to r
+extern int32_t icos (int32_t a, int32_t r);     // cos of a (degrees) scaled to r
+extern int32_t icircle (int32_t y, int32_t r);  // x for circuit at y within r
 
 typedef uint8_t gfx_alpha_t;    // The alpha of a pixel 0-255
 typedef int16_t gfx_pos_t;      // X/Y location of a pixel - off screen allowed (and ignored)
