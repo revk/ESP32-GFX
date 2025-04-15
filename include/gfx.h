@@ -98,14 +98,13 @@ const char *gfx_init_opts(gfx_init_t);
 #define gfx_draw (w,h,wm,hm,xp,yp)
 #define gfx_box(w,h,a)
 #define gfx_fill(w,h,a)
-#define gfx_line2(x1,y1,x2,y2 s,a)
+#define gfx_line(x1,y1,x2,y2,a)
+#define gfx_line2(x1,y1,x2,y2,s,a)
 #define gfx_circle2 (x,y,r,s,a)
 #define gfx_clear(a)
 #define gfx_draw (w,h,wm,hm,xp,yp)
 #define gfx_box(w,h,a)
 #define gfx_fill(w,h,a)
-#define gfx_line2(x1,y1,x2,y2,s,a)
-#define gfx_circle2 (x,y,r,s,a)
 #define gfx_text(flags,size,fmt,...)
 #define gfx_text_size(flags,size,t,w,h)
 #define gfx_7seg(flags,size,fmt,...)
@@ -169,6 +168,7 @@ void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t *
 void gfx_box(gfx_pos_t w,gfx_pos_t h,gfx_alpha_t); // draw a box, not filled
 void gfx_fill(gfx_pos_t w,gfx_pos_t h,gfx_alpha_t); // draw a filled rectangle
 
+#define	gfx_line(x1,y1,x2,y2,a) gfx_line2((x1)*2,(y1)*2,(x2)*2,(y2)*2,2,a)
 void gfx_line2(gfx_pos_t x1,gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s,gfx_alpha_t); // Draw a line (all in half pixel units)
 void gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s, gfx_alpha_t a); // Draw a circle (all in half pixel units)
 
