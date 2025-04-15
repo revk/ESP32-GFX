@@ -534,8 +534,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1025,6 +1026,21 @@ icircle (int32_t y, int32_t r)
    return r * circle256[255 * y / r] / 255;
 }
 
+uint16_t
+isqrt (uint32_t s)
+{                               // Simple
+   uint32_t res = 0;
+   uint32_t add = 0x8000;
+   for (uint8_t i = 0; i < 16; i++)
+   {
+      uint32_t next = res | add;
+      if (s >= next * next)
+         res = next;
+      add >>= 1;
+   }
+   return res;
+}
+
 static void
 plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, uint16_t weight, uint8_t aa, uint8_t italic)
 {                               // Plot a character, allow for antialiasing (aa), weight and size are pixel based
@@ -1222,9 +1238,11 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
 #if	GFX_BPP <= 2
       gfx_pos_t *a[aa];
       uint8_t an[aa];
+      memset (an, 0, aa);
 #endif
       gfx_pos_t *c[aa];
       uint8_t cn[aa];
+      memset (cn, 0, aa);
       for (int r = 0; r < aa; r++)
       {
 #if	GFX_BPP <= 2
@@ -1885,12 +1903,16 @@ gfx_border (uint8_t border)
 }
 
 void
-gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke)
+gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s)
 {                               // Draw a line (half pixel units)
    const uint8_t max_runs = 2;
    if (!gfx)
       return;
-   //if (stroke <= 2)
+#if	GFX_BPP <=2
+   if (s < 1)
+#else
+   if (s <= 2)
+#endif
    {                            // Simple solid pixel plot
       x1 /= 2;
       y1 /= 2;
@@ -1946,14 +1968,69 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t str
       const uint8_t aa = 1;
 #else
       const uint8_t aa = 4;
+      x1 *= aa;
+      y1 *= aa;
+      x2 *= aa;
+      y2 *= aa;
+      s *= aa;
 #endif
       uint8_t runs[aa];
+      memset (runs, 0, aa);
       gfx_pos_t *run[aa];
       for (int i = 0; i < aa; i++)
          run[i] = alloca (sizeof (gfx_pos_t) * 2 * max_runs);
-      uint8_t sub;
       gfx_pos_t yy;
-
+      if (y2 < y1)
+      {                         // y1 at top.
+         gfx_pos_t t;
+         t = x1;
+         x1 = x2;
+         x2 = t;
+         t = y1;
+         y1 = y2;
+         y2 = t;
+      }
+      int32_t w = x2 - x1,
+         h = y2 - y1;
+      if (w < 0)
+         w = -w;                // width
+      uint16_t l = isqrt (w * w + h * h);
+      if (l > 0)
+      {
+         gfx_pos_t dy = s * w / l;
+         uint8_t sub = 0;
+         for (yy = -s; yy <= h + s; yy += 2)
+         {
+            if (!sub)
+               memset (runs, 0, aa);
+            gfx_pos_t l = 0,
+               r = 0;
+            if (yy <= dy)
+               l = -icircle (yy, s);
+            else if (yy < h + dy)
+               l = w * (yy - dy) / h;
+            else
+               l = w - icircle (yy - h, s);
+            if (yy <= -dy)
+               r = icircle (yy, s);
+            else if (yy < h - dy)
+               r = w * (yy + dy) / h;
+            else
+               r = w + icircle (yy - h, s);
+            if (x1 > x2)
+               runs[sub] = add_run (run[sub], runs[sub], max_runs, -r / 2, -l / 2);
+            else
+               runs[sub] = add_run (run[sub], runs[sub], max_runs, l / 2, r / 2);
+            sub++;
+            if (sub == aa)
+            {
+               sub = 0;
+               plot_runs (gfx_pixel, x1 / aa / 2, (y1 + yy) / aa / 2, aa, runs, run);
+            }
+         }
+         if (sub)
+            plot_runs (gfx_pixel, x1 / aa / 2, (y1 + yy) / aa / 2, aa, runs, run);
+      }
    }
 }
 
@@ -2022,7 +2099,7 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
             if (sub == aa)
             {
                sub = 0;
-               plot_runs (gfx_pixel_bg, x / 2, y / 2 - (yy + 1) / aa / 2, aa, runs, run);
+               plot_runs (gfx_pixel_bg, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
             }
          }
          if (sub)
@@ -2042,7 +2119,7 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
             if (sub == aa)
             {
                sub = 0;
-               plot_runs (gfx_pixel, x / 2, y / 2 - (yy + 1) / aa / 2, aa, runs, run);
+               plot_runs (gfx_pixel, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
             }
          }
       if (sub)

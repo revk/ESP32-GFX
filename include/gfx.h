@@ -6,6 +6,7 @@ extern const uint8_t sin256[256];       // sin constants
 extern int32_t isin (int32_t a, int32_t r);     // sin of a (degrees) scaled to r
 extern int32_t icos (int32_t a, int32_t r);     // cos of a (degrees) scaled to r
 extern int32_t icircle (int32_t y, int32_t r);  // x for circuit at y within r
+extern uint16_t isqrt(uint32_t s); 	// simple integer square root
 
 typedef uint8_t gfx_alpha_t;    // The alpha of a pixel 0-255
 typedef int16_t gfx_pos_t;      // X/Y location of a pixel - off screen allowed (and ignored)
