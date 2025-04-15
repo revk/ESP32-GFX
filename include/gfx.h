@@ -18,6 +18,16 @@ typedef	uint32_t gfx_colour_t; // Colour RGB as low three bytes
 #define	GFX_R	0x20	// right align
 #define	GFX_H	0x80	// horizontal move
 
+// gfx_text flags
+#define	GFX_TEXT_DESCENDERS	(1<<0)	// Allow descenders
+#define	GFX_TEXT_BLOCKY		(1<<1)	// Blocky text
+#define	GFX_TEXT_LIGHT		(1<<2)	// Thin (vector) test
+#define	GFX_TEXT_FIXED		(1<<3)	// Don't do narrow special characters (full stop, colon, etc)
+#define	GFX_TEXT_ITALIC		(1<<4)	// Italic
+#define	GFX_7SEG_SMALL_DOT	(1<<0)	// Small (half size) after dot
+#define	GFX_7SEG_SMALL_COLON	(1<<1)	// Small (half size) after colon
+#define	GFX_7SEG_ITALIC		(1<<2)	// Italic
+
 // Set up SPI, and start the update task (note GPIO 0 not used)
 typedef struct {
  uint8_t port;	// The SPI port to use, if -ve then se default
@@ -50,6 +60,58 @@ typedef struct {
 } gfx_init_t;
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts(gfx_init_t);
+
+#ifdef  CONFIG_GFX_BUILD_SUFFIX_GFXNONE
+
+// Dummy
+#define	gfx_lock()
+#define	gfx_unlock()
+#define	gfx_refresh()
+#define	gfx_force()
+#define	gfx_wait()
+#define	gfx_load(x)
+#define	gfx_ok()
+#define	gfx_border(x)
+#define	gfx_set_contrast(x)
+#define	gfx_pos(x,y,t)
+#define	gfx_foreground(x)
+#define	gfx_background(x)
+#define gfx_width()	(0)
+#define gfx_height()	(0)
+#define gfx_bpp(	 (0)
+#define gfx_pos_t gfx_x()
+#define gfx_pos_t gfx_y()
+#define gfx_align_t gfx_a()
+#define gfx_colour_t gfx_rgb(x)
+#define gfx_colour_t gfx_f()
+#define gfx_colour_t gfx_b()
+#define gfx_raw_w()	(0)
+#define gfx_raw_h()	(0)
+#define *gfx_raw_b()	(NULL)
+#define gfx_flip()	(0)
+#define gfx_pixel_argb(x,y,c)
+#define gfx_pixel_rgb(x,y,c)
+#define gfx_pixel(x,y,i)
+#define gfx_pixel_bg (x,y,a)
+#define gfx_pixel_fb (x,y,a)
+#define gfx_clear(a)
+#define gfx_draw (w,h,wm,hm,xp,yp)
+#define gfx_box(w,h,a)
+#define gfx_fill(w,h,a)
+#define gfx_line2(x1,y1,x2,y2 s,a)
+#define gfx_circle2 (x,y,r,s,a)
+#define gfx_clear(a)
+#define gfx_draw (w,h,wm,hm,xp,yp)
+#define gfx_box(w,h,a)
+#define gfx_fill(w,h,a)
+#define gfx_line2(x1,y1,x2,y2,s,a)
+#define gfx_circle2 (x,y,r,s,a)
+#define gfx_text(flags,size,fmt,...)
+#define gfx_text_size(flags,size,t,w,h)
+#define gfx_7seg(flags,size,fmt,...)
+#define gfx_7seg_size(flags,size,t,*w,*h)
+
+#else
 
 // locking, etc
 void gfx_lock(void);	// sets drawing state to 0, 0, left, top, horizontal, white on black
@@ -110,17 +172,8 @@ void gfx_fill(gfx_pos_t w,gfx_pos_t h,gfx_alpha_t); // draw a filled rectangle
 void gfx_line2(gfx_pos_t x1,gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s,gfx_alpha_t); // Draw a line (all in half pixel units)
 void gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s, gfx_alpha_t a); // Draw a circle (all in half pixel units)
 
-// gfx_text flags
-#define	GFX_TEXT_DESCENDERS	(1<<0)	// Allow descenders
-#define	GFX_TEXT_BLOCKY		(1<<1)	// Blocky text
-#define	GFX_TEXT_LIGHT		(1<<2)	// Thin (vector) test
-#define	GFX_TEXT_FIXED		(1<<3)	// Don't do narrow special characters (full stop, colon, etc)
-#define	GFX_TEXT_ITALIC		(1<<4)	// Italic
 void gfx_text(uint8_t flags,uint8_t size, const char *fmt,...); // text, use -ve size for descenders versions
 void gfx_text_size(uint8_t flags,uint8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
-#define	GFX_7SEG_SMALL_DOT	(1<<0)	// Small (half size) after dot
-#define	GFX_7SEG_SMALL_COLON	(1<<1)	// Small (half size) after colon
-#define	GFX_7SEG_ITALIC		(1<<2)	// Italic
 void gfx_7seg (uint8_t flags,int8_t size, const char *fmt, ...); // digits (allows : or , or space after a digit)
 void gfx_7seg_size(uint8_t flags,int8_t size,const char *,gfx_pos_t *w,gfx_pos_t *h);
 
@@ -132,3 +185,4 @@ const uint8_t * gfx_pack (const uint8_t * data, uint8_t * lx, uint8_t * hx, uint
 
 // General tools
 void gfx_message(const char *);	// General full screen message display (lines separated with / and using [colour/size])
+#endif
