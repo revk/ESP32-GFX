@@ -262,7 +262,7 @@ gfx_driver_init (void)
    gfx_command0 (EPD75_POF);    // Needed as we did PON
    gfx_busy_wait ();
    uint64_t b = esp_timer_get_time ();
-   ESP_LOGD (TAG, "Init time %lldms", (b - a + 500) / 1000);
+   DEBUG (TAG, "Init time %lldms", (b - a + 500) / 1000);
    return NULL;
 }
 
@@ -380,6 +380,6 @@ gfx_driver_send (void)
          return "DTM1 failed";
    }
    uint64_t b = esp_timer_get_time ();
-   ESP_LOGD (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");
+   DEBUG (TAG, "Draw time %lldms%s", (b - a + 500) / 1000, gfx_settings.asleep ? " (sleep)" : "");
    return NULL;
 }

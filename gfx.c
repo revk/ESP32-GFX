@@ -185,6 +185,7 @@ static gfx_colour_t f = 0,      // colour
 static void
 gfx_busy_wait (void)
 {                               // manual wait if BUSY not set
+   DEBUG (TAG, "Busy");
    if (!gfx_settings.busy)
       sleep (5);
    else
@@ -199,6 +200,7 @@ gfx_busy_wait (void)
       if (!try)
          ESP_LOGE (TAG, "Busy too long");
    }
+   DEBUG (TAG, "Busy done");
 }
 
 static esp_err_t
@@ -922,7 +924,7 @@ plot_runs (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs
 static uint8_t
 add_run (gfx_pos_t * run, uint8_t runs, uint8_t max, gfx_pos_t l, gfx_pos_t r)
 {                               // Update run with new run l to r, return new run len
-   if (runs == max)
+   if (runs == max || l >= r)
       return runs;
    uint8_t n = 0;
    while (n < runs && run[n * 2] < l)
@@ -1017,7 +1019,7 @@ icircle (int16_t y, int16_t r)
       y = -y;
    if (!y)
       return r;
-   if (y >= r)
+   if (y > r)
       return 0;
    return r * circle256[255 * y / r] / 255;
 }
@@ -1882,11 +1884,12 @@ gfx_border (uint8_t border)
 }
 
 void
-gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke, gfx_alpha_t a)
+gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t stroke)
 {                               // Draw a line (half pixel units)
+   const uint8_t max_runs = 2;
    if (!gfx)
       return;
-   if (stroke <= 2)
+   //if (stroke <= 2)
    {                            // Simple solid pixel plot
       x1 /= 2;
       y1 /= 2;
@@ -1909,7 +1912,7 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t str
             gfx_pos_t d = adx / 2;
             while (x1 != x2)
             {
-               gfx_pixel (x1, y1, a);
+               gfx_pixel (x1, y1, 255);
                d += ady;
                if (d >= adx)
                {
@@ -1923,7 +1926,7 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t str
             gfx_pos_t d = ady / 2;
             while (y1 != y2)
             {
-               gfx_pixel (x1, y1, a);
+               gfx_pixel (x1, y1, 255);
                d += adx;
                if (d >= ady)
                {
@@ -1934,27 +1937,113 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t str
             }
          }
       }
-      gfx_pixel (x1, y1, a);
+      gfx_pixel (x1, y1, 255);
       return;
    }
-   // Stroke width based
-   // TODO
+   {                            // Stroke width based
+#if	GFX_BPP <=2
+      const uint8_t aa = 1;
+#else
+      const uint8_t aa = 4;
+#endif
+      uint8_t runs[aa];
+      gfx_pos_t *run[aa];
+      for (int i = 0; i < aa; i++)
+         run[i] = alloca (sizeof (gfx_pos_t) * 2 * max_runs);
+      uint8_t sub;
+      gfx_pos_t yy;
 
+   }
 }
 
 void
-gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t stroke, gfx_alpha_t a)
+gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
 {                               // Draw a circle (half pixel units)
-   if (stroke <= 1)
+   const uint8_t max_runs = 2;
+   if (s <= 1)
    {                            // Simple solid pixel
       x /= 2;
       y /= 2;
       r /= 2;
-      // TODO
+      uint8_t runs = 0;
+      gfx_pos_t *run[1];
+      run[0] = alloca (sizeof (gfx_pos_t) * 2 * max_runs);
+      gfx_pos_t w;
+      if (f != b)
+      {
+         for (gfx_pos_t yy = 0; yy <= r; yy++)
+         {
+            w = icircle (yy, r);
+            runs = 0;
+            runs = add_run (*run, runs, max_runs, -w, w);
+            plot_runs (gfx_pixel_bg, x, y - yy, 1, &runs, run);
+            plot_runs (gfx_pixel_bg, x, y + yy, 1, &runs, run);
+         }
+
+      }
+      w = r;
+      for (gfx_pos_t yy = 0; yy <= r; yy++)
+      {
+         gfx_pos_t w2 = icircle (yy, r);
+         runs = 0;
+         runs = add_run (*run, runs, max_runs, -w, -w2 + 1);
+         runs = add_run (*run, runs, max_runs, w2 - 1, w);
+         plot_runs (gfx_pixel, x, y + yy, 1, &runs, run);
+         plot_runs (gfx_pixel, x, y - yy, 1, &runs, run);
+         w = w2;
+      }
       return;
    }
-// Stroke width based
-// TODO
+   {                            // Stroke width based
+#if	GFX_BPP <=2
+      const uint8_t aa = 1;
+#else
+      const uint8_t aa = 4;
+#endif
+      uint8_t runs[aa];
+      gfx_pos_t *run[aa];
+      for (int i = 0; i < aa; i++)
+         run[i] = alloca (sizeof (gfx_pos_t) * 2 * max_runs);
+      uint8_t sub;
+      gfx_pos_t yy;
+      if (f != b)
+      {
+         sub = 0;
+         for (yy = -r - s; yy <= r + s; yy += 2)
+         {
+            if (!sub)
+               memset (runs, 0, aa);
+            gfx_pos_t w = icircle (yy, r + s) / 2;
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, -w, w);
+            sub++;
+            if (sub == aa)
+            {
+               sub = 0;
+               plot_runs (gfx_pixel_bg, x / 2, y / 2 - (yy + 1) / aa / 2, aa, runs, run);
+            }
+         }
+         if (sub)
+            plot_runs (gfx_pixel_bg, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
+      }
+      sub = 0;
+      for (yy = -r - s; yy <= r + s; yy += 2)
+      {
+         if (!sub)
+            memset (runs, 0, aa);
+         gfx_pos_t wo = icircle (yy, r + s);
+         gfx_pos_t wi = icircle (yy, r - s);
+         runs[sub] = add_run (run[sub], runs[sub], max_runs, -wo / 2, (-wi - 1) / 2);
+         runs[sub] = add_run (run[sub], runs[sub], max_runs, (wi + 1) / 2, wo / 2);
+         sub++;
+         if (sub == aa)
+         {
+            sub = 0;
+            plot_runs (gfx_pixel, x / 2, y / 2 - (yy + 1) / aa / 2, aa, runs, run);
+         }
+      }
+      if (sub)
+         plot_runs (gfx_pixel, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
+   }
 }
 
 uint16_t
