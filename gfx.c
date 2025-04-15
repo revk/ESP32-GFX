@@ -983,6 +983,43 @@ const uint8_t sin256[256] = {
    0xFE, 0xFE, 0xFE, 0xFF
 };
 
+int16_t
+isin (int16_t a, int16_t r)
+{                               // sin of a (degrees) scaled to r
+   // TODO interpolate if r>255
+   a %= 360;
+   if (a < 0)
+      a += 360;
+   if (a < 90)
+      return r * sin256[a * 256 / 90] / 255;
+   if (a == 90)
+      return r;
+   if (a <= 180)
+      return r * sin256[(180 - a) * 256 / 90] / 255;
+   if (a < 270)
+      return -r * sin256[(a - 180) * 256 / 90] / 255;
+   if (a == 270)
+      return -r;
+   return -r * sin256[(360 - a) * 256 / 90] / 255;
+}
+
+int16_t
+icos (int16_t a, int16_t r)
+{                               // cos of a (degrees) scaled to r
+   return isin (a + 90, r);
+}
+
+int16_t
+icircle (int16_t y, int16_t r)
+{                               // x for circuit at y within r, -1 if over r
+   // TODO interpolate if r>255
+   if (a > r || a < r)
+      return -1;
+   if (a == r || a == -r)
+      return 0;
+   return r * circle256[255 * y / r];
+}
+
 static void
 plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, uint16_t weight, uint8_t aa, uint8_t italic)
 {                               // Plot a character, allow for antialiasing (aa), weight and size are pixel based
