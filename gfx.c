@@ -534,8 +534,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1029,15 +1030,16 @@ isqrt (uint32_t q)
    if (q <= 1)
       return q;
    uint32_t r = 0;
-   uint8_t b = 16;
+   uint16_t s = 0x8000;
    if (q < 255 * 255)
-      b = 8;
-   while (b--)
+      s = 0x0080;
+   do
    {
-      uint32_t t = r | (1 << b);
+      uint32_t t = r | s;
       if (t * t <= q)
          r = t;
    }
+   while ((>>=1))
    return r;
 }
 
