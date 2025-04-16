@@ -534,9 +534,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -953,7 +952,7 @@ add_run (gfx_pos_t * run, uint8_t runs, uint8_t max, gfx_pos_t l, gfx_pos_t r)
    return runs;
 }
 
-const uint8_t circle256[256] = {
+const uint8_t circle256[257] = {
    0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
    0xFF, 0xFF, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFE, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFD, 0xFC, 0xFC, 0xFC,
    0xFC, 0xFC, 0xFC, 0xFB, 0xFB, 0xFB, 0xFB, 0xFB, 0xFA, 0xFA, 0xFA, 0xFA, 0xFA, 0xF9, 0xF9, 0xF9, 0xF9, 0xF8, 0xF8, 0xF8, 0xF8,
@@ -1018,9 +1017,9 @@ icircle (int32_t y, int32_t r)
       y = -y;
    if (!y)
       return r;
-   if (y > r)
+   if (y >= r)
       return 0;
-   uint16_t n = 65280 * y / r;
+   uint16_t n = 65536 * y / r;
    uint32_t v = circle256[n >> 8] * (255 - (n & 255)) + circle256[(n >> 8) + 1] * (n & 255);
    return r * v / 255 / 255;
 }
