@@ -1021,7 +1021,7 @@ icircle (int32_t y, int32_t r)
       return 0;
    uint16_t n = 65536 * y / r;
    if (n < 180 * 256)
-      return r * circle256[n >> 8] / 255;       // no point interpolating as 1 or less steps
+      return r * circle256[n >> 8] / 255;       // no point interpolating as 1 or fewer steps
    return r * (circle256[n >> 8] * (255 - (n & 255)) + circle256[(n >> 8) + 1] * (n & 255)) / 255 / 255;
 }
 
