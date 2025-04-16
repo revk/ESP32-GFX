@@ -534,8 +534,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -900,20 +901,18 @@ plot_runs (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs
       for (uint8_t a = 0; a < aa; a++)
          if (pos[a] & 1)
             c++;
-      if (!c)
-         l = r;
-      else
-         while (l < r)
+      while (l < r && (c || sum))
+      {
+         sum += c;
+         l++;
+         if (!(l % aa))
          {
-            sum += c;
-            l++;
-            if (!(l % aa))
-            {
-               if (sum)
-                  p (x + l / aa - 1, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa);
-               sum = 0;
-            }
+            if (sum)
+               p (x + l / aa - 1, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa);
+            sum = 0;
          }
+      }
+      l = r;
       for (uint8_t a = 0; a < aa; a++)
          if (pos[a] < runs[a] * 2 && run[a][pos[a]] <= l)
             pos[a]++;
@@ -1026,18 +1025,21 @@ icircle (int32_t y, int32_t r)
 }
 
 uint16_t
-isqrt (uint32_t s)
+isqrt (uint32_t q)
 {                               // Simple
-   uint32_t res = 0;
-   uint32_t add = 0x8000;
-   for (uint8_t i = 0; i < 16; i++)
+   if (q <= 1)
+      return q;
+   uint32_t r = 0;
+   uint8_t b = 16;
+   if (q < 255 * 255)
+      b = 8;
+   while (b--)
    {
-      uint32_t next = res | add;
-      if (s >= next * next)
-         res = next;
-      add >>= 1;
+      uint32_t t = r | (1 << b);
+      if (t * t <= q)
+         r = t;
    }
-   return res;
+   return r;
 }
 
 static void
