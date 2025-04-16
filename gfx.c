@@ -1025,7 +1025,7 @@ icircle (int32_t y, int32_t r)
 
 uint16_t
 isqrt (uint32_t q)
-{                               // Simple
+{                               // Simple integer square root
    if (q <= 1)
       return q;
    uint32_t r = 0;
