@@ -71,6 +71,8 @@ These plot text or fixed digits. They have a number of flags and a based size. I
 
 You can check size of text with `gfx_text_size` and `gfx_7seg_size`.
 
+Note for text, a `size` of 0 plots a non anti-aliased size 1.
+
 #### `gfx_line`
 
 A number of extra functions exist - these are being updated and new functions added.

@@ -1044,10 +1044,8 @@ isqrt (uint32_t q)
 static void
 plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, uint16_t weight, uint8_t aa, uint8_t italic)
 {                               // Plot a character, allow for antialiasing (aa), weight and size are pixel based
-   if (u < 32)
+   if (u < 32 || !aa)
       return;
-   if (!aa || weight == 1)
-      aa = 1;
    size *= aa;
    weight *= aa;
    uint8_t *start,
@@ -1388,7 +1386,7 @@ gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * w
    if (hp)
       *hp = 0;
    if (!size)
-      return;
+      size = 1;
    gfx_pos_t x = 0,
       y = 0,
       w = 0,
@@ -1427,8 +1425,17 @@ gfx_text_draw_size (uint8_t flags, uint8_t size, const char *text, gfx_pos_t * w
 static void
 gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
 {
-   if (!gfx || !size)
+   if (!gfx)
       return;
+#if	GFX_BPP <= 2
+   uint8_t aa = 1;
+#else
+   uint8_t aa = 4;
+   if (!size)
+      aa = 1;
+#endif
+   if (!size)
+      size = 1;
    uint8_t z = 7;
    if (flags & GFX_TEXT_DESCENDERS)
       z = 9;
@@ -1462,14 +1469,10 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
             c = ' ';
          if (!cwidth (flags, size, *p))
             charw -= size;      // Crop right edge border - messy for UTF8 but should be OK
-         if (ox + x + gfx_width () >= 0 && ox + x < gfx_width () && oy + y + size * 9 >= 0 && oy + y < gfx_height ())
+         if (c > 32 && ox + x + gfx_width () >= 0 && ox + x < gfx_width () && oy + y + size * 9 >= 0 && oy + y < gfx_height ())
          {                      // On screen
             int dx = size * ((cwidth (flags, 1, c) == 2) ? 2 : 0);      // Narrow are offset
-#if	GFX_BPP <= 2
-            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, 1, flags & GFX_TEXT_ITALIC);
-#else
-            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, 4, flags & GFX_TEXT_ITALIC);
-#endif
+            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, aa, flags & GFX_TEXT_ITALIC);
          }
          x += charw;
       }
@@ -2026,11 +2029,11 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s)
             if (sub == aa)
             {
                sub = 0;
-               plot_runs (gfx_pixel, x1 / aa / 2, (y1 + yy) / aa / 2, aa, runs, run);
+               plot_runs (gfx_pixel, x1 / aa / 2, (y1 / aa + yy / aa) / 2, aa, runs, run);
             }
          }
          if (sub)
-            plot_runs (gfx_pixel, x1 / aa / 2, (y1 + yy) / aa / 2, aa, runs, run);
+            plot_runs (gfx_pixel, x1 / aa / 2, (y1 / aa + yy / aa) / 2, aa, runs, run);
       }
    }
 }
@@ -2039,7 +2042,11 @@ void
 gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
 {                               // Draw a circle (half pixel units)
    const uint8_t max_runs = 2;
-   if (s == 1)
+#if     GFX_BPP <= 2
+   if (s <= 1)
+#else
+   if (!s)
+#endif
    {                            // Simple solid pixel
       x /= 2;
       y /= 2;
