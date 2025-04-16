@@ -1039,7 +1039,7 @@ isqrt (uint32_t q)
       if (t * t <= q)
          r = t;
    }
-   while ((s>>=1))
+   while ((s>>=1));
    return r;
 }
 
