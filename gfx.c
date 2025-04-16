@@ -534,9 +534,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -2123,17 +2122,17 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
                memset (runs, 0, aa);
             gfx_pos_t wo = icircle (yy, r + s);
             gfx_pos_t wi = icircle (yy, r - s);
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, -wo / 2, -wi / 2);
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, wi / 2, wo / 2);
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, (x - wo) / 2, (x - wi) / 2);
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, (x + wi) / 2, (x + wo) / 2);
             sub++;
             if (sub == aa)
             {
                sub = 0;
-               plot_runs (gfx_pixel, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
+               plot_runs (gfx_pixel, 0, (y + yy / aa) / 2, aa, runs, run);
             }
          }
       if (sub)
-         plot_runs (gfx_pixel, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
+         plot_runs (gfx_pixel, 0, (y + yy / aa) / 2, aa, runs, run);
    }
 }
 
