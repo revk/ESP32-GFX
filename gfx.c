@@ -534,8 +534,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1013,14 +1014,15 @@ icos (int32_t a, int32_t r)
 inline int32_t
 icircle (int32_t y, int32_t r)
 {                               // x for circuit at y within r
-   // TODO interpolate if r>255
    if (y < 0)
       y = -y;
    if (!y)
       return r;
    if (y > r)
       return 0;
-   return r * circle256[255 * y / r] / 255;
+   uint16_t n = 65535 * y / r;
+   uint32_t v = circle256[n >> 8] * (255 - (n & 255)) + circle256[(n >> 8) + 1] * (n & 255);
+   return r * n / 255 / 255;
 }
 
 uint16_t
