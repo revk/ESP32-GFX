@@ -1022,7 +1022,7 @@ icircle (int32_t y, int32_t r)
       return 0;
    uint16_t n = 65535 * y / r;
    uint32_t v = circle256[n >> 8] * (255 - (n & 255)) + circle256[(n >> 8) + 1] * (n & 255);
-   return r * n / 255 / 255;
+   return r * v / 255 / 255;
 }
 
 uint16_t
