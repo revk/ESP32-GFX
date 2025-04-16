@@ -1809,6 +1809,8 @@ gfx_rgb (char c)
       b = u;
    if (c == 'O')
       r = u, g = u / 2;         // Orange
+   if (c == 'S')
+      b = u, g = u / 2;         // Sky blue
    return (r << 16) | (g << 8) | b;
 }
 
