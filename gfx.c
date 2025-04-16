@@ -534,9 +534,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -2065,9 +2064,9 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
          {
             w = icircle (yy, r);
             runs = 0;
-            runs = add_run (*run, runs, max_runs, -w, w);
-            plot_runs (gfx_pixel_bg, x, y - yy, 1, &runs, run);
-            plot_runs (gfx_pixel_bg, x, y + yy, 1, &runs, run);
+            runs = add_run (*run, runs, max_runs, x - w, x + w);
+            plot_runs (gfx_pixel_bg, 0, y - yy, 1, &runs, run);
+            plot_runs (gfx_pixel_bg, 0, y + yy, 1, &runs, run);
          }
 
       }
@@ -2076,10 +2075,10 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
       {
          gfx_pos_t w2 = icircle (yy, r);
          runs = 0;
-         runs = add_run (*run, runs, max_runs, -w, -w2 + 1);
-         runs = add_run (*run, runs, max_runs, w2 - 1, w);
-         plot_runs (gfx_pixel, x, y + yy, 1, &runs, run);
-         plot_runs (gfx_pixel, x, y - yy, 1, &runs, run);
+         runs = add_run (*run, runs, max_runs, x - w, x - w2);
+         runs = add_run (*run, runs, max_runs, x + w2, x + w);
+         plot_runs (gfx_pixel, 0, y + yy, 1, &runs, run);
+         plot_runs (gfx_pixel, 0, y - yy, 1, &runs, run);
          w = w2;
       }
       return;
@@ -2091,6 +2090,7 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
       const uint8_t aa = 4;
       r *= aa;
       s *= aa;
+      x *= aa;
 #endif
       uint8_t runs[aa];
       gfx_pos_t *run[aa];
@@ -2105,17 +2105,16 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
          {
             if (!sub)
                memset (runs, 0, aa);
-            gfx_pos_t w = icircle (yy, r + s) / 2;
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, -w, w);
+            gfx_pos_t w = icircle (yy, r + s) runs[sub] = add_run (run[sub], runs[sub], max_runs, (x - w) / 2, (x + w) / 2);
             sub++;
             if (sub == aa)
             {
                sub = 0;
-               plot_runs (gfx_pixel_bg, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
+               plot_runs (gfx_pixel_bg, 0, (y + yy / aa) / 2, aa, runs, run);
             }
          }
          if (sub)
-            plot_runs (gfx_pixel_bg, x / 2, y / 2 - yy / aa / 2, aa, runs, run);
+            plot_runs (gfx_pixel_bg, 0, (y + yy / aa) / 2, aa, runs, run);
       }
       sub = 0;
       if (s)
