@@ -534,8 +534,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -2025,9 +2026,9 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s)
             else
                r = w + icircle (yy - h, s);
             if (x1 > x2)
-               runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 / aa - r) / 2, (x1 / aa - l) / 2);
+               runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 - r) / 2, (x1 - l) / 2);
             else
-               runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 / aa + l) / 2, (x1 / aa + r) / 2);
+               runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 + l) / 2, (x1 + r) / 2);
             sub++;
             if (sub == aa)
             {
@@ -2106,7 +2107,7 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
             if (!sub)
                memset (runs, 0, aa);
             gfx_pos_t w = icircle (yy, r + s);
-	    runs[sub] = add_run (run[sub], runs[sub], max_runs, (x - w) / 2, (x + w) / 2);
+            runs[sub] = add_run (run[sub], runs[sub], max_runs, (x - w) / 2, (x + w) / 2);
             sub++;
             if (sub == aa)
             {
