@@ -2105,7 +2105,8 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
          {
             if (!sub)
                memset (runs, 0, aa);
-            gfx_pos_t w = icircle (yy, r + s) runs[sub] = add_run (run[sub], runs[sub], max_runs, (x - w) / 2, (x + w) / 2);
+            gfx_pos_t w = icircle (yy, r + s);
+	    runs[sub] = add_run (run[sub], runs[sub], max_runs, (x - w) / 2, (x + w) / 2);
             sub++;
             if (sub == aa)
             {
