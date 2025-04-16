@@ -173,7 +173,7 @@ void gfx_draw (gfx_pos_t w, gfx_pos_t h, gfx_pos_t wm, gfx_pos_t hm, gfx_pos_t *
 void gfx_box (gfx_pos_t w, gfx_pos_t h, gfx_alpha_t);   // draw a box, not filled
 void gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_alpha_t);  // draw a filled rectangle
 
-#define	gfx_line(x1,y1,x2,y2) gfx_line2((x1)*2,(y1)*2,(x2)*2,(y2)*2,2)
+#define	gfx_line(x1,y1,x2,y2) gfx_line2((x1)*2,(y1)*2,(x2)*2,(y2)*2,0)
 void gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s );      // Draw a line (all in half pixel units)
 void gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s );   // Draw a circle (all in half pixel units)
 
