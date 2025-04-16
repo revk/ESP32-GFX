@@ -1030,7 +1030,7 @@ isqrt (uint32_t q)
       return q;
    uint16_t r = 0;
    uint16_t s = 0x8000;
-   if (q < 255 * 255)
+   if (q <= 255 * 255)
       s = 0x0080;
    while (s)
    {
