@@ -1028,7 +1028,7 @@ isqrt (uint32_t q)
 {                               // Simple integer square root
    if (q <= 1)
       return q;
-   uint32_t r = 0;
+   uint16_t r = 0;
    uint16_t s = 0x8000;
    if (q < 255 * 255)
       s = 0x0080;
