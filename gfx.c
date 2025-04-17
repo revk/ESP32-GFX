@@ -534,8 +534,9 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+      K = ((K * a) + (was * (255 - a)) / 255;
+           }
+           gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1198,18 +1199,16 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
             w += size;
          if (((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
              && isdigit ((int) (uint8_t) p[2]))
-         {
-            size = (size / 2) - 1;
-            if (size < 1)
-               size = 1;
-         }
+            size = (size / 2) ? : 1;
       }
-   if (flags & GFX_7SEG_ITALIC)
-      w += size;
-   if (wp)
-      *wp = w;
-   if (hp)
-      *hp = 9 * size;
+}
+
+if (flags & GFX_7SEG_ITALIC)
+   w += size;
+if (wp)
+   *wp = w;
+if (hp)
+   *hp = 9 * size;
 }
 
 void
@@ -1287,8 +1286,8 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             } else
             {
                x -= size * 6;   // over digit
-               y -= wsize * 9;  // superscript
                y += size * 9;
+               y -= wsize * 9;  // superscript
             }
             if (flags & GFX_7SEG_ITALIC)
                x += size;
@@ -1366,9 +1365,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
              && isdigit ((int) (uint8_t) p[2]))
          {
             y += size * 9;
-            size = (size / 2) - 1;
-            if (size < 1)
-               size = 1;
+            size = (size / 2) ? : 1;
             y -= size * 9;
             fontw = 7 * size;   // pixel width of characters in font file
          }
