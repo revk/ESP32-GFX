@@ -73,6 +73,8 @@ You can check size of text with `gfx_text_size` and `gfx_7seg_size`.
 
 Note for text, a `size` of 0 plots a non anti-aliased size 1.
 
+If using the `GFX_7SEG_SMALL_DOT` flag, a trailing `C` or `F` character is superscript (for temperatures).
+
 #### `gfx_line`
 
 A number of extra functions exist - these are being updated and new functions added.

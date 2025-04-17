@@ -1175,15 +1175,34 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
       *hp = 0;
    if (size < 1)
       size = 1;
+   uint8_t wsize = size;
    gfx_pos_t w = 0;
    for (const char *p = t; *p; p++)
       if (strchr (sevensegchar, *p))
       {
+         if ((flags & GFX_7SEG_SMALL_DOT) && (*p == 'C' || *p == 'F') && !p[1])
+         {
+            if (size == wsize)
+            {
+               size = (size / 2) - 1;
+               if (size < 1)
+                  size = 1;
+               w += 6 * size;
+            }
+            if (flags & GFX_7SEG_ITALIC)
+               w += size;
+            break;
+         }
          w += 6 * size;
          if (p[1] == ':' || p[1] == '.')
             w += size;
-         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
-            size = ((size / 2) ? : 1);
+         if (((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
+             && isdigit ((int) (uint8_t) p[2]))
+         {
+            size = (size / 2) - 1;
+            if (size < 1)
+               size = 1;
+         }
       }
    if (flags & GFX_7SEG_ITALIC)
       w += size;
@@ -1200,6 +1219,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
       return;
    if (size < 1)
       size = 1;
+   uint8_t wsize = size;
    va_list ap;
    char *temp;
    va_start (ap, fmt);
@@ -1256,6 +1276,23 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
          char *m = strchr (sevensegchar, *p);
          if (!m)
             continue;
+         if ((flags & GFX_7SEG_SMALL_DOT) && (*p == 'C' || *p == 'F') && !p[1])
+         {
+            if (size == wsize)
+            {
+               size = (size / 2) - 1;
+               if (size < 1)
+                  size = 1;
+               fontw = 7 * size;        // pixel width of characters in font file
+            } else
+            {
+               x -= size * 6;   // over digit
+               y -= wsize * 9;  // superscript
+               y += size * 9;
+            }
+            if (flags & GFX_7SEG_ITALIC)
+               x += size;
+         }
          uint8_t segs = 7;
          uint16_t map = 0;
          map = sevensegmap[m - sevensegchar];
@@ -1325,10 +1362,13 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             }
          }
          x += (segs > 7 ? fontw : 6 * size);
-         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
+         if (((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
+             && isdigit ((int) (uint8_t) p[2]))
          {
             y += size * 9;
-            size = ((size / 2) ? : 1);
+            size = (size / 2) - 1;
+            if (size < 1)
+               size = 1;
             y -= size * 9;
             fontw = 7 * size;   // pixel width of characters in font file
          }
