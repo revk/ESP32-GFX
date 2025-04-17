@@ -1020,8 +1020,6 @@ icircle (int32_t y, int32_t r)
    if (y >= r)
       return 0;
    uint16_t n = 65536 * y / r;
-   if (n < 180 * 256)
-      return r * circle256[n >> 8] / 255;       // no point interpolating as 1 or fewer steps
    return r * (circle256[n >> 8] * (255 - (n & 255)) + circle256[(n >> 8) + 1] * (n & 255)) / 255 / 255;
 }
 
@@ -1031,9 +1029,9 @@ isqrt (uint32_t q)
    if (q <= 1)
       return q;
    uint16_t r = 0;
-   uint16_t s = 0x8000;
-   if (q <= 255 * 255)
-      s = 0x0080;
+   uint16_t s = (q & 0xFFFF0000) ? 0x8000 : 0x0080;
+   if (!(q & 0xFF00FF00))
+      s >>= 4;
    while (s)
    {
       uint32_t t = r | s;
