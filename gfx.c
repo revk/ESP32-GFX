@@ -534,9 +534,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1273,17 +1272,15 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             continue;
          if ((flags & GFX_7SEG_SMALL_DOT) && (*p == 'C' || *p == 'F') && !p[1])
          {
+            y += size * 9;
             size = (wsize / 2) - 1;
             if (size < 1)
                size = 1;
             if (size == wsize)
                fontw = 7 * size;        // pixel width of characters in font file
             else
-            {
                x -= size * 6;   // over digit
-               y += size * 9;
-               y -= wsize * 9;  // superscript
-            }
+            y -= wsize * 9;     // superscript
             if (flags & GFX_7SEG_ITALIC)
                x += size;
          }
