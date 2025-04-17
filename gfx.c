@@ -534,9 +534,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1201,14 +1200,12 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
              && isdigit ((int) (uint8_t) p[2]))
             size = (size / 2) ? : 1;
       }
-}
-
-if (flags & GFX_7SEG_ITALIC)
-   w += size;
-if (wp)
-   *wp = w;
-if (hp)
-   *hp = 9 * size;
+   if (flags & GFX_7SEG_ITALIC)
+      w += size;
+   if (wp)
+      *wp = w;
+   if (hp)
+      *hp = 9 * size;
 }
 
 void
