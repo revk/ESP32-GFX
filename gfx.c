@@ -534,9 +534,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -1015,7 +1014,7 @@ icircle (int32_t y, int32_t r)
    uint8_t h = (n >> 8),
       l = (n & 0xFF);
    int32_t v = ((r * circle[h]) >> 15);
-   if (!l)
+   if (!l || r < 64)
       return v;
    v = v * (256 - l) + ((r * circle[h + 1]) >> 15) * l;
    return v >> 8;
