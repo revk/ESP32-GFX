@@ -1,11 +1,9 @@
 // Simple display and text logic
 // Copyright © 2019-22 Adrian Kennard Andrews & Arnold Ltd
 
-extern const uint8_t circle256[257];    // circle constants
-extern const uint8_t sin256[256];       // sin constants
 extern int32_t isin (int32_t a, int32_t r);     // sin of a (degrees) scaled to r
 extern int32_t icos (int32_t a, int32_t r);     // cos of a (degrees) scaled to r
-extern int32_t icircle (int32_t y, int32_t r);  // x for circuit at y within r
+extern int32_t icircle (int32_t y, int32_t r);  // x for circle radius r, at y from centre
 extern uint16_t isqrt(uint32_t s); 	// simple integer square root
 
 typedef uint8_t gfx_alpha_t;    // The alpha of a pixel 0-255
