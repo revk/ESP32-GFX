@@ -2039,13 +2039,13 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s)
             if (yy < dy)
                l = -icircle (yy, s);
             else if (yy <= h + dy)
-               l = (w * (yy - dy) + h / 2) / h - dx;
+               l = w * (yy - dy) / h - dx;
             else
                l = w - icircle (yy - h, s);
             if (yy < -dy)
                r = icircle (yy, s);
             else if (yy <= h - dy)
-               r = (w * (yy + dy) + h / 2) / h + dx;
+               r = w * (yy + dy) / h + dx;
             else
                r = w + icircle (yy - h, s);
             if (x1 > x2)
