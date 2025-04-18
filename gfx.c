@@ -1010,7 +1010,7 @@ icircle (int32_t y, int32_t r)
       return r;
    if (y >= r)
       return 0;
-   uint16_t n = 256 * 128 * y / r;
+   uint16_t n = (y<<15) / r;
    uint8_t h = (n >> 8),
       l = (n & 0xFF);
    int32_t v = ((r * circle[h]) >> 15);
