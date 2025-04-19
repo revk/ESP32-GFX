@@ -534,9 +534,8 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (a < 255)
    {
       uint8_t was = gfx[line * y + x];
-      K = ((K * a) + (was * (255 - a)) / 255;
-           }
-           gfx[line * y + x] = K;
+   K = ((K * a) + (was * (255 - a)) / 255;}
+        gfx[line * y + x] = K;
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
@@ -859,8 +858,6 @@ gfx_icon16 (gfx_pos_t w, gfx_pos_t h, const void *data)
    }
 }
 
-typedef void gfx_pixel_t (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
-
 // Run length plotting
 
 static void
@@ -875,8 +872,8 @@ plot_run (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t runs, gfx_pos_t * r
    }
 }
 
-static void
-plot_runs (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs, gfx_pos_t ** run)
+void
+gfx_run_plot (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs, gfx_pos_t ** run)
 {                               // Anti-alias plot of runs aa x aa (run length is pixels*aa)
    if (!aa)
       return;
@@ -921,8 +918,8 @@ plot_runs (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs
       p (x + l / aa, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa);
 }
 
-static uint8_t
-add_run (gfx_pos_t * run, uint8_t runs, uint8_t max, gfx_pos_t l, gfx_pos_t r)
+uint8_t
+gfx_run_add (gfx_pos_t * run, uint8_t runs, uint8_t max, gfx_pos_t l, gfx_pos_t r)
 {                               // Update run with new run l to r, return new run len
    if (runs == max || l >= r)
       return runs;
@@ -1040,8 +1037,13 @@ isqrt (uint32_t q)
    return r;
 }
 
+#define	PLOT_ITALIC	(1<<0)
+#define	PLOT_BLOCKY	(1<<1)
+#define	PLOT_DOTTY	(1<<2)
+#define	PLOT_CRT	(1<<3)
+
 static void
-plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, uint16_t weight, uint8_t aa, uint8_t italic)
+plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, uint16_t weight, uint8_t aa, uint8_t flags)
 {                               // Plot a character, allow for antialiasing (aa), weight and size are pixel based
    if (u < 32 || !aa)
       return;
@@ -1082,7 +1084,7 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
       uint8_t sub = Y / 2 % aa;
       runs[sub] = 0;
       gfx_pos_t i = 0;
-      if (italic)
+      if (flags & PLOT_ITALIC)
          i = size * (size * 9 * 2 - 1 - Y) / (size * 9 * 2);
       for (uint8_t * d = start; d < end; d++)
       {
@@ -1091,8 +1093,10 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
          gfx_pos_t y1 = ((b1 & 15) * size * 2 + offset);
          if (Y >= y1 - weight && Y <= y1 + weight)
          {                      // Possible dot
-            gfx_pos_t w = icircle (Y - y1, weight);
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, i + (x1 - w) / 2, i + (x1 + w + 1) / 2);
+            gfx_pos_t w = weight;
+            if (!(flags & PLOT_BLOCKY))
+               w = icircle (Y - y1, weight);
+            runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, i + (x1 - w) / 2, i + (x1 + w + 1) / 2);
          }
          if (d + 1 >= end)
             continue;
@@ -1113,52 +1117,97 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
          }
          if (Y >= y1 - weight && Y <= y2 + weight)
          {                      // Possible line
-            if (y1 == y2)
-            {                   // Horizontal, simple
-               if (x1 < x2)
-                  runs[sub] = add_run (run[sub], runs[sub], max_runs, i + x1 / 2, i + (x2 + 1) / 2);
-               else
-                  runs[sub] = add_run (run[sub], runs[sub], max_runs, i + x2 / 2, i + (x1 + 1) / 2);
-            } else if (x1 == x2)
-            {                   // Vertical, simple
-               if (Y >= y1 && Y <= y2)
-                  runs[sub] = add_run (run[sub], runs[sub], max_runs, i + (x1 - weight) / 2, i + (x1 + weight + 1) / 2);
-            } else
-            {                   // Diagonal (we cheat knowing 45 degress)
-               gfx_pos_t d = (int32_t) weight * 7071 / 10000;
-               if (Y >= y1 - d && Y <= y2 + d)
-               {
-                  gfx_pos_t l = 0,
-                     r = 0;
-                  if (x1 < x2)
-                  {             // right
-                     if (Y < y1 + d)
-                        l = x1 + (y1 - Y);
-                     else
-                        l = x1 - d * 2 + (Y - y1);
-                     if (Y < y2 - d)
-                        r = x2 + d * 2 - (y2 - Y);
-                     else
-                        r = x2 + (y2 - Y);
-
-                  } else
-                  {             // left
-                     if (Y < y2 - d)
-                        l = x2 - d * 2 + (y2 - Y);
-                     else
-                        l = x2 - (y2 - Y);
-                     if (Y > y1 + d)
-                        r = x1 + d * 2 + (y1 - Y);
-                     else
-                        r = x1 - (y1 - Y);
+            if (y1 == y2 && x2 < x1)
+            {
+               gfx_pos_t s = x2;
+               x2 = x1;
+               x1 = s;
+            }
+            if (flags & (PLOT_BLOCKY | PLOT_DOTTY))
+            {
+               gfx_pos_t w = weight;
+               gfx_pos_t dy = (Y + weight - y1) / size / 2 * size * 2;
+               if (y1 == y2)
+               {                // Horizontal, simple
+                  if (!(flags & PLOT_BLOCKY))
+                     w = icircle (Y - y1, weight);
+                  if (flags & PLOT_CRT)
+                     runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, i + (x1 - w) / 2, i + (x2 + w + 1) / 2);
+                  else
+                     while (x1 < x2)
+                     {
+                        runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, i + (x1 - w) / 2, i + (x1 + w + 1) / 2);
+                        x1 += size * 2;
+                     }
+               } else if (x1 == x2)
+               {                // Vertical, simple
+                  y1 += dy;
+                  if (Y >= y1 - weight && Y <= y1 + weight)
+                  {
+                     if (!(flags & PLOT_BLOCKY))
+                        w = icircle (Y - y1, weight);
+                     runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, i + (x1 - w) / 2, i + (x1 + w + 1) / 2);
                   }
-                  runs[sub] = add_run (run[sub], runs[sub], max_runs, i + l / 2, i + (r + 1) / 2);
+               } else
+               {                // Diagonal (we cheat knowing 45 degrees)
+                  if (x1 < x2)
+                     x1 += dy;
+                  else
+                     x1 -= dy;
+                  y1 += dy;
+                  if (Y >= y1 - weight && Y <= y1 + weight)
+                  {
+                     if (!(flags & PLOT_BLOCKY))
+                        w = icircle (Y - y1, weight);
+                     runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, i + (x1 - w) / 2, i + (x1 + w + 1) / 2);
+                  }
+               }
+            } else
+            {
+               if (y1 == y2)
+               {                // Horizontal, simple
+                  runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, i + x1 / 2, i + (x2 + 1) / 2);
+               } else if (x1 == x2)
+               {                // Vertical, simple
+                  if (Y >= y1 && Y <= y2)
+                     runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, i + (x1 - weight) / 2, i + (x1 + weight + 1) / 2);
+               } else
+               {                // Diagonal (we cheat knowing 45 degrees)
+                  gfx_pos_t d = (int32_t) weight * 7071 / 10000;
+                  if (Y >= y1 - d && Y <= y2 + d)
+                  {
+                     gfx_pos_t l = 0,
+                        r = 0;
+                     if (x1 < x2)
+                     {          // right
+                        if (Y < y1 + d)
+                           l = x1 + (y1 - Y);
+                        else
+                           l = x1 - d * 2 + (Y - y1);
+                        if (Y < y2 - d)
+                           r = x2 + d * 2 - (y2 - Y);
+                        else
+                           r = x2 + (y2 - Y);
+
+                     } else
+                     {          // left
+                        if (Y < y2 - d)
+                           l = x2 - d * 2 + (y2 - Y);
+                        else
+                           l = x2 - (y2 - Y);
+                        if (Y > y1 + d)
+                           r = x1 + d * 2 + (y1 - Y);
+                        else
+                           r = x1 - (y1 - Y);
+                     }
+                     runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, i + l / 2, i + (r + 1) / 2);
+                  }
                }
             }
          }
       }
       if (sub == aa - 1)
-         plot_runs (p, x, y + Y / 2 / aa, aa, runs, run);
+         gfx_run_plot (p, x, y + Y / 2 / aa, aa, runs, run);
    }
 }
 
@@ -1325,10 +1374,10 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                         if (S < segs)
                         {
 #if	GFX_BPP <= 2
-                           an[sub] = add_run (a[sub], an[sub], max_runs, l, r);
+                           an[sub] = gfx_run_add (a[sub], an[sub], max_runs, l, r);
 #endif
                            if (map & (1 << S))
-                              cn[sub] = add_run (c[sub], cn[sub], max_runs, l, r);
+                              cn[sub] = gfx_run_add (c[sub], cn[sub], max_runs, l, r);
                         }
                         I += 3;
                      }
@@ -1336,9 +1385,9 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                      {
 #if	GFX_BPP <= 2
                         if (f != b)
-                           plot_runs (gfx_pixel_bg, x, y + yy / aa, aa, an, a); // background clear
+                           gfx_run_plot (gfx_pixel_bg, x, y + yy / aa, aa, an, a);      // background clear
 #endif
-                        plot_runs (gfx_pixel, x, y + yy / aa, aa, cn, c);       // plot
+                        gfx_run_plot (gfx_pixel, x, y + yy / aa, aa, cn, c);    // plot
                      }
                   }
                   y7++;
@@ -1457,7 +1506,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    uint8_t aa = 1;
 #else
    uint8_t aa = 4;
-   if (!size)
+   if (!size || (flags & GFX_TEXT_BLOCKY))
       aa = 1;
 #endif
    if (!size)
@@ -1484,6 +1533,15 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
    int s1 = size;               // Stroke size
    if ((flags & GFX_TEXT_LIGHT) && size > 1)
       s1 = s1 * 2 / 3;
+   uint8_t plotflags = 0;
+   if (flags & GFX_TEXT_BLOCKY)
+      plotflags |= PLOT_BLOCKY;
+   if (flags & GFX_TEXT_ITALIC)
+      plotflags |= PLOT_ITALIC;
+   if (flags & GFX_TEXT_DOTTY)
+      plotflags |= PLOT_DOTTY;
+   if (flags & GFX_TEXT_CRT)
+      plotflags |= PLOT_CRT;
    const char *p = text;
    int c;
    while ((c = utf8 (&p)) > 0)
@@ -1498,7 +1556,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
          if (c > 32 && ox + x + gfx_width () >= 0 && ox + x < gfx_width () && oy + y + size * 9 >= 0 && oy + y < gfx_height ())
          {                      // On screen
             int dx = size * ((cwidth (flags, 1, c) == 2) ? 2 : 0);      // Narrow are offset
-            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, aa, flags & GFX_TEXT_ITALIC);
+            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, aa, plotflags);
          }
          x += charw;
       }
@@ -2050,18 +2108,18 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s)
             else
                r = w + icircle (yy - h, s);
             if (x1 > x2)
-               runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 - r) / 2, (x1 - l) / 2);
+               runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, (x1 - r) / 2, (x1 - l) / 2);
             else
-               runs[sub] = add_run (run[sub], runs[sub], max_runs, (x1 + l) / 2, (x1 + r) / 2);
+               runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, (x1 + l) / 2, (x1 + r) / 2);
             sub++;
             if (sub == aa)
             {
                sub = 0;
-               plot_runs (gfx_pixel, 0, (y1 / aa + yy / aa) / 2, aa, runs, run);
+               gfx_run_plot (gfx_pixel, 0, (y1 / aa + yy / aa) / 2, aa, runs, run);
             }
          }
          if (sub)
-            plot_runs (gfx_pixel, 0, (y1 / aa + yy / aa) / 2, aa, runs, run);
+            gfx_run_plot (gfx_pixel, 0, (y1 / aa + yy / aa) / 2, aa, runs, run);
       }
    }
 }
@@ -2089,9 +2147,9 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
          {
             w = icircle (yy, r);
             runs = 0;
-            runs = add_run (*run, runs, max_runs, x - w, x + w);
-            plot_runs (gfx_pixel_bg, 0, y - yy, 1, &runs, run);
-            plot_runs (gfx_pixel_bg, 0, y + yy, 1, &runs, run);
+            runs = gfx_run_add (*run, runs, max_runs, x - w, x + w);
+            gfx_run_plot (gfx_pixel_bg, 0, y - yy, 1, &runs, run);
+            gfx_run_plot (gfx_pixel_bg, 0, y + yy, 1, &runs, run);
          }
 
       }
@@ -2100,10 +2158,10 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
       {
          gfx_pos_t w2 = icircle (yy, r);
          runs = 0;
-         runs = add_run (*run, runs, max_runs, x - w, x - w2);
-         runs = add_run (*run, runs, max_runs, x + w2, x + w);
-         plot_runs (gfx_pixel, 0, y + yy, 1, &runs, run);
-         plot_runs (gfx_pixel, 0, y - yy, 1, &runs, run);
+         runs = gfx_run_add (*run, runs, max_runs, x - w, x - w2);
+         runs = gfx_run_add (*run, runs, max_runs, x + w2, x + w);
+         gfx_run_plot (gfx_pixel, 0, y + yy, 1, &runs, run);
+         gfx_run_plot (gfx_pixel, 0, y - yy, 1, &runs, run);
          w = w2;
       }
       return;
@@ -2131,16 +2189,16 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
             if (!sub)
                memset (runs, 0, aa);
             gfx_pos_t w = icircle (yy, r + s);
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, (x - w) / 2, (x + w) / 2);
+            runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, (x - w) / 2, (x + w) / 2);
             sub++;
             if (sub == aa)
             {
                sub = 0;
-               plot_runs (gfx_pixel_bg, 0, (y + yy / aa) / 2, aa, runs, run);
+               gfx_run_plot (gfx_pixel_bg, 0, (y + yy / aa) / 2, aa, runs, run);
             }
          }
          if (sub)
-            plot_runs (gfx_pixel_bg, 0, (y + yy / aa) / 2, aa, runs, run);
+            gfx_run_plot (gfx_pixel_bg, 0, (y + yy / aa) / 2, aa, runs, run);
       }
       sub = 0;
       if (s)
@@ -2150,17 +2208,17 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
                memset (runs, 0, aa);
             gfx_pos_t wo = icircle (yy, r + s);
             gfx_pos_t wi = icircle (yy, r - s);
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, (x - wo) / 2, (x - wi) / 2);
-            runs[sub] = add_run (run[sub], runs[sub], max_runs, (x + wi) / 2, (x + wo) / 2);
+            runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, (x - wo) / 2, (x - wi) / 2);
+            runs[sub] = gfx_run_add (run[sub], runs[sub], max_runs, (x + wi) / 2, (x + wo) / 2);
             sub++;
             if (sub == aa)
             {
                sub = 0;
-               plot_runs (gfx_pixel, 0, (y + yy / aa) / 2, aa, runs, run);
+               gfx_run_plot (gfx_pixel, 0, (y + yy / aa) / 2, aa, runs, run);
             }
          }
       if (sub)
-         plot_runs (gfx_pixel, 0, (y + yy / aa) / 2, aa, runs, run);
+         gfx_run_plot (gfx_pixel, 0, (y + yy / aa) / 2, aa, runs, run);
    }
 }
 

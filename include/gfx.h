@@ -23,9 +23,12 @@ typedef uint32_t gfx_colour_t;  // Colour RGB as low three bytes
 // gfx_text flags
 #define	GFX_TEXT_DESCENDERS	(1<<0)  // Allow descenders
 #define	GFX_TEXT_BLOCKY		(1<<1)  // Blocky text
-#define	GFX_TEXT_LIGHT		(1<<2)  // Thin (vector) test
-#define	GFX_TEXT_FIXED		(1<<3)  // Don't do narrow special characters (full stop, colon, etc)
-#define	GFX_TEXT_ITALIC		(1<<4)  // Italic
+#define	GFX_TEXT_DOTTY		(1<<2)  // Dotty
+#define	GFX_TEXT_CRT		(1<<3)  // LCD (use with dotty or blocky to make horizontal lines)
+#define	GFX_TEXT_LIGHT		(1<<4)  // Thin (vector) test
+#define	GFX_TEXT_FIXED		(1<<5)  // Don't do narrow special characters (full stop, colon, etc)
+#define	GFX_TEXT_ITALIC		(1<<6)  // Italic
+
 #define	GFX_7SEG_SMALL_DOT	(1<<0)  // Small (half size) after dot
 #define	GFX_7SEG_SMALL_COLON	(1<<1)  // Small (half size) after colon
 #define	GFX_7SEG_ITALIC		(1<<2)  // Italic
@@ -112,6 +115,8 @@ const char *gfx_init_opts (gfx_init_t);
 #define gfx_text_size(flags,size,t,w,h)
 #define gfx_7seg(flags,size,fmt,...)
 #define gfx_7seg_size(flags,size,t,*w,*h)
+#define gfx_run_plot (p,x,y,aa,runs,run)
+#define gfx_run_add (run,runs,max,l,r)	(0)
 
 #else
 
@@ -159,11 +164,14 @@ uint8_t *gfx_raw_b (void);      // Raw frame buffer
 uint8_t gfx_flip (void);        // Get effective flip
 
 // Pixel setting with colour and/or alpha
+typedef void gfx_pixel_t (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
 void gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t);
 void gfx_pixel_rgb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t);
 void gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t i);
 void gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
 void gfx_pixel_fb (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
+void gfx_run_plot (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs, gfx_pos_t ** run);
+uint8_t gfx_run_add (gfx_pos_t * run, uint8_t runs, uint8_t max, gfx_pos_t l, gfx_pos_t r);
 
 // Drawing
 void gfx_clear (gfx_alpha_t);   // clear whole display 

@@ -75,6 +75,8 @@ Note for text, a `size` of 0 plots a non anti-aliased size 1.
 
 If using the `GFX_7SEG_SMALL_DOT` flag, a trailing `C` or `F` character is superscript (for temperatures).
 
+There are various options including italic, dotty, blocky, etc.
+
 #### `gfx_line`
 
 A number of extra functions exist - these are being updated and new functions added.
