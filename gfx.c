@@ -456,14 +456,40 @@ blend (gfx_alpha_t a)
 }
 
 void
-gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
-{
-   if (!gfx)
+gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
+{                               // Plot run of ARGB - this is complex as handles all BPPs and hardware flips
+   if (!gfx || !run)
       return;
    uint8_t a = c >> 24;
    uint8_t r = c >> 16;
    uint8_t g = c >> 8;
    uint8_t b = c;
+   {                            // Range check
+      if (x < 0)
+      {
+         if (x + run <= 0)
+            return;
+         run -= (-x);           // Left crop
+         x = 0;
+      }
+      gfx_pos_t r = (
+#ifndef	GFX_FLIP_XY
+                       (gfx_settings.flip & 4) ? gfx_settings.height :
+#endif
+                       gfx_settings.width);
+      if (x >= r)
+         return;
+      if (x + run > r)
+         run = r - x;           // Right crop
+      if (y < 0)
+         return;
+      if (y >= (
+#ifndef	GFX_FLIP_XY
+                  (gfx_settings.flip & 4) ? gfx_settings.width :
+#endif
+                  gfx_settings.height))
+         return;
+   }
 #ifndef	GFX_FLIP_XY
    if (gfx_settings.flip & 4)
    {
@@ -480,129 +506,365 @@ gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
    if (gfx_settings.flip & 2)
       y = gfx_settings.height - 1 - y;
 #endif
-   if (x < 0 || x >= gfx_settings.width || y < 0 || y >= gfx_settings.height)
-      return;                   // out of display
-#if	GFX_BPP <= 2
+#if	GFX_BPP == 1            // 1 BPP Black/White
    if (!(a & 0x80))
       return;                   // Do not plot - simple cut off alpha
    const int line = (gfx_settings.width + 7) / 8;
-   uint8_t K = (r * 2 + g * 3 + b) / 6;
-   if (gfx_settings.invert)
-      K = 255 - K;
-   // Low level dither options on a 2x2
-   switch (K / 51)
+   uint8_t *A = gfx + line * y + (x / 8);
+   inline void next (void)
    {
-   case 0:
-      K = 0;
-      break;
-   case 1:
-      K = (!(x & 1) && !(y & 1)) ? 255 : 0;
-      break;
-   case 2:
-      K = ((x & 1) ^ (y & 1)) ? 255 : 0;
-      break;
-   case 3:
-      K = (!(x & 1) && !(y & 1)) ? 0 : 255;
-      break;
-   case 4:
-      K = 255;
-      break;
+#ifndef  GFX_FLIP_XY
+      if (gfx_settings.flip & 4)
+      {
+#ifndef	GFX_FLIP_Y
+         if (gfx_settings.flip & 2)
+            A -= line;
+         else
+#endif
+            A += line;
+      } else
+#endif
+#ifndef	GFX_FLIP_X
+      if (gfx_settings.flip & 1)
+      {
+         if (!(x & 7))
+            A--;
+         x--;
+      } else
+#endif
+      {
+         x++;
+         if (!(x & 7))
+            A++;
+      }
+   }
+   uint8_t k = (r * 2 + g * 3 + b) / 6;
+   if (gfx_settings.invert)
+      k = 255 - k;
+   if (k < 51)
+   {                            // Fixed
+      while (1)
+      {
+         *A &= ~(0x80 >> (x & 7));
+         if (!--run)
+            break;
+         next ();
+      }
+   } else if (k >= 204)
+   {                            // Fixed
+      while (1)
+      {
+         *A |= (0x80 >> (x & 7));
+         if (!--run)
+            break;
+         next ();
+      }
+   } else
+   {                            // Dither
+      k /= 51;
+      while (1)
+      {
+         uint8_t K = 255;
+         // Low level dither options on a 2x2
+         switch (k)
+         {
+         case 1:
+            K = (!(x & 1) && !(y & 1)) ? 255 : 0;
+            break;
+         case 2:
+            K = ((x & 1) ^ (y & 1)) ? 255 : 0;
+            break;
+         case 3:
+            K = (!(x & 1) && !(y & 1)) ? 0 : 255;
+            break;
+         }
+         if (K & 0x80)
+            *A |= (0x80 >> (x & 7));
+         else
+            *A &= ~(0x80 >> (x & 7));
+         if (!--run)
+            break;
+         next ();
+      }
+   }
+#elif	GFX_BPP == 2            // 2 BPP Black/Red/White
+   if (!(a & 0x80))
+      return;                   // Do not plot - simple cut off alpha
+   const int line = (gfx_settings.width + 7) / 8;
+   inline void next (void)
+   {
+#ifndef  GFX_FLIP_XY
+      if (gfx_settings.flip & 4)
+      {
+#ifndef	GFX_FLIP_Y
+         if (gfx_settings.flip & 2)
+            A -= line;
+         else
+#endif
+            A += line;
+      } else
+#endif
+#ifndef	GFX_FLIP_X
+      if (gfx_settings.flip & 1)
+      {
+         if (!(x & 7))
+            A--;
+         x--;
+      } else
+#endif
+      {
+         x++;
+         if (!(x & 7))
+            A++;
+      }
    }
    uint8_t *A = gfx + line * y + (x / 8);
-#endif
-#if	GFX_BPP == 1            // 1 BPP Black/White
-   if (K & 0x80)
-      *A |= (0x80 >> (x & 7));
-   else
-      *A &= ~(0x80 >> (x & 7));
-#elif	GFX_BPP == 2            // 2 BPP Black/Red/White
    uint8_t R = (r > g && r > b) ? 0xFF : 0;
-   if (!R && K & 0x80)
-      *A |= (0x80 >> (x & 7));
-   else
-      *A &= ~(0x80 >> (x & 7));
-   A += GFX_PAGE;
-   if (R & 0x80)
-      *A |= (0x80 >> (x & 7));
-   else
-      *A &= ~(0x80 >> (x & 7));
+   uint8_t k = (r * 2 + g * 3 + b) / 6;
+   if (gfx_settings.invert)
+      k = 255 - k;
+   if (R)
+   {                            // Fixed
+      while (1)
+      {
+         *A &= ~(0x80 >> (x & 7));
+         A[GFX_PAGE] |= (0x80 >> (x & 7));
+         if (!--run)
+            break;
+         next ();
+      }
+   } else if (k < 51)
+   {                            // Fixed
+      while (1)
+      {
+         *A &= ~(0x80 >> (x & 7));
+         A[GFX_PAGE] &= ~(0x80 >> (x & 7));
+         if (!--run)
+            break;
+         next ();
+      }
+   } else if (k >= 204)
+   {                            // Fixed
+      while (1)
+      {
+         *A |= (0x80 >> (x & 7));
+         A[GFX_PAGE] &= ~(0x80 >> (x & 7));
+         if (!--run)
+            break;
+         next ();
+      }
+   } else
+   {                            // Dither
+      k /= 51;
+      while (1)
+      {
+         uint8_t K = 255;
+         // Low level dither options on a 2x2
+         switch (k)
+         {
+         case 1:
+            K = (!(x & 1) && !(y & 1)) ? 255 : 0;
+            break;
+         case 2:
+            K = ((x & 1) ^ (y & 1)) ? 255 : 0;
+            break;
+         case 3:
+            K = (!(x & 1) && !(y & 1)) ? 0 : 255;
+            break;
+         }
+         if (K & 0x80)
+            *A |= (0x80 >> (x & 7));
+         else
+            *A &= ~(0x80 >> (x & 7));
+         A[GFX_PAGE] &= ~(0x80 >> (x & 7));
+         if (!--run)
+            break;
+         next ();
+      }
+   }
 #elif	GFX_BPP == 8
    if (!a)
       return;                   // Do not plot
    const int line = gfx_settings.width;
+   uint8_t *A = gfx + line * y + x;
+   void inline next (void)
+   {
+#ifndef  GFX_FLIP_XY
+      if (gfx_settings.flip & 4)
+      {
+#ifndef	GFX_FLIP_Y
+         if (gfx_settings.flip & 2)
+            A -= line;
+         else
+#endif
+            A += line;
+      } else
+#endif
+#ifndef	GFX_FLIP_X
+      if (gfx_settings.flip & 1)
+         A--;
+      else
+#endif
+         A++;
+   }
    uint8_t K = (r * 2 + g * 3 + b) / 6;
    if (a < 255)
-   {
-      uint8_t was = gfx[line * y + x];
-   K = ((K * a) + (was * (255 - a)) / 255;}
-        gfx[line * y + x] = K;
+   {                            // Blend
+      while (1)
+      {
+         uint8_t was = *A;
+         *A = ((K * a) + (was * (255 - a)) / 255);
+         if (!--run)
+            break;
+         next ();
+      }
+   } else
+   {                            // Store
+      while (1)
+      {
+         *A = K;
+         if (!--run)
+            break;
+         next ();
+      }
+   }
 #elif	GFX_BPP == 16
    if (!a)
       return;                   // Do not plot
    const int line = gfx_settings.width * 2;
    uint8_t *A = gfx + line * y + x * 2;
+   void inline next (void)
+   {
+#ifndef  GFX_FLIP_XY
+      if (gfx_settings.flip & 4)
+      {
+#ifndef	GFX_FLIP_Y
+         if (gfx_settings.flip & 2)
+            A -= line;
+         else
+#endif
+            A += line;
+      } else
+#endif
+#ifndef	GFX_FLIP_X
+      if (gfx_settings.flip & 1)
+         A -= 2;
+      else
+#endif
+         A += 2;
+   }
    if (a < 255)
    {
-      uint16_t v = ((A[0] << 8) | A[1]);
-      uint8_t z;
-      z = (v >> 11);
-      z = ((z << 3) | (z >> 2));
-      r = ((r * a) + (z * (255 - a))) / 255;
-      z = (v >> 5) & 0x3F;
-      z = ((z << 2) | (z >> 4));
-      g = ((g * a) + (z * (255 - a))) / 255;
-      z = (v & 0x1F);
-      z = ((z << 3) | (z >> 2));
-      b = ((b * a) + (z * (255 - a))) / 255;
+      while (1)
+      {
+         uint16_t v = ((A[0] << 8) | A[1]);
+         uint8_t z;
+         z = (v >> 11);
+         z = ((z << 3) | (z >> 2));
+         uint8_t rr = ((r * a) + (z * (255 - a))) / 255;
+         z = (v >> 5) & 0x3F;
+         z = ((z << 2) | (z >> 4));
+         uint8_t gg = ((g * a) + (z * (255 - a))) / 255;
+         z = (v & 0x1F);
+         z = ((z << 3) | (z >> 2));
+         uint8_t bb = ((b * a) + (z * (255 - a))) / 255;
+         v = (((rr >> 3) << 11) | ((gg >> 2) << 5) | (bb >> 3));
+         A[0] = (v >> 8);
+         A[1] = v;
+         if (!--run)
+            break;
+         next ();
+      }
+   } else
+   {
+      uint16_t v = (((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
+      while (1)
+      {
+         A[0] = (v >> 8);
+         A[1] = v;
+         if (!--run)
+            break;
+         next ();
+      }
    }
-   uint16_t v = (((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
-   A[0] = (v >> 8);
-   A[1] = v;
-
 #elif	GFX_BPP == 24
    if (!a)
       return;                   // Do not plot
    const int line = gfx_settings.width * 3;
    uint8_t *A = gfx + line * y + x * 3;
+   void inline next (void)
+   {
+#ifndef  GFX_FLIP_XY
+      if (gfx_settings.flip & 4)
+      {
+#ifndef	GFX_FLIP_Y
+         if (gfx_settings.flip & 2)
+            A -= line;
+         else
+#endif
+            A += line;
+      } else
+#endif
+#ifndef	GFX_FLIP_X
+      if (gfx_settings.flip & 1)
+         A -= 3;
+      else
+#endif
+         A += 3;
+   }
    if (a < 255)
    {
-      r = ((r * a) + (A[0] * (255 - a))) / 255;
-      g = ((r * g) + (A[1] * (255 - a))) / 255;
-      b = ((r * b) + (A[2] * (255 - a))) / 255;
+      while (1)
+      {
+         A[0] = ((r * a) + (A[0] * (255 - a))) / 255;
+         A[1] = ((r * g) + (A[1] * (255 - a))) / 255;
+         A[2] = ((r * b) + (A[2] * (255 - a))) / 255;
+         if (!--run)
+            break;
+         next ();
+      }
+   } else
+   {
+      while (1)
+      {
+         A[0] = r;
+         A[1] = g;
+         A[2] = b;
+         if (!--run)
+            break;
+         next ();
+      }
    }
-   A[0] = r;
-   A[1] = g;
-   A[2] = b;
 #else
 #error	Unsupported BPP
 #endif
 }
 
 void
-gfx_pixel_rgb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c)
+gfx_pixel_rgb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
 {
-   gfx_pixel_argb (x, y, 0xFF000000 | c);
+   gfx_pixel_argb_run (x, y, 0xFF000000 | c, run);
 }
 
 void
-gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
+gfx_pixel_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a, gfx_pos_t run)
 {                               // set a pixel
-   gfx_pixel_argb (x, y, (a << 24) | f);
+   gfx_pixel_argb_run (x, y, (a << 24) | f, run);
 }
 
 void
-gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
+gfx_pixel_bg_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a, gfx_pos_t run)
 {                               // set a background pixel
-   gfx_pixel_argb (x, y, (a << 24) | b);
+   gfx_pixel_argb_run (x, y, (a << 24) | b, run);
 }
 
 void
-gfx_pixel_fb (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a)
+gfx_pixel_fb_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a, gfx_pos_t run)
 {                               // set based on foreground / background blend
    if (f == b)
-      gfx_pixel_argb (x, y, (a << 24) | f);     // Mask mode
+      gfx_pixel_argb_run (x, y, (a << 24) | f, run);    // Mask mode
    else
-      gfx_pixel_rgb (x, y, blend (a));
+      gfx_pixel_rgb_run (x, y, blend (a), run);
 }
 
 void
@@ -674,9 +936,8 @@ gfx_block2N_pack (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t 
          if (row >= ly && row < hy && col >= lx && col < hx && !(col & 7))
             d = *data++;
          if (col >= dx)
-            for (uint8_t qx = 0; qx < mx; qx++)
-               for (uint8_t qy = 0; qy < mx; qy++)
-                  gfx_pixel (x + (col - dx) * mx + qx, y + row * my + qy, (d & 0x80) ? 255 : 0);
+            for (uint8_t qy = 0; qy < mx; qy++)
+               gfx_pixel_run (x + (col - dx) * mx, y + row * my + qy, (d & 0x80) ? 255 : 0, mx);
          d <<= 1;
       }
    }
@@ -710,7 +971,7 @@ gfx_block2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t w, gfx_pos_t h, gfx_pos_t dx, co
    for (gfx_pos_t row = 0; row < h; row++)
    {
       for (gfx_pos_t col = 0; col < w; col++)
-         gfx_pixel (x + col, y + row, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0);
+         gfx_pixel_run (x, y + row, ((data[(col + dx) / 8] >> ((col + dx) & 7)) & 1) ? 255 : 0, w);
       data += l;
    }
 }
@@ -779,8 +1040,7 @@ gfx_clear (gfx_alpha_t a)
       return;
    gfx_colour_t c = blend (a);
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
-      for (gfx_pos_t x = 0; x < gfx_width (); x++)
-         gfx_pixel_rgb (x, y, c);
+      gfx_pixel_rgb_run (0, y, c, gfx_width ());
 }
 
 void
@@ -805,12 +1065,8 @@ gfx_box (gfx_pos_t w, gfx_pos_t h, gfx_alpha_t a)
    gfx_pos_t x,
      y;
    gfx_draw (w, h, 0, 0, &x, &y);
-   if (f != b)
-      for (gfx_pos_t n = 0; n < w; n++)
-      {
-         gfx_pixel (x + n, y, a);
-         gfx_pixel (x + n, y + h - 1, a);
-      }
+   gfx_pixel_run (x, y, a, w);
+   gfx_pixel_run (x, y + h - 1, a, w);
    for (gfx_pos_t n = 1; n < h - 1; n++)
    {
       gfx_pixel (x, y + n, a);
@@ -828,8 +1084,7 @@ gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_alpha_t a)
    gfx_draw (w, h, 0, 0, &x, &y);
    if (f != b)
       for (gfx_pos_t row = 0; row < h; row++)
-         for (gfx_pos_t col = 0; col < w; col++)
-            gfx_pixel (x + col, y + row, a);
+         gfx_pixel_run (x, y + row, a, w);
 }
 
 void
@@ -867,8 +1122,7 @@ plot_run (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t runs, gfx_pos_t * r
    {
       gfx_pos_t l = *run++;
       gfx_pos_t r = *run++;
-      while (l < r)
-         p (x + l++, y, (gfx_alpha_t) - 1);
+      p (x + l, y, (gfx_alpha_t) - 1, r - l);
    }
 }
 
@@ -905,7 +1159,14 @@ gfx_run_plot (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * r
          if (!(l % aa))
          {
             if (sum)
-               p (x + l / aa - 1, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa);
+            {
+               gfx_pos_t run = 1;
+               if (sum == c * aa && r > l + aa)
+                  run += ((r - l) / aa);
+               p (x + l / aa - 1, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa, run);
+               if (run > 1)
+                  l += (run - 1) * aa;
+            }
             sum = 0;
          }
       }
@@ -915,7 +1176,7 @@ gfx_run_plot (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * r
             pos[a]++;
    }
    if ((l % aa) && sum)
-      p (x + l / aa, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa);
+      p (x + l / aa, y, (int16_t) ((gfx_alpha_t) - 1) * sum / aa / aa, 1);
 }
 
 uint8_t
@@ -1278,9 +1539,8 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
    gfx_draw (w, h, size, size, &ox, &oy);       // starting point
 #if GFX_BPP > 2
    if (f != b)
-      for (x = -size; x < w + size; x++)
-         for (y = -size; y < h + size; y++)
-            gfx_pixel_bg (ox + x, oy + y, 255); // background
+      for (y = -size; y < h + size; y++)
+         gfx_pixel_bg_run (ox - size, oy + y, 255, w + size * 2);       // background
 #endif
    x = ox, y = oy;
    x += size * 9 / 20;          // Better alignment in box
@@ -1385,9 +1645,9 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                      {
 #if	GFX_BPP <= 2
                         if (f != b)
-                           gfx_run_plot (gfx_pixel_bg, x, y + yy / aa, aa, an, a);      // background clear
+                           gfx_run_plot (gfx_pixel_bg_run, x, y + yy / aa, aa, an, a);  // background clear
 #endif
-                        gfx_run_plot (gfx_pixel, x, y + yy / aa, aa, cn, c);    // plot
+                        gfx_run_plot (gfx_pixel_run, x, y + yy / aa, aa, cn, c);        // plot
                      }
                   }
                   y7++;
@@ -1526,9 +1786,8 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
       oy = 0;
    gfx_draw (w, h, size, size, &ox, &oy);       // starting point
    if (f != b)
-      for (x = -size; x < w + size; x++)
-         for (y = -size; y < h + size; y++)
-            gfx_pixel_bg (ox + x, oy + y, 255); // background
+      for (y = -size; y < h + size; y++)
+         gfx_pixel_bg_run (ox - size, oy + y, 255, w + size * 2);       // background
    x = y = 0;
    int s1 = size;               // Stroke size
    if ((flags & GFX_TEXT_LIGHT) && size > 1)
@@ -1556,7 +1815,7 @@ gfx_vector_draw (uint8_t flags, int8_t size, const char *text)
          if (c > 32 && ox + x + gfx_width () >= 0 && ox + x < gfx_width () && oy + y + size * 9 >= 0 && oy + y < gfx_height ())
          {                      // On screen
             int dx = size * ((cwidth (flags, 1, c) == 2) ? 2 : 0);      // Narrow are offset
-            plot_5x9 (gfx_pixel, ox + x - dx, oy + y, c, size, s1, aa, plotflags);
+            plot_5x9 (gfx_pixel_run, ox + x - dx, oy + y, c, size, s1, aa, plotflags);
          }
          x += charw;
       }
@@ -2007,49 +2266,58 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s)
       y1 /= 2;
       x2 /= 2;
       y2 /= 2;
-      gfx_pos_t dx = (x2 - x1),
-         adx = dx,
-         sdx = 1;
-      gfx_pos_t dy = (y2 - y1),
-         ady = dy,
-         sdy = 1;
-      if (dx < 0)
-         adx = (sdx = -1) * dx;
-      if (dy < 0)
-         ady = (sdy = -1) * dy;
-      if (dx || dy)
+      if (y1 == y2)
+      {                         // Fast horizontal
+         if (x2 >= x1)
+            gfx_pixel_run (x1, y1, 255, x2 + 1 - x1);
+         else
+            gfx_pixel_run (x2, y1, 255, x1 + 1 - x2);
+      } else
       {
-         if (adx > ady)
+         gfx_pos_t dx = (x2 - x1),
+            adx = dx,
+            sdx = 1;
+         gfx_pos_t dy = (y2 - y1),
+            ady = dy,
+            sdy = 1;
+         if (dx < 0)
+            adx = (sdx = -1) * dx;
+         if (dy < 0)
+            ady = (sdy = -1) * dy;
+         if (dx || dy)
          {
-            gfx_pos_t d = adx / 2;
-            while (x1 != x2)
+            if (adx > ady)
             {
-               gfx_pixel (x1, y1, 255);
-               d += ady;
-               if (d >= adx)
+               gfx_pos_t d = adx / 2;
+               while (x1 != x2)
                {
-                  d -= adx;
-                  y1 += sdy;
-               }
-               x1 += sdx;
-            }
-         } else
-         {
-            gfx_pos_t d = ady / 2;
-            while (y1 != y2)
-            {
-               gfx_pixel (x1, y1, 255);
-               d += adx;
-               if (d >= ady)
-               {
-                  d -= ady;
+                  gfx_pixel (x1, y1, 255);
+                  d += ady;
+                  if (d >= adx)
+                  {
+                     d -= adx;
+                     y1 += sdy;
+                  }
                   x1 += sdx;
                }
-               y1 += sdy;
+            } else
+            {
+               gfx_pos_t d = ady / 2;
+               while (y1 != y2)
+               {
+                  gfx_pixel (x1, y1, 255);
+                  d += adx;
+                  if (d >= ady)
+                  {
+                     d -= ady;
+                     x1 += sdx;
+                  }
+                  y1 += sdy;
+               }
             }
          }
+         gfx_pixel (x1, y1, 255);
       }
-      gfx_pixel (x1, y1, 255);
       return;
    }
    {                            // Stroke width based
@@ -2115,11 +2383,11 @@ gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s)
             if (sub == aa)
             {
                sub = 0;
-               gfx_run_plot (gfx_pixel, 0, (y1 / aa + yy / aa) / 2, aa, runs, run);
+               gfx_run_plot (gfx_pixel_run, 0, (y1 / aa + yy / aa) / 2, aa, runs, run);
             }
          }
          if (sub)
-            gfx_run_plot (gfx_pixel, 0, (y1 / aa + yy / aa) / 2, aa, runs, run);
+            gfx_run_plot (gfx_pixel_run, 0, (y1 / aa + yy / aa) / 2, aa, runs, run);
       }
    }
 }
@@ -2148,8 +2416,8 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
             w = icircle (yy, r);
             runs = 0;
             runs = gfx_run_add (*run, runs, max_runs, x - w, x + w);
-            gfx_run_plot (gfx_pixel_bg, 0, y - yy, 1, &runs, run);
-            gfx_run_plot (gfx_pixel_bg, 0, y + yy, 1, &runs, run);
+            gfx_run_plot (gfx_pixel_bg_run, 0, y - yy, 1, &runs, run);
+            gfx_run_plot (gfx_pixel_bg_run, 0, y + yy, 1, &runs, run);
          }
 
       }
@@ -2160,8 +2428,8 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
          runs = 0;
          runs = gfx_run_add (*run, runs, max_runs, x - w, x - w2);
          runs = gfx_run_add (*run, runs, max_runs, x + w2, x + w);
-         gfx_run_plot (gfx_pixel, 0, y + yy, 1, &runs, run);
-         gfx_run_plot (gfx_pixel, 0, y - yy, 1, &runs, run);
+         gfx_run_plot (gfx_pixel_run, 0, y + yy, 1, &runs, run);
+         gfx_run_plot (gfx_pixel_run, 0, y - yy, 1, &runs, run);
          w = w2;
       }
       return;
@@ -2194,11 +2462,11 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
             if (sub == aa)
             {
                sub = 0;
-               gfx_run_plot (gfx_pixel_bg, 0, (y + yy / aa) / 2, aa, runs, run);
+               gfx_run_plot (gfx_pixel_bg_run, 0, (y + yy / aa) / 2, aa, runs, run);
             }
          }
          if (sub)
-            gfx_run_plot (gfx_pixel_bg, 0, (y + yy / aa) / 2, aa, runs, run);
+            gfx_run_plot (gfx_pixel_bg_run, 0, (y + yy / aa) / 2, aa, runs, run);
       }
       sub = 0;
       if (s)
@@ -2214,11 +2482,11 @@ gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s)
             if (sub == aa)
             {
                sub = 0;
-               gfx_run_plot (gfx_pixel, 0, (y + yy / aa) / 2, aa, runs, run);
+               gfx_run_plot (gfx_pixel_run, 0, (y + yy / aa) / 2, aa, runs, run);
             }
          }
       if (sub)
-         gfx_run_plot (gfx_pixel, 0, (y + yy / aa) / 2, aa, runs, run);
+         gfx_run_plot (gfx_pixel_run, 0, (y + yy / aa) / 2, aa, runs, run);
    }
 }
 

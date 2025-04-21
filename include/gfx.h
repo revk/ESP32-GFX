@@ -67,6 +67,12 @@ typedef struct
 #define gfx_init(...)  gfx_init_opts((gfx_init_t){__VA_ARGS__})
 const char *gfx_init_opts (gfx_init_t);
 
+#define	gfx_pixel_argb(x,y,c) gfx_pixel_argb_run(x,y,c,1)
+#define	gfx_pixel_rgb(x,y,c)	gfx_pixel_rgb_run(x,y,c,1)
+#define	gfx_pixel(x,y,i)	gfx_pixel_run(x,y,i,1)
+#define	gfx_pixel_bg(x,y,a)	gfx_pixel_bg_run(x,y,a,1)
+#define	gfx_pixel_fb(x,y,a)	gfx_pixel_fb_run(x,y,a,1)
+
 #ifdef  CONFIG_GFX_BUILD_SUFFIX_GFXNONE
 
 // Dummy
@@ -95,11 +101,11 @@ const char *gfx_init_opts (gfx_init_t);
 #define gfx_raw_h()	(0)
 #define *gfx_raw_b()	(NULL)
 #define gfx_flip()	(0)
-#define gfx_pixel_argb(x,y,c)
-#define gfx_pixel_rgb(x,y,c)
-#define gfx_pixel(x,y,i)
-#define gfx_pixel_bg (x,y,a)
-#define gfx_pixel_fb (x,y,a)
+#define gfx_pixel_argb_run(x,y,c,run)
+#define gfx_pixel_rgb_run(x,y,c,run)
+#define gfx_pixel_run(x,y,i,run)
+#define gfx_pixel_bg_run (x,y,a,run)
+#define gfx_pixel_fb_run (x,y,a,run)
 #define gfx_clear(a)
 #define gfx_draw (w,h,wm,hm,xp,yp)
 #define gfx_box(w,h,a)
@@ -164,12 +170,12 @@ uint8_t *gfx_raw_b (void);      // Raw frame buffer
 uint8_t gfx_flip (void);        // Get effective flip
 
 // Pixel setting with colour and/or alpha
-typedef void gfx_pixel_t (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
-void gfx_pixel_argb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t);
-void gfx_pixel_rgb (gfx_pos_t x, gfx_pos_t y, gfx_colour_t);
-void gfx_pixel (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t i);
-void gfx_pixel_bg (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
-void gfx_pixel_fb (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a);
+typedef void gfx_pixel_t (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a,gfx_pos_t);
+void gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t,gfx_pos_t);
+void gfx_pixel_rgb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t,gfx_pos_t);
+void gfx_pixel_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t i,gfx_pos_t);
+void gfx_pixel_bg_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a,gfx_pos_t);
+void gfx_pixel_fb_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a,gfx_pos_t);
 void gfx_run_plot (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs, gfx_pos_t ** run);
 uint8_t gfx_run_add (gfx_pos_t * run, uint8_t runs, uint8_t max, gfx_pos_t l, gfx_pos_t r);
 
