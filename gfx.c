@@ -591,6 +591,7 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
    if (!(a & 0x80))
       return;                   // Do not plot - simple cut off alpha
    const int line = (gfx_settings.width + 7) / 8;
+   uint8_t *A = gfx + line * y + (x / 8);
    inline void next (void)
    {
 #ifndef  GFX_FLIP_XY
@@ -618,7 +619,6 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
             A++;
       }
    }
-   uint8_t *A = gfx + line * y + (x / 8);
    uint8_t R = (r > g && r > b) ? 0xFF : 0;
    uint8_t k = (r * 2 + g * 3 + b) / 6;
    if (gfx_settings.invert)
