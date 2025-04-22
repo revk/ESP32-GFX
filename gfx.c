@@ -455,6 +455,24 @@ blend (gfx_alpha_t a)
    return ((fr << 16) | (fg << 8) | fb);
 }
 
+#if	GFX_BPP <= 2
+uint8_t inline
+dither (uint8_t k, gfx_pos_t x, gfx_pos_t y)
+{
+#ifdef	CONFIG_GFX_DITHER4
+   const uint8_t dither[] =
+      { 1 * 15, 9 * 15, 3 * 15, 11 * 15, 13 * 15, 5 * 15, 15 * 15, 7 * 15, 4 * 15, 12 * 15, 2 * 15, 10 * 15, 16 * 15, 8 * 15,
+14 * 15, 6 * 15 };
+   return dither[(x & 3) + ((y & 3) << 2)] < k;
+
+#else
+   const uint8_t dither[] = { 1 * 51, 3 * 51, 4 * 51, 2 * 51 };
+   return dither[(x & 1) + ((y & 1) << 1)] < k;
+
+#endif
+}
+#endif
+
 void
 gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
 {                               // Plot run of ARGB - this is complex as handles all BPPs and hardware flips
@@ -541,7 +559,7 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
    uint8_t k = (r * 2 + g * 3 + b) / 6;
    if (gfx_settings.invert)
       k = 255 - k;
-   if (k < 51)
+   if (!k)
    {                            // Fixed
       while (1)
       {
@@ -550,7 +568,7 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
             break;
          next ();
       }
-   } else if (k >= 204)
+   } else if (k == 255)
    {                            // Fixed
       while (1)
       {
@@ -561,24 +579,9 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
       }
    } else
    {                            // Dither
-      k /= 51;
       while (1)
       {
-         uint8_t K = 255;
-         // Low level dither options on a 2x2
-         switch (k)
-         {
-         case 1:
-            K = (!(x & 1) && !(y & 1)) ? 255 : 0;
-            break;
-         case 2:
-            K = ((x & 1) ^ (y & 1)) ? 255 : 0;
-            break;
-         case 3:
-            K = (!(x & 1) && !(y & 1)) ? 0 : 255;
-            break;
-         }
-         if (K & 0x80)
+         if (dither (k, x, y))
             *A |= (0x80 >> (x & 7));
          else
             *A &= ~(0x80 >> (x & 7));
@@ -633,7 +636,7 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
             break;
          next ();
       }
-   } else if (k < 51)
+   } else if (!k)
    {                            // Fixed
       while (1)
       {
@@ -643,7 +646,7 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
             break;
          next ();
       }
-   } else if (k >= 204)
+   } else if (k == 255)
    {                            // Fixed
       while (1)
       {
@@ -655,24 +658,9 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
       }
    } else
    {                            // Dither
-      k /= 51;
       while (1)
       {
-         uint8_t K = 255;
-         // Low level dither options on a 2x2
-         switch (k)
-         {
-         case 1:
-            K = (!(x & 1) && !(y & 1)) ? 255 : 0;
-            break;
-         case 2:
-            K = ((x & 1) ^ (y & 1)) ? 255 : 0;
-            break;
-         case 3:
-            K = (!(x & 1) && !(y & 1)) ? 0 : 255;
-            break;
-         }
-         if (K & 0x80)
+         if (dither (k, x, y))
             *A |= (0x80 >> (x & 7));
          else
             *A &= ~(0x80 >> (x & 7));

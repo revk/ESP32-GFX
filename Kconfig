@@ -56,6 +56,12 @@ menu "GFX"
 	help
 		Enable fine tuning settings (RevK library)
 
+	config GFX_DITHER4
+	bool "Bayer4x4 dither instead of Bayer2x2 for E-Paper"
+	default y 
+	help
+		Bayer4x4 dither instead of Bayer2x2 for E-Paper
+
 	config GFX_7SEG
 	bool "Include 7 seg font"
 	default y 
