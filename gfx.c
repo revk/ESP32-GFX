@@ -639,7 +639,7 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
                break;
             next ();
          }
-      } else if (R = 255)
+      } else if (R == 255)
       {                         // Fixed R
          while (1)
          {
