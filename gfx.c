@@ -462,7 +462,8 @@ dither (uint8_t k, gfx_pos_t x, gfx_pos_t y)
 #ifdef	CONFIG_GFX_DITHER4
    const uint8_t dither[] =
       { 1 * 15, 9 * 15, 3 * 15, 11 * 15, 13 * 15, 5 * 15, 15 * 15, 7 * 15, 4 * 15, 12 * 15, 2 * 15, 10 * 15, 16 * 15, 8 * 15,
-14 * 15, 6 * 15 };
+      14 * 15, 6 * 15
+   };
    return dither[(x & 3) + ((y & 3) << 2)] < k;
 
 #else
@@ -622,22 +623,48 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
             A++;
       }
    }
-   uint8_t R = (r > g && r > b) ? 0xFF : 0;
+   uint8_t R = (r > g / 4 && r > b / 4) ? r : 0;
    uint8_t k = (r * 2 + g * 3 + b) / 6;
    if (gfx_settings.invert)
       k = 255 - k;
    if (R)
-   {                            // Fixed
-      while (1)
-      {
-         *A &= ~(0x80 >> (x & 7));
-         A[GFX_PAGE] |= (0x80 >> (x & 7));
-         if (!--run)
-            break;
-         next ();
+   {                            // Red
+      if (!R)
+      {                         // Fixed R
+         while (1)
+         {
+            *A &= ~(0x80 >> (x & 7));
+            A[GFX_PAGE] &= (0x80 >> (x & 7));
+            if (!--run)
+               break;
+            next ();
+         }
+      } else if (R = 255)
+      {                         // Fixed R
+         while (1)
+         {
+            *A &= ~(0x80 >> (x & 7));
+            A[GFX_PAGE] |= (0x80 >> (x & 7));
+            if (!--run)
+               break;
+            next ();
+         }
+      } else
+      {                         // Dither R
+         while (1)
+         {
+            *A &= ~(0x80 >> (x & 7));
+            if (dither (R, x, y))
+               A[GFX_PAGE] |= (0x80 >> (x & 7));
+            else
+               A[GFX_PAGE] &= (0x80 >> (x & 7));
+            if (!--run)
+               break;
+            next ();
+         }
       }
    } else if (!k)
-   {                            // Fixed
+   {                            // Fixed K
       while (1)
       {
          *A &= ~(0x80 >> (x & 7));
@@ -647,7 +674,7 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
          next ();
       }
    } else if (k == 255)
-   {                            // Fixed
+   {                            // Fixed K
       while (1)
       {
          *A |= (0x80 >> (x & 7));
@@ -657,7 +684,7 @@ gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t c, gfx_pos_t run)
          next ();
       }
    } else
-   {                            // Dither
+   {                            // Dither K
       while (1)
       {
          if (dither (k, x, y))
