@@ -460,14 +460,14 @@ uint8_t inline
 dither (uint8_t k, gfx_pos_t x, gfx_pos_t y)
 {
 #ifdef	CONFIG_GFX_DITHER4
-   const uint8_t dither[] =
+   static const uint8_t dither[] =
       { 1 * 15, 9 * 15, 3 * 15, 11 * 15, 13 * 15, 5 * 15, 15 * 15, 7 * 15, 4 * 15, 12 * 15, 2 * 15, 10 * 15, 16 * 15, 8 * 15,
       14 * 15, 6 * 15
    };
    return dither[(x & 3) + ((y & 3) << 2)] < k;
 
 #else
-   const uint8_t dither[] = { 1 * 51, 3 * 51, 4 * 51, 2 * 51 };
+   static const uint8_t dither[] = { 1 * 51, 3 * 51, 4 * 51, 2 * 51 };
    return dither[(x & 1) + ((y & 1) << 1)] < k;
 
 #endif
