@@ -90,7 +90,7 @@ const char *gfx_init_opts (gfx_init_t);
 #define	gfx_background(x)
 #define gfx_width()	(0)
 #define gfx_height()	(0)
-#define gfx_bpp(	 (0)
+#define gfx_bpp()	 (0)
 #define gfx_pos_t gfx_x()
 #define gfx_pos_t gfx_y()
 #define gfx_align_t gfx_a()
