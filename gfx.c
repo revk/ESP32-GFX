@@ -2097,7 +2097,7 @@ gfx_lock (void)
    gfx_background (0);
    gfx_foreground (0xFFFFFF);
 #endif
-   gfx_pos (0, 0, GFX_L | GFX_T | GFX_V);
+   gfx_pos (gfx_width()/2, 0, GFX_C | GFX_T | GFX_V);
 }
 
 void
