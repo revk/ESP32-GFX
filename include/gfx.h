@@ -120,7 +120,7 @@ const char *gfx_init_opts (gfx_init_t);
 #define gfx_text(flags,size,fmt,...)
 #define gfx_text_size(flags,size,t,w,h)
 #define gfx_7seg(flags,size,fmt,...)
-#define gfx_7seg_size(flags,size,t,*w,*h)
+#define gfx_7seg_size(flags,size,t,w,h)
 #define gfx_run_plot (p,x,y,aa,runs,run)
 #define gfx_run_add (run,runs,max,l,r)	(0)
 
