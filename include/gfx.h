@@ -22,12 +22,12 @@ typedef uint32_t gfx_colour_t;  // Colour RGB as low three bytes
 
 // gfx_text flags
 #define	GFX_TEXT_DESCENDERS	(1<<0)  // Allow descenders
-#define	GFX_TEXT_BLOCKY		(1<<1)  // Blocky text
-#define	GFX_TEXT_DOTTY		(1<<2)  // Dotty
-#define	GFX_TEXT_CRT		(1<<3)  // LCD (use with dotty or blocky to make horizontal lines)
-#define	GFX_TEXT_LIGHT		(1<<4)  // Thin (vector) test
-#define	GFX_TEXT_FIXED		(1<<5)  // Don't do narrow special characters (full stop, colon, etc)
-#define	GFX_TEXT_ITALIC		(1<<6)  // Italic
+#define	GFX_TEXT_LIGHT		(1<<1)  // Thin (vector) test
+#define	GFX_TEXT_ITALIC		(1<<2)  // Italic
+#define	GFX_TEXT_BLOCKY		(1<<3)  // Blocky text
+#define	GFX_TEXT_DOTTY		(1<<4)  // Dotty
+#define	GFX_TEXT_CRT		(1<<5)  // LCD (use with dotty or blocky to make horizontal lines)
+#define	GFX_TEXT_FIXED		(1<<6)  // Don't do narrow special characters (full stop, colon, etc)
 
 #define	GFX_7SEG_SMALL_DOT	(1<<0)  // Small (half size) after dot
 #define	GFX_7SEG_SMALL_COLON	(1<<1)  // Small (half size) after colon
