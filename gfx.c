@@ -437,8 +437,8 @@ gfx_b (void)
    return b;
 }
 
-static gfx_colour_t
-blend (gfx_alpha_t a)
+gfx_colour_t
+gfx_blend (gfx_colour_t b,gfx_colour_t f,gfx_alpha_t a)
 {
    uint8_t fr = (f >> 16);
    uint8_t fg = (f >> 8);
@@ -879,7 +879,7 @@ gfx_pixel_fb_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a, gfx_pos_t run)
    if (f == b)
       gfx_pixel_argb_run (x, y, (a << 24) | f, run);    // Mask mode
    else
-      gfx_pixel_rgb_run (x, y, blend (a), run);
+      gfx_pixel_rgb_run (x, y, gfx_blend (f,b,a), run);
 }
 
 void
@@ -1053,7 +1053,7 @@ gfx_clear (gfx_alpha_t a)
 {                               // Mix bg and fg
    if (!gfx)
       return;
-   gfx_colour_t c = blend (a);
+   gfx_colour_t c = gfx_blend (f,b,a);
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
       gfx_pixel_rgb_run (0, y, c, gfx_width ());
 }

@@ -123,6 +123,7 @@ const char *gfx_init_opts (gfx_init_t);
 #define gfx_7seg_size(flags,size,t,w,h)	do{}while(0)
 #define gfx_run_plot (p,x,y,aa,runs,run)	do{}while(0)
 #define gfx_run_add (run,runs,max,l,r)	(0)
+#define	gfx_blend(f,b,a)	do{}while(0)
 
 #else
 
@@ -151,6 +152,7 @@ void gfx_pos (gfx_pos_t x, gfx_pos_t y, gfx_align_t);   // Set position and alig
 // Setting background and foreground the same colour only plots for alpha 255 (using foreground) - i.e. mask mode
 void gfx_foreground (gfx_colour_t);     // Set foreground - colour is a character
 void gfx_background (gfx_colour_t);     // Set background - colour is a character
+gfx_colour_t gfx_blend (gfx_colour_t b,gfx_colour_t f,gfx_alpha_t a);
 
 // State get
 uint16_t gfx_width (void);      // Display width
