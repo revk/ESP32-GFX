@@ -438,7 +438,7 @@ gfx_b (void)
 }
 
 gfx_colour_t
-gfx_blend (gfx_colour_t b,gfx_colour_t f,gfx_alpha_t a)
+gfx_blend (gfx_colour_t b, gfx_colour_t f, gfx_alpha_t a)
 {
    uint8_t fr = (f >> 16);
    uint8_t fg = (f >> 8);
@@ -879,7 +879,7 @@ gfx_pixel_fb_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a, gfx_pos_t run)
    if (f == b)
       gfx_pixel_argb_run (x, y, (a << 24) | f, run);    // Mask mode
    else
-      gfx_pixel_rgb_run (x, y, gfx_blend (f,b,a), run);
+      gfx_pixel_rgb_run (x, y, gfx_blend (b, f, a), run);
 }
 
 void
@@ -1053,7 +1053,7 @@ gfx_clear (gfx_alpha_t a)
 {                               // Mix bg and fg
    if (!gfx)
       return;
-   gfx_colour_t c = gfx_blend (f,b,a);
+   gfx_colour_t c = gfx_blend (b, g, a);
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
       gfx_pixel_rgb_run (0, y, c, gfx_width ());
 }
@@ -2097,7 +2097,7 @@ gfx_lock (void)
    gfx_background (0);
    gfx_foreground (0xFFFFFF);
 #endif
-   gfx_pos (gfx_width()/2, 0, GFX_C | GFX_T | GFX_V);
+   gfx_pos (gfx_width () / 2, 0, GFX_C | GFX_T | GFX_V);
 }
 
 void
