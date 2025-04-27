@@ -1053,7 +1053,7 @@ gfx_clear (gfx_alpha_t a)
 {                               // Mix bg and fg
    if (!gfx)
       return;
-   gfx_colour_t c = gfx_blend (b, g, a);
+   gfx_colour_t c = gfx_blend (b, f, a);
    for (gfx_pos_t y = 0; y < gfx_height (); y++)
       gfx_pixel_rgb_run (0, y, c, gfx_width ());
 }
