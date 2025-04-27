@@ -1,6 +1,5 @@
 #!/bin/csh -f
 
-make fontpack
 make 7segpack
 
 /projects/tools/bin/5x9 --style=vector96 > "include/vector96.h"
