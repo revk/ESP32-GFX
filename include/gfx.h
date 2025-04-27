@@ -114,7 +114,7 @@ const char *gfx_init_opts (gfx_init_t);
 #define gfx_line2(x1,y1,x2,y2,s)	do{}while(0)
 #define gfx_circle2 (x,y,r,s)	do{}while(0)
 #define gfx_clear(a)	do{}while(0)
-#define gfx_draw (w,h,wm,hm,xp,yp)	do{}while(0)
+#define gfx_draw(w,h,wm,hm,xp,yp)	do{}while(0)
 #define gfx_box(w,h,a)	do{}while(0)
 #define gfx_fill(w,h,a)	do{}while(0)
 #define gfx_text(flags,size,fmt,...)	do{}while(0)
