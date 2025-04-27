@@ -4,7 +4,7 @@
 extern int32_t isin (int32_t a, int32_t r);     // sin of a (degrees) scaled to r
 extern int32_t icos (int32_t a, int32_t r);     // cos of a (degrees) scaled to r
 extern int32_t icircle (int32_t y, int32_t r);  // x for circle radius r, at y from centre
-extern uint16_t isqrt(uint32_t s); 	// simple integer square root
+extern uint16_t isqrt (uint32_t s);     // simple integer square root
 
 typedef uint8_t gfx_alpha_t;    // The alpha of a pixel 0-255
 typedef int16_t gfx_pos_t;      // X/Y location of a pixel - off screen allowed (and ignored)
@@ -119,7 +119,7 @@ const char *gfx_init_opts (gfx_init_t);
 #define gfx_7seg_size(flags,size,t,w,h)	do{}while(0)
 #define gfx_run_plot (p,x,y,aa,runs,run)	do{}while(0)
 #define gfx_run_add (run,runs,max,l,r)	(0)
-#define	gfx_blend(f,b,a)	do{}while(0)
+#define	gfx_blend(f,b,a)	(0)
 
 #else
 
@@ -148,7 +148,7 @@ void gfx_pos (gfx_pos_t x, gfx_pos_t y, gfx_align_t);   // Set position and alig
 // Setting background and foreground the same colour only plots for alpha 255 (using foreground) - i.e. mask mode
 void gfx_foreground (gfx_colour_t);     // Set foreground - colour is a character
 void gfx_background (gfx_colour_t);     // Set background - colour is a character
-gfx_colour_t gfx_blend (gfx_colour_t b,gfx_colour_t f,gfx_alpha_t a);
+gfx_colour_t gfx_blend (gfx_colour_t b, gfx_colour_t f, gfx_alpha_t a);
 
 // State get
 uint16_t gfx_width (void);      // Display width
@@ -168,12 +168,12 @@ uint8_t *gfx_raw_b (void);      // Raw frame buffer
 uint8_t gfx_flip (void);        // Get effective flip
 
 // Pixel setting with colour and/or alpha
-typedef void gfx_pixel_t (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a,gfx_pos_t);
-void gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t,gfx_pos_t);
-void gfx_pixel_rgb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t,gfx_pos_t);
-void gfx_pixel_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t i,gfx_pos_t);
-void gfx_pixel_bg_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a,gfx_pos_t);
-void gfx_pixel_fb_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a,gfx_pos_t);
+typedef void gfx_pixel_t (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a, gfx_pos_t);
+void gfx_pixel_argb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t, gfx_pos_t);
+void gfx_pixel_rgb_run (gfx_pos_t x, gfx_pos_t y, gfx_colour_t, gfx_pos_t);
+void gfx_pixel_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t i, gfx_pos_t);
+void gfx_pixel_bg_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a, gfx_pos_t);
+void gfx_pixel_fb_run (gfx_pos_t x, gfx_pos_t y, gfx_alpha_t a, gfx_pos_t);
 void gfx_run_plot (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint8_t aa, uint8_t * runs, gfx_pos_t ** run);
 uint8_t gfx_run_add (gfx_pos_t * run, uint8_t runs, uint8_t max, gfx_pos_t l, gfx_pos_t r);
 
@@ -184,8 +184,8 @@ void gfx_box (gfx_pos_t w, gfx_pos_t h, gfx_alpha_t);   // draw a box, not fille
 void gfx_fill (gfx_pos_t w, gfx_pos_t h, gfx_alpha_t);  // draw a filled rectangle
 
 #define	gfx_line(x1,y1,x2,y2) gfx_line2((x1)*2,(y1)*2,(x2)*2,(y2)*2,0)
-void gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s );      // Draw a line (all in half pixel units)
-void gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s );   // Draw a circle (all in half pixel units)
+void gfx_line2 (gfx_pos_t x1, gfx_pos_t y1, gfx_pos_t x2, gfx_pos_t y2, gfx_pos_t s);   // Draw a line (all in half pixel units)
+void gfx_circle2 (gfx_pos_t x, gfx_pos_t y, gfx_pos_t r, gfx_pos_t s);  // Draw a circle (all in half pixel units)
 
 void gfx_text (uint8_t flags, uint8_t size, const char *fmt, ...);      // text, use -ve size for descenders versions
 void gfx_text_size (uint8_t flags, uint8_t size, const char *, gfx_pos_t * w, gfx_pos_t * h);
