@@ -30,6 +30,12 @@ menu "GFX"
 	config GFX_BUILD_SUFFIX_EPD29K
 		bool "Waveshare 2.9in epaper 128x296  1bpp+1bpp"
 
+	config GFX_BUILD_SUFFIX_LCD24
+		bool "Waveshare 2.4in LCD 240x320 16bpp"
+
+	config GFX_BUILD_SUFFIX_LCD2
+		bool "Waveshare 2in LCD 320x240 16bpp"
+
 	endchoice
 
 	config GFX_WIDTH
@@ -50,6 +56,12 @@ menu "GFX"
 	help
 		Enable fine tuning settings (RevK library)
 
+	config GFX_DITHER4
+	bool "Bayer4x4 dither instead of Bayer2x2 for E-Paper"
+	default y 
+	help
+		Bayer4x4 dither instead of Bayer2x2 for E-Paper
+
 	config GFX_7SEG
 	bool "Include 7 seg font"
 	default y 
@@ -61,6 +73,24 @@ menu "GFX"
 	default y 
 	help
 		Additional Unicode characters (experimental)
+
+	config GFX_DEBUG
+	bool "Debug to error level"
+	default n
+	help
+		Debug at error level
+
+	config GFX_PWR
+	int "GPIO pin for PWR"
+	default 0
+	help
+		GPIO pin for PWR (0 means not set)
+
+	config GFX_BL
+	int "GPIO pin for BL"
+	default 0
+	help
+		GPIO pin for BL (0 means not set)
 
 	config GFX_CS
 	int "GPIO pin for CS"

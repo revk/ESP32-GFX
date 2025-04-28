@@ -15,8 +15,8 @@ int debug = 0;
 int
 main (int argc, const char *argv[])
 {
-   int width = 700;
-   int height = 900;
+   int width = 840;
+   int height = 1080;
    poptContext optCon;          // context for parsing command-line options
    {                            // POPT
       const struct poptOption optionsTable[] = {
