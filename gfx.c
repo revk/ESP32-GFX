@@ -1489,7 +1489,7 @@ plot_5x9 (gfx_pixel_t * p, gfx_pos_t x, gfx_pos_t y, uint32_t u, uint16_t size, 
 
 void
 gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_pos_t * hp)
-{
+{                               // The basic 7 seg is 5x9, with one unit spacing to next is 6x9. With dots it is 7x9 including spacing to next
    if (wp)
       *wp = 0;
    if (hp)
@@ -1506,14 +1506,16 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
             char dot = (size != wsize);
             size = (wsize / 3) ? : 1;
             if (!dot)
-               w += 6 * size;
+               w += 5 * size;
             if (flags & GFX_7SEG_ITALIC)
                w += size;
             break;
          }
-         w += 6 * size;
-         if (p[1] == ':' || p[1] == '.')
+         if (w && (p[-1] != ':' && p[-1] != '.'))
             w += size;
+         w += 5 * size;
+         if (p[1] == ':' || p[1] == '.')
+            w += size*2;
          if (((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
              && isdigit ((int) (uint8_t) p[2]))
             size = (wsize / 2) ? : 1;
@@ -1523,7 +1525,7 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
    if (wp)
       *wp = w;
    if (hp)
-      *hp = 9 * size;
+      *hp = 9 * wsize;
 }
 
 void
@@ -1542,8 +1544,6 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
    if (!temp)
       return;
 
-   int fontw = 7 * size;        // pixel width of characters in font file
-
    gfx_pos_t x,
      y,
      w,
@@ -1558,7 +1558,6 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
          gfx_pixel_bg_run (ox - size, oy + y, 255, w + size * 2);       // background
 #endif
    x = ox, y = oy;
-   //x += size * 9 / 20;          // Better alignment in box
    if (y < gfx_height () && y + size * 9 >= 0)
    {
 #if	GFX_BPP <= 2
@@ -1594,9 +1593,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             char dot = (size != wsize);
             y += size * 9;
             size = (wsize / 3) ? : 1;
-            if (!dot)
-               fontw = 7 * size;        // pixel width of characters in font file
-            else
+            if (dot)
                x -= size * 6;   // over digit
             y -= wsize * 9;     // superscript
             if (flags & GFX_7SEG_ITALIC)
@@ -1613,7 +1610,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             else
                map |= 0x200;
          }
-         if (x < gfx_width () && x + (segs > 7 ? fontw : 6 * size) >= 0)
+         if (x < gfx_width () && x + (segs > 7 ? 7 : 6) * size >= 0)
          {                      // Plot digit
             uint8_t *i = pack_7seg,
                *e = pack_7seg + sizeof (pack_7seg);
@@ -1670,14 +1667,13 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
                i += 1 + (*i >> 4) * 3;
             }
          }
-         x += (segs > 7 ? fontw : 6 * size);
+         x += (segs > 7 ? 7 : 6) * size;
          if (((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
              && isdigit ((int) (uint8_t) p[2]))
          {
             y += size * 9;
             size = (wsize / 2) ? : 1;
             y -= size * 9;
-            fontw = 7 * size;   // pixel width of characters in font file
          }
       }
    }
