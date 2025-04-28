@@ -1558,7 +1558,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
          gfx_pixel_bg_run (ox - size, oy + y, 255, w + size * 2);       // background
 #endif
    x = ox, y = oy;
-   x += size * 9 / 20;          // Better alignment in box
+   //x += size * 9 / 20;          // Better alignment in box
    if (y < gfx_height () && y + size * 9 >= 0)
    {
 #if	GFX_BPP <= 2
