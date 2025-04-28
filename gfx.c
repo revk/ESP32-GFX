@@ -1515,7 +1515,7 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
             w += size;
          w += 5 * size;
          if (p[1] == ':' || p[1] == '.')
-            w += size*2;
+            w += size * 2;
          if (((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
              && isdigit ((int) (uint8_t) p[2]))
             size = (wsize / 2) ? : 1;
@@ -1591,10 +1591,12 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
          if ((flags & GFX_7SEG_SMALL_DOT) && (*p == 'C' || *p == 'F') && !p[1])
          {
             char dot = (size != wsize);
+            if (dot)
+               x -= size;
             y += size * 9;
             size = (wsize / 3) ? : 1;
             if (dot)
-               x -= size * 6;   // over digit
+               x -= size * 5;   // over digit
             y -= wsize * 9;     // superscript
             if (flags & GFX_7SEG_ITALIC)
                x += size;
