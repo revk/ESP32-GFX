@@ -120,6 +120,7 @@ const char *gfx_init_opts (gfx_init_t);
 #define gfx_run_plot(p,x,y,aa,runs,run)	do{}while(0)
 #define gfx_run_add(run,runs,max,l,r)	(0)
 #define	gfx_blend(f,b,a)	(0)
+#define gfx_text_desc(0)	(0)
 
 #else
 
