@@ -38,7 +38,8 @@ static UNUSED const char TAG[] = "GFX";
 #define	DEBUG	ESP_LOGD
 #endif
 
-#define	SPI_MAX	16384
+//#define	SPI_MAX	16384
+#define	SPI_MAX	4096
 
 #ifdef	CONFIG_GFX_BUILD_SUFFIX_GFXNONE
 const char *
