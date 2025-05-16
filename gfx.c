@@ -252,7 +252,7 @@ gfx_send_data (const void *data, uint32_t len)
       esp_err_t e = spi_device_transmit (gfx_spi, &c);
       if (e)
       {
-         ESP_LOGE (TAG, "Failed send data (%lu)", l);
+         ESP_LOGE (TAG, "Failed send data (%lu) %s", l, esp_err_to_name (e));
          return e;
       }
       len -= l;
