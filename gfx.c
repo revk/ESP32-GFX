@@ -1973,7 +1973,7 @@ gfx_init_opts (gfx_init_t o)
    if (o.bl && !GPIO_IS_VALID_OUTPUT_GPIO (o.bl))
       return "BL not output";
    gfx_settings = o;
-   extern void *mallocspi (uint32);
+   extern void *mallocspi (uint32_t);
    gfx = mallocspi (GFX_SIZE);
    if (!gfx)
       return "Malloc fail!";
