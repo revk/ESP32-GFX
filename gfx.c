@@ -1517,8 +1517,7 @@ gfx_7seg_size (uint8_t flags, int8_t size, const char *t, gfx_pos_t * wp, gfx_po
          w += 5 * size;
          if (p[1] == ':' || p[1] == '.')
             w += size * 2;
-         if (((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
-             && isdigit ((int) (uint8_t) p[2]))
+         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
             size = (wsize / 2) ? : 1;
       }
    if (flags & GFX_7SEG_ITALIC)
@@ -1671,8 +1670,7 @@ gfx_7seg (uint8_t flags, int8_t size, const char *fmt, ...)
             }
          }
          x += (segs > 7 ? 7 : 6) * size;
-         if (((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
-             && isdigit ((int) (uint8_t) p[2]))
+         if ((p[1] == '.' && (flags & GFX_7SEG_SMALL_DOT)) || (p[1] == ':' && (flags & GFX_7SEG_SMALL_COLON)))
          {
             y += size * 9;
             size = (wsize / 2) ? : 1;
