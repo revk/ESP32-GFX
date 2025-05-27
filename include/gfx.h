@@ -121,6 +121,7 @@ const char *gfx_init_opts (gfx_init_t);
 #define gfx_run_add(run,runs,max,l,r)	(0)
 #define	gfx_blend(f,b,a)	(0)
 #define gfx_text_desc(t)	(0)
+#define	gfx_message(t)		do{}while(0)
 
 #else
 
