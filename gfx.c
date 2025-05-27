@@ -2188,6 +2188,8 @@ gfx_message (const char *m)
                flags |= GFX_TEXT_DESCENDERS;
             else if (*m == '|')
                flags |= GFX_TEXT_LIGHT;
+            else if (*m == '/')
+               flags |= GFX_TEXT_ITALIC;
             else if (isdigit ((unsigned char) *m))
                s = s * 10 + *m - '0';
             else if (isalpha ((unsigned char) *m))

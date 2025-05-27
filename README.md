@@ -42,7 +42,7 @@ Provide details of current display size and attriblues
 
 #### `gfx_lock` / `gfx_unlock`
 
-Cann lock, then plot things, then unlock. Depending on the initial settings the display will be updated on unlock or on a background task (which locks while sending).
+Call lock, then plot things, then unlock. Depending on the initial settings the display will be updated on unlock or on a background task (which locks while sending).
 
 #### `gfx_foreground`/`gfx_background`
 
@@ -80,6 +80,12 @@ There are various options including italic, dotty, blocky, etc.
 #### `gfx_line`
 
 A number of extra functions exist - these are being updated and new functions added.
+
+#### `gfx_message`
+
+This is a simple generic message display, typically used with a `message` command in various apps. The argument is a string with some special cases. The message is displayed centred from the top down, as several lines where lines are broken using a `/` character.
+
+Lines can start with some characters within `[` and `]`, these include colour characters, e.g. `R` for red. A second colour character setting the background. A digit or digits sets the text size. You can also set flags for text (`_` for descenders, `|` for thin, `/` for italic).
 
 ### Some simple data tables
 
