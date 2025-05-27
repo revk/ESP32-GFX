@@ -87,6 +87,8 @@ This is a simple generic message display, typically used with a `message` comman
 
 Lines can start with some characters within `[` and `]`, these include colour characters, e.g. `R` for red. A second colour character setting the background. A digit or digits sets the text size. You can also set flags for text (`_` for descenders, `|` for thin, `/` for italic).
 
+Note: gfx_message calls gfx_lock/unlock.
+
 ### Some simple data tables
 
 - `sin256` a table of sin() for 90 degrees (0-255) giving value 0-255
